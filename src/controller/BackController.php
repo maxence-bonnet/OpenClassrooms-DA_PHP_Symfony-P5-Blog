@@ -8,23 +8,25 @@ class BackController extends Controller
 {
     private function checkLoggedIn()
     {
-        if(!$this->session->get('pseudo')) {
-            $this->session->set('need_login', 'Vous devez vous connecter pour accéder à cette page');
-            header('Location: ../public/index.php?route=login');
-        } else {
-            return true;
-        }
+        // if(!$this->session->get('pseudo')) {
+        //     $this->session->set('need_login', 'Vous devez vous connecter pour accéder à cette page');
+        //     header('Location: ../public/index.php?route=login');
+        // } else {
+        //     return true;
+        // }
+        return true;
     }
 
     private function checkAdmin()
     {
-        $this->checkLoggedIn();
-        if(!($this->session->get('role') === 'admin')) {
-            $this->session->set('not_admin', 'Vous n\'avez pas le droit d\'accéder à cette page');
-            header('Location: ../public/index.php?route=profile');
-        } else {
-            return true;
-        }
+        // $this->checkLoggedIn();
+        // if(!($this->session->get('role') === 'admin')) {
+        //     $this->session->set('not_admin', 'Vous n\'avez pas le droit d\'accéder à cette page');
+        //     header('Location: ../public/index.php?route=profile');
+        // } else {
+        //     return true;
+        // }
+        return true;
     }
 
 
@@ -43,20 +45,20 @@ class BackController extends Controller
                     'errors' => $errors
                 ]);
             }
-            return $this->view->render('add_article');
+            return $this->view->render('edit_article');
         }
     }
 
     public function editArticle(Parameter $post, $articleId)
     {
-        if($this->checkAdmin()) {
-            $article = $this->articleDAO->getArticle($articleId);
+        if($this->checkAdmin()) {           
             if ($post->get('submit')) {
                 $errors = $this->validation->validate($post, 'Article');
                 if (!$errors) {
-                    $this->articleDAO->editArticle($post, $articleId, $this->session->get('id'));
-                    $this->session->set('edit_article', 'L\' article a bien été modifié');
-                    header('Location: ../public/index.php?route=administration');
+                    $this->articleDAO->editArticle($post, $articleId, $post->get('authorId')); // à l'avenir : $this->session->get('id') plutôt que $post->get('authorId')
+                    // $this->session->set('edit_article', 'L\' article a bien été modifié');
+                    
+                    header('Location: ../public/index.php?route=article&articleId=' . $articleId);
                 }
                 return $this->view->render('edit_article', [
                     'post' => $post,
@@ -64,11 +66,16 @@ class BackController extends Controller
                 ]);
 
             }
+            $article = $this->articleDAO->getArticle($articleId);
             $post->set('id', $article->getId());
             $post->set('title', $article->getTitle());
+            $post->set('categoryId', $article->getCategoryId());
+            $post->set('categoryName', $article->getCategoryName());
+            $post->set('lede', $article->getLede());
             $post->set('content', $article->getContent());
-            $post->set('author', $article->getAuthor());
-
+            $post->set('authorPseudo', $article->getAuthorPseudo());
+            $post->set('authorId', $article->getAuthorId());
+            $post->set('statusId', $article->getstatusId());
             return $this->view->render('edit_article', [
                 'post' => $post
             ]);

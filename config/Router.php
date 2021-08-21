@@ -25,15 +25,21 @@ class Router
     public function run()
     {
         $route = $this->request->getGet()->get('route');
-        isset($_SESSION) ? var_dump($_SESSION) : '';
+        // isset($_SESSION) ? var_dump($_SESSION) : '';
         // try{            
             if(isset($route))
             {
-                if($route === 'article'){
-                    $this->frontController->article( (int) $this->request->getGet()->get('articleId'));
+                if($route === 'articles'){
+                    $this->frontController->articles();
+                } elseif($route === 'article'){
+                    $this->frontController->article((int) $this->request->getGet()->get('articleId'));
                 } elseif($route === 'addArticle'){
                     $this->backController->addArticle($this->request->getPost());
-                } else {
+                } elseif($route === 'editArticle'){
+                    $this->backController->editArticle($this->request->getPost(),$this->request->getGet()->get('articleId'));
+                } elseif($route === 'deleteArticle'){
+                    $this->backController->deleteArticle($this->request->getGet()->get('articleId'));
+                }  else {
                     $this->errorController->errorNotFound();
                 }
                 /**

@@ -4,6 +4,8 @@ namespace App\src\constraint;
 
 class Validation
 {
+    protected $constraint;
+
     public function validate($data, $name)
     {
         if($name === 'Article') {

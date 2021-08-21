@@ -20,7 +20,6 @@ class View
     public function render($template, $data = [])
     {
         $this->file = '../views/'. $template .'.html.php';
-        var_dump($this->file);
         $content  = $this->renderFile($this->file, $data);
         $view = $this->renderFile('../views/base.html.php', [
             'title' => $this->title,

@@ -6,7 +6,6 @@ use App\config\Parameter;
 class CommentValidation extends Validation
 {
     private $errors = [];
-    private $constraint;
 
     public function __construct()
     {

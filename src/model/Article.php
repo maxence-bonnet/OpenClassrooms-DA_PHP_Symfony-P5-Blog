@@ -57,9 +57,14 @@ class Article
     private $categoryName;    
 
     /**
+     * @var int
+     */
+    private $statusId;
+
+    /**
      * @var string
      */
-    private $status;
+    private $statusName;
 
     /**
      * @var boolean
@@ -120,9 +125,14 @@ class Article
     public function getCategoryName(){return $this->categoryName;}
 
     /**
+     * @return int
+     */
+    public function getstatusId(){return $this->statusId;}
+
+    /**
      * @return string
      */
-    public function getStatus(){return $this->status;}
+    public function getstatusName(){return $this->statusName;}
 
     /**
      * @return boolean
@@ -181,9 +191,14 @@ class Article
     public function setCategoryName($categoryName){$this->categoryName = $categoryName;}
 
     /**
-     * @param string $status
+     * @param int $statusId
      */
-    public function setStatus($status){$this->status = $status;}
+    public function setstatusId($statusId){$this->statusId = $statusId;}
+
+    /**
+     * @param string $statusName
+     */
+    public function setstatusName($statusName){$this->statusName = $statusName;}
 
     /**
      * @param boolean $allowComment

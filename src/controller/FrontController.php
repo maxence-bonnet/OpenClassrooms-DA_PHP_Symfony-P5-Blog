@@ -6,26 +6,33 @@ use App\config\Parameter;
 
 class FrontController extends Controller
 {
-    
+    // ok
     public function home()
     {
+        return $this->view->render('home');
+    }
+
+    // ok
+    public function articles()
+    {
         $articles = $this->articleDAO->getArticles();        
-        return $this->view->render('home', [
+        return $this->view->render('articles', [
             'articles' => $articles
         ]);
     }
 
+    // ok
     public function article(int $articleId)
     {
         $article = $this->articleDAO->getArticle($articleId);
         if($article){
             $comments = $this->commentDAO->getCommentsFromArticle($articleId);
-            return $this->view->render('single', [
+            return $this->view->render('article', [
                 'article' => $article,
                 'comments' => $comments
             ]);
         }
-        $this->session->set('unfound_article', '<p>L\'article recherché n\'existe pas</p>');
+        //$this->session->set('unfound_article', '<p>L\'article recherché n\'existe pas</p>');
         header('Location: ../public/index.php');
     }
 
@@ -47,13 +54,6 @@ class FrontController extends Controller
                 'errors' => $errors
             ]);
         }
-    }
-
-    public function flagComment($commentId)
-    {
-        $this->commentDAO->flagComment($commentId);
-        $this->session->set('flag_comment', '<p>Le commentaire a bien été signalé</p>');
-        header('Location: ../public/index.php');
     }
 
     public function register(Parameter $post)

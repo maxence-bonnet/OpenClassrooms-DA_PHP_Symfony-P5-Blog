@@ -20,7 +20,8 @@ class ArticleDAO extends DAO
         $article->setAuthorPseudo($row['author_pseudo']);
         $article->setCategoryId($row['category_id']);
         $article->setCategoryName($row['category_name']);
-        $article->setStatus($row['status_name']);
+        $article->setStatusId($row['status_id']);
+        $article->setStatusName($row['status_name']);
         $article->setAllowComment($row['allow_comment']);
         return $article;
     }
@@ -40,6 +41,7 @@ class ArticleDAO extends DAO
                 INNER JOIN article_status ON article.status_id = article_status.id
                 WHERE article.id = :article_id';
         $result = $this->createQuery($sql, [':article_id' => $articleId]);
+        $article = $result->fetch();
         $result->closeCursor();
         if($article){
             return $this->buildObject($article);

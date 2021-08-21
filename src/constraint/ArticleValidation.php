@@ -6,7 +6,7 @@ use App\config\Parameter;
 class ArticleValidation extends Validation
 {
     private $errors = [];
-    private $constraint;
+    
 
     public function __construct()
     {
@@ -27,6 +27,10 @@ class ArticleValidation extends Validation
             $error = $this->checkTitle($name, $value);
             $this->addError($name, $error);
         }
+        elseif ($name === 'lede') {
+            $error = $this->checkLede($name, $value);
+            $this->addError($name, $error);
+        }
         elseif ($name === 'content') {
             $error = $this->checkContent($name, $value);
             $this->addError($name, $error);
@@ -44,23 +48,39 @@ class ArticleValidation extends Validation
     private function checkTitle($name, $value)
     {
         if($this->constraint->notBlank($name, $value)) {
-            return $this->constraint->notBlank('titre', $value);
+            return $this->constraint->notBlank('Title', $value);
         }
         if($this->constraint->minLength($name, $value, 2)) {
-            return $this->constraint->minLength('titre', $value, 2);
+            return $this->constraint->minLength('title', $value, 2);
         }
-        if($this->constraint->maxLength($name, $value, 255)) {
-            return $this->constraint->maxLength('titre', $value, 255);
+        if($this->constraint->maxLength($name, $value, 63)) {
+            return $this->constraint->maxLength('title', $value, 63);
+        }
+    }
+
+    private function checkLede($name, $value)
+    {
+        if($this->constraint->notBlank($name, $value)) {
+            return $this->constraint->notBlank('lede', $value);
+        }
+        if($this->constraint->minLength($name, $value, 2)) {
+            return $this->constraint->minLength('lede', $value, 2);
+        }
+        if($this->constraint->maxLength($name, $value, 500)) {
+            return $this->constraint->maxLength('lede', $value, 500);
         }
     }
 
     private function checkContent($name, $value)
     {
         if($this->constraint->notBlank($name, $value)) {
-            return $this->constraint->notBlank('contenu', $value);
+            return $this->constraint->notBlank('content', $value);
         }
-        if($this->constraint->minLength($name, $value, 2)) {
-            return $this->constraint->minLength('contenu', $value, 2);
+        if($this->constraint->minLength($name, $value, 100)) {
+            return $this->constraint->minLength('content', $value, 100);
+        }
+        if($this->constraint->maxLength($name, $value, 2000)) {
+            return $this->constraint->maxLength('lede', $value, 2000);
         }
     }
 
