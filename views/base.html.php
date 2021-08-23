@@ -26,6 +26,9 @@
                         <a class="nav-link" href="../public/index.php?route=articles">Les articles</a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link" href="../public/index.php?route=addArticle">Nouvel article</a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" href="../public/uploads/CV.pdf" target="_blank">Mon CV</a>
                     </li>
                     <?php

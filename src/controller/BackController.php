@@ -36,11 +36,11 @@ class BackController extends Controller
             if ($post->get('submit')) {
                 $errors = $this->validation->validate($post, 'Article');
                 if (!$errors) {
-                    $this->articleDAO->addArticle($post, $this->session->get('id'));
-                    $this->session->set('add_article', 'Le nouvel article a bien été ajouté');
-                    header('Location: ../public/index.php?route=administration');
+                    $this->articleDAO->addArticle($post, $post->get('authorId')); // à l'avenir : $this->session->get('id') plutôt que $post->get('authorId')
+                    // $this->session->set('add_article', 'Le nouvel article a bien été ajouté');
+                    header('Location: ../public/index.php?route=articles');
                 }
-                return $this->view->render('add_article', [
+                return $this->view->render('edit_article', [
                     'post' => $post,
                     'errors' => $errors
                 ]);
@@ -49,6 +49,7 @@ class BackController extends Controller
         }
     }
 
+    // ok
     public function editArticle(Parameter $post, $articleId)
     {
         if($this->checkAdmin()) {           
@@ -82,12 +83,13 @@ class BackController extends Controller
         }
     }
 
+    // ok
     public function deleteArticle($articleId)
     {
         if($this->checkAdmin()) {
             $this->articleDAO->deleteArticle($articleId);
-            $this->session->set('delete_article', 'L\' article a bien été supprimé');
-            header('Location: ../public/index.php?route=administration');
+            // $this->session->set('delete_article', 'L\' article a bien été supprimé');
+            header('Location: ../public/index.php?route=articles');
         }
     }
 

@@ -23,6 +23,7 @@ class CommentDAO extends DAO
         return $comment;
     }
 
+    // ok
     public function getCommentsFromArticle(int $articleId) : array
     {
         $sql = 'SELECT comment.id, comment.user_id, comment.article_id, comment.created_at, comment.last_modified, comment.content, comment.validated, comment.answer_to,
@@ -44,5 +45,30 @@ class CommentDAO extends DAO
         }
         $result->closeCursor();
         return $comments;
+    }
+
+    public function getPendingComments() 
+    {
+        // For administration stuff
+    }
+
+    // ok
+    public function addComment (Parameter $post, int $articledId, int $userId)
+    {
+        $answerTo = null;
+        if($post->get('answer_to')){
+            $answerTo = $post->get('answer_to');
+        }
+        $sql ='INSERT INTO comment (user_id, article_id, created_at, last_modified, content, validated, answer_to)
+               VALUES (:user_id, :article_id, NOW(), null, :content, :validated, :answer_to)';
+        $this->createQuery($sql, [ 'user_id' => $userId,
+                                   'article_id' => $articledId,
+                                   'content' => $post->get('content'),
+                                   'validated' => "0",
+                                   'answer_to' => $answerTo]);
+    }
+
+    public function edditComment (Parameter $post, int $commentId){
+        // User will be able to update his comment (new validation required)
     }
 }

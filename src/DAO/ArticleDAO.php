@@ -7,6 +7,7 @@ use App\src\model\Article;
 
 class ArticleDAO extends DAO
 {
+
     private function buildObject($row)
     {
         $article = new Article();
@@ -102,7 +103,7 @@ class ArticleDAO extends DAO
     /**
      * Insert one new article
      */
-    public function addArticle(Parameter $post, $userId)
+    public function addArticle(Parameter $post, int $userId)
     {
         $sql = 'INSERT INTO article (created_at, last_modified, title, lede, content, author_id, category_id, status_id, allow_comment) 
                 VALUES (NOW(), null, :title, :lede, :content, :author_id, :category_id, :status_id, :allow_comment)';
@@ -142,7 +143,7 @@ class ArticleDAO extends DAO
     {
         $sql = 'DELETE FROM comment WHERE article_id = :article_id';
         $this->createQuery($sql, ['article_id' => $articleId]);
-        $sql = 'DELETE FROM article WHERE id = article_id';
+        $sql = 'DELETE FROM article WHERE id = :article_id';
         $this->createQuery($sql, ['article_id' => $articleId]);
     }
 }

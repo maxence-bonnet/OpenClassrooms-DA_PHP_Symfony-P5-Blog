@@ -26,7 +26,10 @@ class FrontController extends Controller
     {
         $article = $this->articleDAO->getArticle($articleId);
         if($article){
-            $comments = $this->commentDAO->getCommentsFromArticle($articleId);
+            $comments = "";
+            if($article->getAllowComment()) {
+                $comments = $this->commentDAO->getCommentsFromArticle($articleId);
+            }                        
             return $this->view->render('article', [
                 'article' => $article,
                 'comments' => $comments
@@ -36,24 +39,29 @@ class FrontController extends Controller
         header('Location: ../public/index.php');
     }
 
+
     public function addComment(Parameter $post, $articleId)
     {
-        if($post->get('submit')) {
-            $errors = $this->validation->validate($post, 'Comment');
-            if(!$errors) {
-                $this->commentDAO->addComment($post, $articleId);
-                $this->session->set('add_comment', '<p>Le nouveau commentaire a bien été ajouté</p>');
-                header('Location: ../public/index.php');
+        $article = $this->articleDAO->getArticle($articleId);
+        if($article->getAllowComment()){
+            if($post->get('submit')) {
+                $errors = $this->validation->validate($post, 'Comment');
+                if(!$errors) {
+                    $userId = 1; // à enlever, ici pour travaux
+                    $this->commentDAO->addComment($post, $articleId, $userId); // à l'avenir : $this->session->get('id')
+                    // $this->session->set('add_comment', '<p>Le nouveau commentaire a bien été ajouté</p>');
+                    header('Location: ../public/index.php?route=article&articleId=' . $articleId);
+                }
+                $comments = $this->commentDAO->getCommentsFromArticle($articleId);
+                return $this->view->render('article', [
+                    'article' => $article,
+                    'comments' => $comments,
+                    'post' => $post,
+                    'errors' => $errors
+                ]);
             }
-            $article = $this->articleDAO->getArticle($articleId);
-            $comments = $this->commentDAO->getCommentsFromArticle($articleId);
-            return $this->view->render('single', [
-                'article' => $article,
-                'comments' => $comments,
-                'post' => $post,
-                'errors' => $errors
-            ]);
         }
+        // header('Location: ../public/index.php?route=article&articleId=' . $articleId);
     }
 
     public function register(Parameter $post)
