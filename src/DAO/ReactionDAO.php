@@ -17,4 +17,8 @@ class ReactionDAO extends DAO
         $reaction->setCommentId($row['comment_id']);
         return $reaction;
     }
+
+    /**
+     * EN TRAVAUX
+     */
 }

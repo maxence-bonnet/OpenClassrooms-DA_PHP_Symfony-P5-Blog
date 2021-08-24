@@ -1,3 +1,4 @@
+<!-- Waiting for Twig -->
 <?php $this->title = htmlspecialchars($article->getTitle()); 
     $createdAt = new DateTime(htmlspecialchars($article->getCreatedAt()));
     $createdAt = $createdAt->format('d-m-y H:i');
@@ -10,6 +11,10 @@
 ?>
 
 <p>En construction</p>
+
+<?= $this->session->show('editedArticle'); ?>
+<?= $this->session->show('addedComment'); ?>
+
 <section class="container bg-light">
     <div class="row">
         <div class="col-12 col-lg-8 p-2 shadow-sm">
@@ -46,7 +51,8 @@
                     <div class="col-6 bg-light shadow-sm">
                         <h6><?= htmlspecialchars($comment->getUserPseudo()) . " le " . $createdAt?></h5>
                         <p><?= nl2br(htmlspecialchars($comment->getContent()))?></p>
-                    </div>
+                        <a href="../public/index.php?route=deleteComment&commentId=<?= htmlspecialchars($comment->getId()) ?>" class="btn btn-primary">Supprimer ce commentaire</a>
+                    </div>                
                 </div>
             <?php
         }

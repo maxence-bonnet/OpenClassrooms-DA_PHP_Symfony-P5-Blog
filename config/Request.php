@@ -15,7 +15,6 @@ class Request
         if(isset($_SESSION)){
         $this->session = new Session($_SESSION);
         }
-
     }
 
     /**

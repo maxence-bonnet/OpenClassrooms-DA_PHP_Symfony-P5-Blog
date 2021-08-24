@@ -21,4 +21,8 @@ class UserDAO extends DAO
         $user->setScore($row['score']);
         return $user;
     }
+
+    /**
+     * EN TRAVAUX
+     */
 }

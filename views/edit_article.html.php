@@ -1,3 +1,5 @@
+<!-- Waiting for Twig -->
+
 <?php
 
 if(isset($post) && $post->get('id')) {

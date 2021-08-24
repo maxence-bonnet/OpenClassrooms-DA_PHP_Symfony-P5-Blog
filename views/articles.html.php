@@ -1,6 +1,16 @@
+<!-- Waiting for Twig -->
 <?php $this->title = "Les Articles"; ?>
+
 <h1><?= $this->title ?></h1>
+
 <p>En construction</p>
+
+<?= $this->session->show('addedArticle'); ?>
+<?= $this->session->show('deletedArticle'); ?>
+<?= $this->session->show('unfoundArticle'); ?>
+<?= $this->session->show('deletedComment'); ?>
+
+
 <div class="row">
         <?php
         foreach($articles as $article)

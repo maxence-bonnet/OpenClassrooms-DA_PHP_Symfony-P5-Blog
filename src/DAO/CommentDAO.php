@@ -64,11 +64,20 @@ class CommentDAO extends DAO
         $this->createQuery($sql, [ 'user_id' => $userId,
                                    'article_id' => $articledId,
                                    'content' => $post->get('content'),
-                                   'validated' => "0",
+                                   'validated' => "1",
                                    'answer_to' => $answerTo]);
     }
 
-    public function edditComment (Parameter $post, int $commentId){
+    public function edditComment (Parameter $post, int $commentId)
+    {
         // User will be able to update his comment (new validation required)
+    }
+
+
+    // ok
+    public function deleteComment(int $commentId)
+    {
+        $sql = 'DELETE FROM comment WHERE id = :comment_id';
+        $this->createQuery($sql, ['comment_id' => $commentId]);
     }
 }

@@ -28,7 +28,7 @@ abstract class DAO
             die('Erreur lors de la connexion à la base de données : ' . $connectionError->getMessage());
         }
     }
-
+    
     protected function createQuery($sql, $parameters = null)
     {
         if($parameters){
