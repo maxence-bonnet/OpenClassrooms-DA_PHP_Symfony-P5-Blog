@@ -64,7 +64,6 @@ class BackController extends Controller
                     'post' => $post,
                     'errors' => $errors
                 ]);
-
             }
             $article = $this->articleDAO->getArticle($articleId);
             $post->set('id', $article->getId());
@@ -91,14 +90,50 @@ class BackController extends Controller
             header('Location: ../public/index.php?route=articles');
         }
     }
-    
+
+    // en travaux
+    public function editComment(Parameter $post, $commentId)
+    {
+        if($this->checkAdmin()) {
+            $comment = $this->commentDAO->getComment($commentId);
+            $articleId = $comment->getArticleId();          
+            $article = $this->articleDAO->getArticle($articleId);
+            $comments = $this->commentDAO->getCommentsFromArticle($articleId);
+            if ($post->get('submit')) {
+                $errors = $this->validation->validate($post, 'Comment');
+                if (!$errors) {
+                    $this->commentDAO->editComment($post, $commentId); // à l'avenir : $this->session->get('id') plutôt que $userId
+                    $this->session->set('editedComment', '<div class="alert alert-success">Le commentaire a bien été modifié</div>');                
+                    header('Location: ../public/index.php?route=article&articleId=' . $articleId);
+                    exit();
+                }
+                return $this->view->render('article', [
+                    'article' => $article,
+                    'comments' => $comments,
+                    'post' => $post,
+                    'errors' => $errors
+                ]);
+            }
+            $post->set('id', $comment->getId());
+            $post->set('content', $comment->getContent());
+            return $this->view->render('article', [
+                'article' => $article,
+                'comments' => $comments,
+                'post' => $post
+            ]);
+        }
+    }
     // ok
     public function deleteComment($commentId)
     {
         if($this->checkAdmin()) {
-            $this->commentDAO->deleteComment($commentId);
+            $comment = $this->commentDAO->getComment($commentId);
+            $articleId = $comment->getArticleId();
+            $this->commentDAO->deleteComment($commentId);       
             $this->session->set('deletedComment', '<div class="alert alert-success">Le commentaire a bien été supprimé</div>');
-            header('Location: ../public/index.php?route=articles');
+            header('Location: ../public/index.php?route=article&articleId=' . $articleId);
         }
     }
+
+    
 }

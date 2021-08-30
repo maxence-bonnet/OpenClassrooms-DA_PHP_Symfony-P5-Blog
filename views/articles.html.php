@@ -8,8 +8,6 @@
 <?= $this->session->show('addedArticle'); ?>
 <?= $this->session->show('deletedArticle'); ?>
 <?= $this->session->show('unfoundArticle'); ?>
-<?= $this->session->show('deletedComment'); ?>
-
 
 <div class="row">
         <?php

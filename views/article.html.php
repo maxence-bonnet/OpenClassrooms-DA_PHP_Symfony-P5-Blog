@@ -14,6 +14,8 @@
 
 <?= $this->session->show('editedArticle'); ?>
 <?= $this->session->show('addedComment'); ?>
+<?= $this->session->show('editedComment'); ?>
+<?= $this->session->show('deletedComment'); ?>
 
 <section class="container bg-light">
     <div class="row">
@@ -46,15 +48,21 @@
         {
             $createdAt = new DateTime(htmlspecialchars($comment->getCreatedAt()));
             $createdAt = $createdAt->format('d-m-y H:i') . " à " . $createdAt->format('H:i');
+            if($comment->getLastModified() !== null){
+                $createdAt .= " (modifié)";
+            }
             ?>
                 <div class="row mb-2">
                     <div class="col-6 bg-light shadow-sm">
-                        <h6><?= htmlspecialchars($comment->getUserPseudo()) . " le " . $createdAt?></h5>
-                        <p><?= nl2br(htmlspecialchars($comment->getContent()))?></p>
-                        <a href="../public/index.php?route=deleteComment&commentId=<?= htmlspecialchars($comment->getId()) ?>" class="btn btn-primary">Supprimer ce commentaire</a>
+                        <div class="<?= (isset($post) && ($post->get('id') === $comment->getId())) ? 'alert alert-warning' : '' ?> ">
+                            <h6><?= htmlspecialchars($comment->getUserPseudo()) . " le " . $createdAt?></h6>
+                            <p><?= nl2br(htmlspecialchars($comment->getContent()))?></p>
+                            <a href="../public/index.php?route=editComment&commentId=<?= htmlspecialchars($comment->getId()) ?>" class="btn btn-primary">Modifier ce commentaire</a>
+                            <a href="../public/index.php?route=deleteComment&commentId=<?= htmlspecialchars($comment->getId()) ?>" class="btn btn-primary">Supprimer ce commentaire</a>                                
+                        </div>
                     </div>                
                 </div>
-            <?php
+            <?php                
         }
     ?>
     <div class="row">
@@ -62,8 +70,8 @@
         if (1){ //$this->session->get('pseudo')
             ?>
                 <div class="col-6">
-                    <h4 class="text-center text-md-start">Ajouter un commentaire</h4>
-                    <form method="post" action="../public/index.php?route=addComment&articleId=<?= htmlspecialchars($article->getId()); ?>">
+                    <h4 class="text-center text-md-start"><?= isset($post) ? 'Modifier le commentaire' : 'Ajouter un commentaire' ?></h4>
+                    <form method="post" action="../public/index.php?route=<?= isset($post) ? "editComment&commentId=" . htmlspecialchars($comment->getId()) : "addComment&articleId=" . htmlspecialchars($article->getId()); ?>">
                         <div class="row">
                             <div class="col-2">
                             <h5> Maxence </h5>
@@ -71,7 +79,7 @@
                             <div class="col">
                                 <div class="mb-3">
                                     <label class="form-label" for="content">Votre commentaire :</label>
-                                    <textarea class="form-control <?= isset($errors['content']) ? "is-invalid" : ''; ?>" id="commentContent" name="content" aria-describedby="commentContentHelp" style="height: 120px" placeholder="C'est énorme j'adore !"><?= isset($post) ? htmlspecialchars($post->get('content')): ''; ?></textarea>
+                                    <textarea class="form-control <?= isset($errors['content']) ? "is-invalid" : ''; ?>" id="commentContent" name="content" aria-describedby="commentContentHelp" style="height: 120px" placeholder="C'est énorme j'adore !"><?= isset($post) ? htmlspecialchars($post->get('content')) : ''; ?></textarea>
                                     <?= isset($errors['content']) ? $errors['content'] : ''; ?>
                                     <div id="commentContentHelp" class="form-text">Ce commentaire sera soumis à relecture avant publication.<br>500 caractères maximum : 0/500</div>
                                 </div>

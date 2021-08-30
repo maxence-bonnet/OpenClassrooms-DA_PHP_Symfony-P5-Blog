@@ -43,6 +43,8 @@ class Router
                     $this->frontController->addComment($this->request->getPost(),$this->request->getGet()->get('articleId'));
                 } elseif($route === 'deleteComment'){
                     $this->backController->deleteComment($this->request->getGet()->get('commentId'));
+                } elseif($route === 'editComment'){
+                    $this->backController->editComment($this->request->getPost(),$this->request->getGet()->get('commentId'));
                 } else {
                     $this->errorController->errorNotFound();
                 }
