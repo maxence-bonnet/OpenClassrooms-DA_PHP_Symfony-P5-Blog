@@ -48,7 +48,9 @@ class Router
                 } elseif($route === 'register'){
                     $this->frontController->register($this->request->getPost());
                 } elseif($route === 'login'){
-                    $this->frontController->login($this->request->getPost());
+                    $this->backController->login($this->request->getPost());
+                } elseif($route === 'logout'){
+                    $this->backController->logout();
                 } else {
                     $this->errorController->errorNotFound();
                 }

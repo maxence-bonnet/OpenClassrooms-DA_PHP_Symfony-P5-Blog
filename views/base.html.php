@@ -33,7 +33,7 @@
                         <a class="nav-link" href="../public/uploads/CV.pdf" target="_blank">Mon CV</a>
                     </li>
                     <?php
-                   // if ($this->session->get('pseudo')) {
+                   if ($this->session->get('pseudo')) {
                         ?>
                         <li class="nav-item">
                             <a class="nav-link" href="../public/index.php?route=logout">Déconnexion</a>
@@ -41,14 +41,14 @@
                         <li class="nav-item">
                             <a class="nav-link" href="../public/index.php?route=profile">Profil</a>
                         </li>
-                        <?php //if($this->session->get('role') === 'admin') { ?>
+                        <?php if($this->session->get('role') === 'admin') { ?>
                             <li class="nav-item">
                                 <a class="nav-link" href="../public/index.php?route=administration">Administration</a>
                             </li>
-                        <?php //} ?>
+                        <?php } ?>
                         
                         <?php
-                    //} else {
+                    } else {
                         ?>
                         <li class="nav-item">
                             <a class="nav-link" href="../public/index.php?route=register">Inscription</a>
@@ -57,7 +57,7 @@
                             <a class="nav-link" href="../public/index.php?route=login">Connexion</a>
                         </li>
                         <?php
-                    //}
+                    }
                     ?>
                 </ul>
             </div>

@@ -3,7 +3,9 @@
 namespace App\src\DAO;
 
 use App\config\Parameter;
+use App\config\Session;
 use App\src\model\User;
+
 
 class UserDAO extends DAO
 {
@@ -30,7 +32,7 @@ class UserDAO extends DAO
         return $result->fetchColumn();;
     }
 
-    public function register($post)
+    public function register(Parameter $post)
     {
         $sql = 'INSERT INTO user (created_at, firstname, lastname, pseudo, password, mail, phone, role_id, status, score)
                 VALUES(NOW(), :firstname, :lastname, :pseudo, :password, :mail, :phone, :role_id, :status, :score)';
@@ -47,9 +49,33 @@ class UserDAO extends DAO
         ]);
     }
 
-    public function login($post)
+    public function login(Parameter $post)
     {
-        
+        $sql = 'SELECT user.id, user.pseudo, user.password, role.name
+                FROM user
+                INNER JOIN role ON user.role_id = role_id
+                WHERE user.pseudo = :pseudo';
+        $data = $this->createQuery($sql, ['pseudo' => $post->get('pseudo')]);
+        $result = $data->fetch();
+        $passwordValid = password_verify($post->get('password'), $result['password']);
+        if($passwordValid){
+            $sql = 'UPDATE user 
+                    SET status = 1 
+                    WHERE pseudo = :pseudo';
+            $this->createQuery($sql, ['pseudo' => $post->get('pseudo')]);
+        }
+        return [
+            'result' => $result,
+            'passwordValid' => $passwordValid
+        ];
+    }
+
+    public function logout(int $userId) : void
+    {
+        $sql ='UPDATE user
+               SET status = 0
+               WHERE id = :id';
+        $this->createQuery($sql, ['id' => $userId]);
     }
 
     /**

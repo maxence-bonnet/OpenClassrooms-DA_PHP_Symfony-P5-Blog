@@ -13,15 +13,10 @@ class FrontController extends Controller
         return $this->view->render('home');
     }
 
-    public function login(Parameter $post)
-    {
-        return $this->view->render('login');
-    }
-
     // ok
     public function register(Parameter $post)
     {
-        if($post->get('submit')) {
+        if($post->get('submit')){
             // Special error needing DAO
             if($this->userDAO->pseudoExists($post->get('pseudo'))){
                 $post->set('pseudoExists', Constraint::EXISTING_PSEUDO);       
@@ -30,7 +25,7 @@ class FrontController extends Controller
             if(!$errors){
                 $this->userDAO->register($post);
                 $this->session->set('Registered', '<div class="alert alert-success">Inscription réussie</div>');
-                header('Location: ../public/');
+                header('Location: ../public/index.php?route=login');
                 exit();
             }
             return $this->view->render('register', [

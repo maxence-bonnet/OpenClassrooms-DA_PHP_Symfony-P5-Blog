@@ -4,7 +4,7 @@
 <div class="row justify-content-md-center">
     <div class="col-6">
     <h4 class="text-center text-md-start">Formulaire d'inscription</h4>
-    <form action="#" method="post">
+    <form action="" method="post">
         <div class="mb-3">
             <label class="form-label" for="lastname">Votre nom* :</label>
             <input type="text" class="form-control <?= isset($errors['lastname']) ? "is-invalid" : ''; ?>" id="lastnameContent" name="lastname"  aria-describedby="lastnameContentHelp" placeholder="Dupont" value="<?= isset($post) ? htmlspecialchars($post->get('lastname')): ''; ?>">

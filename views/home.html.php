@@ -5,7 +5,8 @@
 
 <p>En construction</p>
 
-<?= $this->session->show('Registered'); ?>
+<?= $this->session->show('loginSuccess'); ?>
+<?= $this->session->show('logout'); ?>
 
 <h1> Maxence Bonnet</h1>
 

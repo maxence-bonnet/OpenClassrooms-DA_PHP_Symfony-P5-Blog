@@ -8,12 +8,12 @@ class BackController extends Controller
 {
     private function checkLoggedIn()
     {
-        // if(!$this->session->get('pseudo')) {
-        //     $this->session->set('need_login', 'Vous devez vous connecter pour accéder à cette page');
-        //     header('Location: ../public/index.php?route=login');
-        // } else {
-        //     return true;
-        // }
+        if(!$this->session->get('pseudo')) {
+            $this->session->set('loginNeeded', '<div class="alert alert-success">Vous devez être connecté pour accèder à cette page</div>');
+            header('Location: ../public/index.php?route=login');
+        } else {
+            return true;
+        }
         return true;
     }
 
@@ -133,6 +133,47 @@ class BackController extends Controller
             $this->session->set('deletedComment', '<div class="alert alert-success">Le commentaire a bien été supprimé</div>');
             header('Location: ../public/index.php?route=article&articleId=' . $articleId);
         }
+    }
+
+    // ok
+    public function login(Parameter $post)
+    {
+        if($post->get('submit')){
+            if($this->userDAO->pseudoExists($post->get('pseudo'))){
+                $result = $this->userDAO->login($post);
+                if($result && $result['passwordValid']) {
+                    $this->session->set('id', $result['result']['id']);
+                    $this->session->set('role', $result['result']['name']);
+                    $this->session->set('pseudo', $post->get('pseudo'));
+
+                    $this->session->set('loginSuccess', '<div class="alert alert-success"> Vous êtes connecté en tant que ' . $post->get('pseudo') . '</div>');
+
+                    header('Location: ../public/index.php');
+                    exit();
+                }
+            }
+            $this->session->set('LoginError', '<div class="alert alert-danger">Le pseudo ou mot de passe incorrect</div>');
+            return $this->view->render('login', [
+                'post'=> $post
+            ]);    
+        }
+        return $this->view->render('login');
+    }
+
+    //
+    public function logout()
+    {
+        $this->checkLoggedIn();
+
+        $this->userDAO->logout($this->session->get('id'));
+
+        $this->session->stop();
+        $this->session->start();
+
+        $this->session->set('logout', '<div class="alert alert-success">Vous êtes déconnecté, à bientôt !</div>');
+
+        header('Location: ../public/index.php');
+        exit();
     }
 
     
