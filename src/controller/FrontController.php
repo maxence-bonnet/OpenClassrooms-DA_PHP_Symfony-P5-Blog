@@ -3,6 +3,7 @@
 namespace App\src\controller;
 
 use App\config\Parameter;
+use App\src\constraint\Constraint;
 
 class FrontController extends Controller
 {
@@ -10,6 +11,29 @@ class FrontController extends Controller
     public function home()
     {
         return $this->view->render('home');
+    }
+
+    // ok
+    public function register(Parameter $post)
+    {
+        if($post->get('submit')){
+            // Special error needing DAO
+            if($this->userDAO->pseudoExists($post->get('pseudo'))){
+                $post->set('pseudoExists', Constraint::EXISTING_PSEUDO);       
+            }
+            $errors = $this->validation->validate($post, 'User');
+            if(!$errors){
+                $this->userDAO->register($post);
+                $this->session->set('Registered', '<div class="alert alert-success">Inscription réussie</div>');
+                header('Location: ../public/index.php?route=login');
+                exit();
+            }
+            return $this->view->render('register', [
+                'post' =>$post,
+                'errors' => $errors
+            ]);
+        }
+        return $this->view->render('register');
     }
 
     // ok
@@ -36,7 +60,6 @@ class FrontController extends Controller
             ]);
         }
         $this->session->set('unfoundArticle', '<div class="alert alert-success">L\'article recherché n\'existe pas</div>');
-
         header('Location: ../public/index.php?route=articles');
     }
 

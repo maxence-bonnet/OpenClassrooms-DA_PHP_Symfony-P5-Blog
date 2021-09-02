@@ -5,6 +5,9 @@
 
 <p>En construction</p>
 
+<?= $this->session->show('loginSuccess'); ?>
+<?= $this->session->show('logout'); ?>
+
 <h1> Maxence Bonnet</h1>
 
 <!-- <img src="../public/uploads/photo.jpg" alt="Ceci est une photo"> -->
@@ -41,6 +44,7 @@ Error vitae asperiores provident accusantium blanditiis non quidem, aut impedit.
             <?= isset($errors['message']) ? $errors['message'] : ''; ?>
             <div id="messageContentHelp" class="form-text">...<br>500 caractères maximum : 0/500</div>
         </div>
+        <input type="submit" class="btn btn-primary" id="submit" name="submit" value="Envoyer">
     </form>
     </div>
 </div>

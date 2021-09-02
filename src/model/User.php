@@ -7,7 +7,12 @@ class User
     /**
      * @var int        
      */
-    private $id;       
+    private $id;  
+    
+    /**
+     * @var \DateTime
+     */
+    private $createdAt;
 
     /**
      * @var string     
@@ -56,6 +61,11 @@ class User
     public function getId(){return $this->id;}
 
     /**
+     * @return \DateTime
+     */
+    public function getCreatedAt(){return $this->createdAt;}
+
+    /**
      * @return string
      */
     public function getFirstname(){return $this->firstname;}
@@ -100,6 +110,11 @@ class User
      * @param int id
      */
     public function setId($id){$this->id = $id;}
+
+    /**
+     * @param \DateTime createdAt
+     */
+    public function setCreatedAt($createdAt){$this->createdAt = $createdAt;}
 
     /**
      * @param string firstname
