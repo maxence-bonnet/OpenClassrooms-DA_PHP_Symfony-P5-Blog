@@ -7,14 +7,15 @@
 
 <?= $this->session->show('loginSuccess'); ?>
 <?= $this->session->show('logout'); ?>
+<?= $this->session->show('adminOnly'); ?>
 
 <h1> Maxence Bonnet</h1>
 
 <!-- <img src="../public/uploads/photo.jpg" alt="Ceci est une photo"> -->
 
-<h2> Ceci est un slogan </h2>
+<h2> Slogan </h2>
 
-<p> blabla </p>
+<p> [...] </p>
 
 <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Ut temporibus nam, quod molestiae ea atque suscipit consequuntur tempora itaque. Quaerat nam facere alias praesentium eveniet ex non incidunt corporis explicabo?
 Error vitae asperiores provident accusantium blanditiis non quidem, aut impedit. Molestias cumque dolorum error voluptas eos similique vitae molestiae quaerat ullam nemo ratione nulla aliquam ipsa, nesciunt modi iusto officia.</p>

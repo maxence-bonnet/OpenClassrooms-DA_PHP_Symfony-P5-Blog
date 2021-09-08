@@ -24,8 +24,8 @@
             <h5 class="text-center text-md-start"><?= htmlspecialchars($article->getAuthorPseudo()) . " le " . $createdAt . $modified ?></h5>
             <p><?= htmlspecialchars($article->getLede()) ?></p>
             <p><?= htmlspecialchars($article->getContent()) ?></p>
-            <a href="../public/index.php?route=editArticle&articleId=<?= htmlspecialchars($article->getId()) ?>" class="btn btn-primary">Modifier cet article</a>
-            <a href="../public/index.php?route=deleteArticle&articleId=<?= htmlspecialchars($article->getId()) ?>" class="btn btn-primary">Supprimer cet article</a>     
+            <!-- <a href="../public/index.php?route=editArticle&articleId=<?= htmlspecialchars($article->getId()) ?>" class="btn btn-primary">Modifier cet article</a> -->
+            <!-- <a href="../public/index.php?route=deleteArticle&articleId=<?= htmlspecialchars($article->getId()) ?>" class="btn btn-primary">Supprimer cet article</a>      -->
         </div>
         <div class="col-12 col-lg-4 p-2 px-md-5 shadow-sm">
             <h3 class="text-center text-md-start">A propos de l'auteur(e):</h3>
@@ -57,8 +57,8 @@
                         <div class="<?= (isset($post) && ($post->get('id') === $comment->getId())) ? 'alert alert-warning' : '' ?> ">
                             <h6><?= htmlspecialchars($comment->getUserPseudo()) . " le " . $createdAt?></h6>
                             <p><?= nl2br(htmlspecialchars($comment->getContent()))?></p>
-                            <a href="../public/index.php?route=editComment&commentId=<?= htmlspecialchars($comment->getId()) ?>" class="btn btn-primary">Modifier ce commentaire</a>
-                            <a href="../public/index.php?route=deleteComment&commentId=<?= htmlspecialchars($comment->getId()) ?>" class="btn btn-primary">Supprimer ce commentaire</a>                                
+                            <!-- <a href="../public/index.php?route=editComment&commentId=<?= htmlspecialchars($comment->getId()) ?>" class="btn btn-primary">Modifier ce commentaire</a> -->
+                            <!-- <a href="../public/index.php?route=deleteComment&commentId=<?= htmlspecialchars($comment->getId()) ?>" class="btn btn-primary">Supprimer ce commentaire</a>                                 -->
                         </div>
                     </div>                
                 </div>
@@ -67,7 +67,7 @@
     ?>
     <div class="row">
         <?php
-        if (1){ //$this->session->get('pseudo')
+        if ($this->session->get('pseudo')){
             ?>
                 <div class="col-6">
                     <h4 class="text-center text-md-start"><?= isset($post) ? 'Modifier le commentaire' : 'Ajouter un commentaire' ?></h4>

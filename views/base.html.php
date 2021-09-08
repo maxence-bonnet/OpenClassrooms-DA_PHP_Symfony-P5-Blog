@@ -4,13 +4,11 @@
 <head>
     <meta charset="UTF-8" />
     <link rel="stylesheet" href="../public/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../public/css/style.css">
     <title><?= $title ?></title>
 </head>
 <body>
     <header>
-        <div class="container-fluid">
-
-        </div>
         <nav class="navbar navbar-expand-md navbar-dark bg-dark">
             <div class="container-fluid">
             <a class="navbar-brand" href="#">LOGO</a>
@@ -19,7 +17,6 @@
                 </button>
                 <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav mb-2 mb-lg-0">
-
                     <li class="nav-item">
                         <a class="nav-link" href="../public">Accueil</a>
                     </li>
@@ -67,11 +64,14 @@
     <div class="container" id="content">
         <?= $content ?>
     </div>
-    <footer>
-        <div class="container-fluid">
+    <footer class="bg-light py-4 footer ">
+        <div class="container">
             <a href="#">Github</a>
             <a href="#">Linkedin</a>
             <a href="#">Twitter</a>
+            <?php if($this->session->get('role') === 'admin') { ?>
+                <a href="../public/index.php?route=administration"> Administration </a>
+            <?php } ?>
         </div>
     </footer>
     <script src="../public/js/bootstrap.min.js"></script>
