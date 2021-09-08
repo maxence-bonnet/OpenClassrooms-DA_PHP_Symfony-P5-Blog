@@ -34,10 +34,11 @@ class CommentDAO extends DAO
                 INNER JOIN user ON comment.user_id = user.id
                 WHERE article_id = :article_id
                 AND comment.validated = :validated';
-                
-        $parameters['article_id'] = $articleId;
-        $parameters['validated'] = "1"; 
-        $result = $this->createQuery($sql,$parameters);
+
+        $result = $this->createQuery($sql,[
+            'article_id' => $articleId,
+            'validated' => 1
+        ]);
         $comments = [];
         foreach ($result as $row){
             $commentId = $row['id'];
@@ -47,6 +48,7 @@ class CommentDAO extends DAO
         return $comments;
     }
 
+    // ok
     public function getComment(int $commentId)
     {
         $sql = 'SELECT comment.id, comment.user_id, comment.article_id, comment.created_at, comment.last_modified, comment.content, comment.validated, comment.answer_to,
@@ -56,7 +58,9 @@ class CommentDAO extends DAO
                 INNER JOIN article ON comment.article_id = article.id
                 INNER JOIN user ON comment.user_id = user.id
                 WHERE comment.id = :comment_id';
-        $result = $this->createQuery($sql,['comment_id' => $commentId]);
+        $result = $this->createQuery($sql,[
+            'comment_id' => $commentId
+        ]);
         $comment = $result->fetch();
         if($comment){
             $comment = $this->buildObject($comment);
@@ -65,9 +69,29 @@ class CommentDAO extends DAO
         return $comment;
     }
 
-    public function getPendingComments() 
+    public function getPendingComments(array $parameters = []) 
     {
-        // For administration stuff
+        $sql = 'SELECT comment.id, comment.user_id, comment.article_id, comment.created_at, comment.last_modified, comment.content, comment.validated, comment.answer_to,
+        user.pseudo as user_pseudo,
+        article.title as article_title
+        FROM comment
+        INNER JOIN article ON comment.article_id = article.id
+        INNER JOIN user ON comment.user_id = user.id
+        AND comment.validated = :validated';
+        if(isset($parameters['limit'])){
+            $sql .= ' LIMIT '. (int) $parameters['limit'];
+        }
+        
+        $result = $this->createQuery($sql,[
+            'validated' => 0
+        ]);
+        $comments = [];
+        foreach ($result as $row){
+            $commentId = $row['id'];
+            $comments[$commentId] = $this->buildObject($row);
+        }
+        $result->closeCursor();
+        return $comments;
     }
 
     // ok
@@ -82,16 +106,18 @@ class CommentDAO extends DAO
         $this->createQuery($sql, [ 'user_id' => $userId,
                                    'article_id' => $articledId,
                                    'content' => $post->get('content'),
-                                   'validated' => "1",
+                                   'validated' => "0",
                                    'answer_to' => $answerTo]);
     }
 
+    // ok
     public function editComment (Parameter $post, int $commentId)
     {
-        // User will be able to update his comment (new validation required)
-        $sql = 'UPDATE comment SET content = :content, last_modified = NOW() WHERE id = :comment_id';
+        $sql = 'UPDATE comment SET content = :content, last_modified = NOW(), validated = :validated WHERE id = :comment_id';
         $this->createQuery($sql,['content' => $post->get('content'),
-                                 'comment_id' => $commentId]);
+                                 'comment_id' => $commentId,
+                                 'validated' => 0
+                                ]);
     }
 
 
@@ -100,5 +126,14 @@ class CommentDAO extends DAO
     {
         $sql = 'DELETE FROM comment WHERE id = :comment_id';
         $this->createQuery($sql, ['comment_id' => $commentId]);
+    }
+
+    public function validateComment(int $commentId)
+    {
+        $sql = 'UPDATE comment SET validated = :validated WHERE id = :comment_id';
+        $this->createQuery($sql,[
+            'validated' => 1,
+            'comment_id' => $commentId
+        ]);
     }
 }

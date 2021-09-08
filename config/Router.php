@@ -43,6 +43,8 @@ class Router
                     $this->frontController->addComment($this->request->getPost(),$this->request->getGet()->get('articleId'));
                 } elseif($route === 'deleteComment'){
                     $this->backController->deleteComment($this->request->getGet()->get('commentId'));
+                } elseif($route === 'validateComment'){
+                    $this->backController->validateComment($this->request->getGet()->get('commentId'));
                 } elseif($route === 'editComment'){
                     $this->backController->editComment($this->request->getPost(),$this->request->getGet()->get('commentId'));
                 } elseif($route === 'register'){
@@ -51,6 +53,8 @@ class Router
                     $this->backController->login($this->request->getPost());
                 } elseif($route === 'logout'){
                     $this->backController->logout();
+                } elseif($route === 'administration'){
+                    $this->backController->administration();
                 } else {
                     $this->errorController->errorNotFound();
                 }

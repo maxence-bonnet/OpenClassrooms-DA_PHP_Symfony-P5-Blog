@@ -9,24 +9,22 @@ class BackController extends Controller
     private function checkLoggedIn()
     {
         if(!$this->session->get('pseudo')) {
-            $this->session->set('loginNeeded', '<div class="alert alert-success">Vous devez être connecté pour accèder à cette page</div>');
+            $this->session->set('loginNeeded', '<div class="alert alert-danger">Vous devez être connecté pour accèder à cette page</div>');
             header('Location: ../public/index.php?route=login');
         } else {
             return true;
         }
-        return true;
     }
 
     private function checkAdmin()
     {
-        // $this->checkLoggedIn();
-        // if(!($this->session->get('role') === 'admin')) {
-        //     $this->session->set('not_admin', 'Vous n\'avez pas le droit d\'accéder à cette page');
-        //     header('Location: ../public/index.php?route=profile');
-        // } else {
-        //     return true;
-        // }
-        return true;
+        $this->checkLoggedIn();
+        if(!($this->session->get('role') === 'admin')) {
+            $this->session->set('adminOnly', '<div class="alert alert-danger">Vous n\'avez pas le droit d\'accéder à cette page</div>');
+            header('Location: ../public/');
+        } else {
+            return true;
+        }
     }
 
     // ok
@@ -91,7 +89,7 @@ class BackController extends Controller
         }
     }
 
-    // en travaux
+    // ok
     public function editComment(Parameter $post, $commentId)
     {
         if($this->checkAdmin()) {
@@ -123,15 +121,42 @@ class BackController extends Controller
             ]);
         }
     }
+
     // ok
     public function deleteComment($commentId)
     {
-        if($this->checkAdmin()) {
+        if($this->checkAdmin()){
             $comment = $this->commentDAO->getComment($commentId);
             $articleId = $comment->getArticleId();
             $this->commentDAO->deleteComment($commentId);       
             $this->session->set('deletedComment', '<div class="alert alert-success">Le commentaire a bien été supprimé</div>');
             header('Location: ../public/index.php?route=article&articleId=' . $articleId);
+        }
+    }
+
+    //
+    public function validateComment($commentId)
+    {
+        if($this->checkAdmin()){
+            $comment = $this->commentDAO->getComment($commentId);
+            $this->commentDAO->validateComment($commentId);       
+            $this->session->set('validatedComment', '<div class="alert alert-success">Le commentaire a bien été validé</div>');
+            header('Location: ../public/index.php?route=administration');
+        }
+    }
+
+    // 
+    public function administration()
+    {
+        if($this->checkAdmin()){
+            $comments = $this->commentDAO->getPendingComments(['limit' => 10]);
+            $articles = $this->articleDAO->getArticles(['limit' => 10]);
+            $users = $this->userDAO->getUsers(['limit' => 10]);
+            return $this->view->render('administration', [
+                'articles' => $articles,
+                'comments' => $comments,
+                'users' => $users
+            ]);            
         }
     }
 
@@ -160,7 +185,7 @@ class BackController extends Controller
         return $this->view->render('login');
     }
 
-    //
+    // ok
     public function logout()
     {
         $this->checkLoggedIn();

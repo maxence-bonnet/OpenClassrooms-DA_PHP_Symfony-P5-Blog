@@ -54,7 +54,13 @@ class Comment
      */
     private $answerTo;
 
-
+    /**
+     * @return string
+     */
+    public function getExtract()
+    {
+        // Will return extract of comment content
+    }
 
     /**
      * @return int

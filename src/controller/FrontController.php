@@ -74,7 +74,7 @@ class FrontController extends Controller
                 if(!$errors) {
                     $userId = 1; // à enlever, ici pour travaux
                     $this->commentDAO->addComment($post, $articleId, $userId); // à l'avenir : $this->session->get('id')    
-                    $this->session->set('addedComment', '<div class="alert alert-success">Le commentaire a bien été ajouté</div>');               
+                    $this->session->set('addedComment', '<div class="alert alert-success">Le commentaire a bien été envoyé (soumis à validation avant publication)</div>');               
                     header('Location: ../public/index.php?route=article&articleId=' . $articleId);
                     exit();
                 }

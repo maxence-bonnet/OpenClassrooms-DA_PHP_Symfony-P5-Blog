@@ -13,7 +13,7 @@ class UserDAO extends DAO
     {
         $user = new User(); 
         $user->setId($row['id']);
-        $user->setScore($row['createdAt']);
+        $user->setCreatedAt($row['created_at']);
         $user->setFirstname($row['firstname']);
         $user->setLastname($row['lastname']);  
         $user->setPseudo($row['pseudo']);      
@@ -53,7 +53,7 @@ class UserDAO extends DAO
     {
         $sql = 'SELECT user.id, user.pseudo, user.password, role.name
                 FROM user
-                INNER JOIN role ON user.role_id = role_id
+                INNER JOIN role ON user.role_id = role.id
                 WHERE user.pseudo = :pseudo';
         $data = $this->createQuery($sql, ['pseudo' => $post->get('pseudo')]);
         $result = $data->fetch();
@@ -76,6 +76,21 @@ class UserDAO extends DAO
                SET status = 0
                WHERE id = :id';
         $this->createQuery($sql, ['id' => $userId]);
+    }
+
+    public function getUsers()
+    {
+        $sql = 'SELECT user.id, user.created_at, user.firstname, user.lastname, user.pseudo, user.mail, user.phone, user.status, user.score, role.name as role_name
+                FROM user
+                INNER JOIN role ON user.role_id = role.id';
+        $result = $this->createQuery($sql);
+        $users = [];
+        foreach ($result as $row){
+            $userId = $row['id'];
+            $users[$userId] = $this->buildObject($row);
+        }
+        $result->closeCursor();
+        return $users;
     }
 
     /**
