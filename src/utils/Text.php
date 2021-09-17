@@ -2,18 +2,27 @@
 
 namespace App\src\utils;
 
-use App\config\Parameter;
-
-/**
- * Text formater (e.g. excerpt text)
- */
 class Text
 {
-
-    public static function excerpt(?string $content) : ?string
+    public static function excerpt(?string $content, int $limit = 20) : ?string
     {
-        
+        if(mb_strlen($content) <= $limit){
+            return $content;
+        }
+        $lastSpace =  mb_strpos($content, ' ', $limit);
+        if(!$lastSpace){
+            $lastSpace =  mb_strpos($content, PHP_EOL , $limit);
+            if(!$lastSpace){
+                $lastSpace =  mb_strpos($content, "\t" , $limit);
+                if(!$lastSpace){
+                    $lastSpace = $limit;
+                }
+            }
+        }
+        if(mb_strlen(mb_substr($content, 0, $lastSpace)) > $limit + 10){
+            return mb_substr($content, 0, $limit + 10) . '...';
+        }
+        return mb_substr($content, 0, $lastSpace) . '...';        
     }
-
 }
 

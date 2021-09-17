@@ -13,21 +13,33 @@
         <?php
         foreach($articles as $article)
         {
-            $createdAt = new DateTime(htmlspecialchars($article->getCreatedAt()));
-            $createdAt = $createdAt->format('d-m-y H:i');
             ?>
                 <div class="col-sm-4">
-                    <div class="card my-0">
+                    <div class="card my-2">
                         <div class="card-body">
                             <h5 class="card-title"><a href="../public/index.php?route=article&articleId=<?= htmlspecialchars($article->getId()) ?>"><?= htmlspecialchars($article->getTitle()) ?></a></h5>
-                            <p class="card-text"><?= htmlspecialchars($article->getLede()) ?></p>
+                            <p class="card-text"><?= htmlspecialchars($article->getLedeExcerpt()) ?></p>
                         </div>
                         <div class="card-footer">
-                            <small class="text-muted">Créé le : <?= $createdAt ?> | Statut : <?= htmlspecialchars($article->getStatusName()) ?></small>
+                            <small class="text-muted">Créé <?= $article->getFormatedDate($article->getCreatedAt()) ?> | Statut : <?= htmlspecialchars($article->getStatusName()) ?></small>
                         </div>
                     </div>
                 </div>
             <?php
         }
         ?>
+        <div class="d-flex justify-content-between my-4">
+            <?php
+            if($page > 1){
+                ?>
+                <a href="?route=articles&page=<?= $page - 1 ?>" class="btn btn-primary"> Page précédente </a>
+                <?php
+            }
+            if($page < $pages && $pages !== 1){
+                ?>
+                <a href="?route=articles&page=<?= $page + 1 ?>" class="btn btn-primary ms-auto"> Page suivante </a>
+                <?php                
+            }
+            ?>
+        </div>
 </div>

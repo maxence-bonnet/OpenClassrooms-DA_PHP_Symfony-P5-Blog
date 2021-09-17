@@ -36,7 +36,7 @@ abstract class DAO
             $result->execute($parameters);
             return $result;
         }
-    $result = $this->checkConnection()->query($sql);
-    return $result;
+        $result = $this->checkConnection()->query($sql);
+        return $result;
     }
 }

@@ -2,7 +2,7 @@
 
 namespace App\src\model;
 
-class Article
+class Article extends Model
 {
     /**
      * @var int
@@ -72,6 +72,13 @@ class Article
     private $allowComment;
 
 
+    public function getLedeExcerpt() : ?string
+    {
+        if($this->lede === null){
+            return null;
+        }
+        return $this->getExcerpt($this->lede, 120);
+    }
 
 
     /**

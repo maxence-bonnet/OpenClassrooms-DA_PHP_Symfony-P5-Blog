@@ -24,31 +24,6 @@ class CommentDAO extends DAO
     }
 
     // ok
-    public function getCommentsFromArticle(int $articleId) : array
-    {
-        $sql = 'SELECT comment.id, comment.user_id, comment.article_id, comment.created_at, comment.last_modified, comment.content, comment.validated, comment.answer_to,
-                       user.pseudo as user_pseudo,
-                       article.title as article_title
-                FROM comment
-                INNER JOIN article ON comment.article_id = article.id
-                INNER JOIN user ON comment.user_id = user.id
-                WHERE article_id = :article_id
-                AND comment.validated = :validated';
-
-        $result = $this->createQuery($sql,[
-            'article_id' => $articleId,
-            'validated' => 1
-        ]);
-        $comments = [];
-        foreach ($result as $row){
-            $commentId = $row['id'];
-            $comments[$commentId] = $this->buildObject($row);
-        }
-        $result->closeCursor();
-        return $comments;
-    }
-
-    // ok
     public function getComment(int $commentId)
     {
         $sql = 'SELECT comment.id, comment.user_id, comment.article_id, comment.created_at, comment.last_modified, comment.content, comment.validated, comment.answer_to,
@@ -69,33 +44,8 @@ class CommentDAO extends DAO
         return $comment;
     }
 
-    public function getPendingComments(array $parameters = []) 
-    {
-        $sql = 'SELECT comment.id, comment.user_id, comment.article_id, comment.created_at, comment.last_modified, comment.content, comment.validated, comment.answer_to,
-        user.pseudo as user_pseudo,
-        article.title as article_title
-        FROM comment
-        INNER JOIN article ON comment.article_id = article.id
-        INNER JOIN user ON comment.user_id = user.id
-        AND comment.validated = :validated';
-        if(isset($parameters['limit'])){
-            $sql .= ' LIMIT '. (int) $parameters['limit'];
-        }
-        
-        $result = $this->createQuery($sql,[
-            'validated' => 0
-        ]);
-        $comments = [];
-        foreach ($result as $row){
-            $commentId = $row['id'];
-            $comments[$commentId] = $this->buildObject($row);
-        }
-        $result->closeCursor();
-        return $comments;
-    }
-
     // ok
-    public function addComment (Parameter $post, int $articledId, int $userId)
+    public function addComment (Parameter $post, int $articleId, int $userId) : void
     {
         $answerTo = null;
         if($post->get('answer_to')){
@@ -104,14 +54,14 @@ class CommentDAO extends DAO
         $sql ='INSERT INTO comment (user_id, article_id, created_at, last_modified, content, validated, answer_to)
                VALUES (:user_id, :article_id, NOW(), null, :content, :validated, :answer_to)';
         $this->createQuery($sql, [ 'user_id' => $userId,
-                                   'article_id' => $articledId,
+                                   'article_id' => $articleId,
                                    'content' => $post->get('content'),
                                    'validated' => "0",
                                    'answer_to' => $answerTo]);
     }
 
     // ok
-    public function editComment (Parameter $post, int $commentId)
+    public function editComment (Parameter $post, int $commentId) : void
     {
         $sql = 'UPDATE comment SET content = :content, last_modified = NOW(), validated = :validated WHERE id = :comment_id';
         $this->createQuery($sql,['content' => $post->get('content'),
@@ -120,20 +70,143 @@ class CommentDAO extends DAO
                                 ]);
     }
 
-
     // ok
-    public function deleteComment(int $commentId)
+    public function deleteComment(int $commentId) : void
     {
         $sql = 'DELETE FROM comment WHERE id = :comment_id';
         $this->createQuery($sql, ['comment_id' => $commentId]);
     }
 
-    public function validateComment(int $commentId)
+    // ok
+    public function updateCommentValidation(int $commentId, int $validation) : void
     {
         $sql = 'UPDATE comment SET validated = :validated WHERE id = :comment_id';
         $this->createQuery($sql,[
-            'validated' => 1,
+            'validated' => $validation,
             'comment_id' => $commentId
         ]);
+    }
+
+    // 
+    public function countComments(array $parameters = []) : int
+    {
+        $where = "WHERE";
+
+        extract($parameters);
+
+        $sql = 'SELECT COUNT(comment.id) FROM comment 
+                INNER JOIN user ON comment.user_id = user.id';
+        
+        if(isset($q)){
+            $sql .= ' ' . $where . ' comment.content LIKE "%' . $q . '%"';
+            $where = "AND";
+        }
+
+        if(isset($author)){
+            $sql .= ' ' . $where . ' user.pseudo LIKE "%' . $author . '%"';
+            $where = "AND";
+        }
+
+        if(isset($articleId)){
+            $sql .= ' ' . $where . ' comment.article_id = ' . $articleId;
+            $where = "AND";
+        }
+
+        if(isset($validated)){
+            if($validated === "validated"){
+                $validated = 1;
+            } elseif($validated === "pending"){
+                $validated = 0;
+            }
+            $sql .= ' ' . $where . ' comment.validated = ' . $validated ;
+            $where = "AND";
+        }
+
+        if(isset($beforeDatetime)){
+            $sql .= ' ' . $where . ' comment.created_at < "' . $beforeDatetime . '"' ;
+            $where = "AND";
+        }
+
+        if(isset($afterDatetime)){
+            $sql .= ' ' . $where . ' comment.created_at > "' . $afterDatetime . '"';
+            $where = "AND";
+        }
+
+        $result = $this->createQuery($sql);
+        return $result->fetch(\PDO::FETCH_NUM)[0];
+    }
+
+    // 
+    public function getComments(array $parameters = []) : array
+    {
+        $where = "WHERE";
+
+        extract($parameters);
+
+        $sql = 'SELECT comment.id, comment.user_id, comment.article_id, comment.created_at, comment.last_modified, comment.content, comment.validated, comment.answer_to,
+        user.pseudo as user_pseudo,
+        article.title as article_title
+        FROM comment
+        INNER JOIN article ON comment.article_id = article.id
+        INNER JOIN user ON comment.user_id = user.id';
+        
+        if(isset($q)){
+            $sql .= ' ' . $where . ' comment.content LIKE "%' . $q . '%"';
+            $where = "AND";
+        }
+
+        if(isset($author)){
+            $sql .= ' ' . $where . ' user.pseudo LIKE "%' . $author . '%"';
+            $where = "AND";
+        }
+
+        if(isset($articleId)){
+            $sql .= ' ' . $where . ' comment.article_id = ' . $articleId;
+            $where = "AND";
+        }
+
+        if(isset($validated)){
+            if($validated === "validated"){
+                $validated = 1;
+            } elseif($validated === "pending"){
+                $validated = 0;
+            }
+            $sql .= ' ' . $where . ' comment.validated = ' . $validated ;
+            $where = "AND";
+        }
+
+        if(isset($beforeDatetime)){
+            $sql .= ' ' . $where . ' comment.created_at < "' . $beforeDatetime . '"' ;
+            $where = "AND";
+        }
+
+        if(isset($afterDatetime)){
+            $sql .= ' ' . $where . ' comment.created_at > "' . $afterDatetime . '"';
+            $where = "AND";
+        }
+
+        if(isset($orderby)){
+            $sql .= ' ORDER BY created_at ' . $orderby;
+        } else {
+            $sql .= ' ORDER BY created_at DESC';
+        }
+        
+        if(isset($limit)){
+            $sql .= ' LIMIT ' . $limit;
+            if(isset($offset)){
+                $sql .= " OFFSET $offset";
+            }
+        }
+
+
+        
+        $result = $this->createQuery($sql);
+        $comments = [];
+        foreach ($result as $row){
+            $commentId = $row['id'];
+            $comments[$commentId] = $this->buildObject($row);
+        }
+        $result->closeCursor();
+        return $comments;
     }
 }
