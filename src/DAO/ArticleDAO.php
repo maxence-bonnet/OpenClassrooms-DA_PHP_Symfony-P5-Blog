@@ -45,24 +45,79 @@ class ArticleDAO extends DAO
         $article = $result->fetch();
         $result->closeCursor();
         if($article){
-            return $this->buildObject($article);
+            $article = $this->buildObject($article);
         }
+        return $article;
     }
+    
+    // ok
+    public function countArticles(array $parameters = []) : int
+    {
+        $where = "WHERE";
+
+        extract($parameters);
+
+
+        $sql = 'SELECT COUNT(article.id) FROM article 
+                INNER JOIN user ON article.author_id = user.id';
+
+        if(isset($q)){
+            $sql .= ' ' . $where . ' article.content LIKE "%' . $q . '%" OR article.lede LIKE "%' . $q . '%"';
+            $where = "AND";
+        }
+
+        if(isset($author)){
+            $sql .= ' ' . $where . ' user.pseudo LIKE "%' . $author . '%"';
+            $where = "AND";
+        }
+
+        if(isset($beforeDatetime)){
+            $sql .= ' ' . $where . ' article.created_at < "' . $beforeDatetime . '"' ;
+            $where = "AND";
+        }
+
+        if(isset($afterDatetime)){
+            $sql .= ' ' . $where . ' article.created_at > "' . $afterDatetime . '"';
+            $where = "AND";
+        }
+
+        if(!isset($allArticleStatus)){
+            if(isset($published) || isset($private) || isset($standby)){
+                $or = "";
+                $sql .= ' ' . $where . ' (' ;
+                if(isset($published)){
+                    $sql .= ' article.status_id = 1';
+                    $or = " OR ";
+                }
+                if(isset($private)){
+                    $sql .= $or . ' article.status_id = 2';
+                    $or = " OR ";
+                }
+                if(isset($standby)){
+                    $sql .= $or . ' article.status_id = 3';
+                }
+                $sql .= ')';
+                $where = "AND";
+            }
+        }
+
+        if(isset($categoryId)){
+            $sql .= ' ' . $where . ' article.category_id = :category_id';     
+        }
+
+        $result = $this->createQuery($sql);
+        return $result->fetch(\PDO::FETCH_NUM)[0];
+    }    
 
     /**
-     *  Returns list of articles, selection options : article statuts, order, limit, limit offset
+     *  Returns list of articles, selection options
      */
-    public function getArticles($options = null)
+    public function getArticles(array $parameters = []) : array
     {
-        $statusId = null;
-        $categoryId = null;
-        $orderby = null;
-        $limit = null;
-        $offset = null;
-        if($options){
-            extract($options);
-        }
-        $parameters = null;
+        $where = "WHERE";
+
+        extract($parameters);
+
         $sql = 'SELECT article.id, article.created_at, article.last_modified, article.title, article.lede, article.content, article.author_id, article.category_id, article.status_id, article.allow_comment,
                        user.pseudo as author_pseudo,
                        category.name as category_name,
@@ -71,26 +126,65 @@ class ArticleDAO extends DAO
                 INNER JOIN user ON article.author_id = user.id
                 LEFT OUTER JOIN category ON article.category_id = category.id
                 INNER JOIN article_status ON article.status_id = article_status.id';
-                
-        if($statusId){
-            $sql .= " WHERE article.status_id = :status_id";
-            $parameters['status_id'] = $statusId;
-            if($categoryId){
-                $sql .= " AND article.category_id = :category_id";
-                $parameters['category_id'] = $categoryId;            
+
+        if(isset($q)){
+            $sql .= ' ' . $where . ' article.content LIKE "%' . $q . '%" OR article.lede LIKE "%' . $q . '%"';
+            $where = "AND";
+        }
+
+        if(isset($author)){
+            $sql .= ' ' . $where . ' user.pseudo LIKE "%' . $author . '%"';
+            $where = "AND";
+        }
+
+        if(isset($beforeDatetime)){
+            $sql .= ' ' . $where . ' article.created_at < "' . $beforeDatetime . '"' ;
+            $where = "AND";
+        }
+
+        if(isset($afterDatetime)){
+            $sql .= ' ' . $where . ' article.created_at > "' . $afterDatetime . '"';
+            $where = "AND";
+        }
+
+        if(!isset($allArticleStatus)){
+            if(isset($published) || isset($private) || isset($standby)){
+                $or = "";
+                $sql .= ' ' . $where . ' (' ;
+                if(isset($published)){
+                    $sql .= ' article.status_id = 1';
+                    $or = " OR ";
+                }
+                if(isset($private)){
+                    $sql .= $or . ' article.status_id = 2';
+                    $or = " OR ";
+                }
+                if(isset($standby)){
+                    $sql .= $or . ' article.status_id = 3';
+                }
+                $sql .= ')';
+                $where = "AND";
             }
         }
-        if($orderby){
-            $sql .= " ORDER BY article.id $orderby";
+
+        if(isset($categoryId)){
+            $sql .= ' ' . $where . ' article.category_id = :category_id';      
         }
-        if($limit){
+
+        if(isset($orderby)){
+            $sql .= ' ORDER BY created_at ' . $orderby;
+        } else {
+            $sql .= ' ORDER BY created_at DESC';
+        }
+
+        if(isset($limit)){
             $sql .= " LIMIT $limit";
-            if($offset){
+            if(isset($offset)){
                 $sql .= " OFFSET $offset";
             }
         }
 
-        $result = $this->createQuery($sql,$parameters);
+        $result = $this->createQuery($sql);
         $articles = [];
         foreach ($result as $row){
             $articleId = $row['id'];
@@ -105,9 +199,15 @@ class ArticleDAO extends DAO
      */
     public function addArticle(Parameter $post, int $userId)
     {
+        if((int)$post->get('statusId') === 3){
+            $date = null;
+        } else {
+            $date = date('Y-m-d H:i:s');
+        }
         $sql = 'INSERT INTO article (created_at, last_modified, title, lede, content, author_id, category_id, status_id, allow_comment) 
-                VALUES (NOW(), null, :title, :lede, :content, :author_id, :category_id, :status_id, :allow_comment)';
-        $this->createQuery($sql, ['title' => $post->get('title'),
+                VALUES (:created_at, null, :title, :lede, :content, :author_id, :category_id, :status_id, :allow_comment)';
+        $this->createQuery($sql, ['created_at' => $date,
+                                  'title' => $post->get('title'),
                                   'lede' => $post->get('lede'),
                                   'content' => $post->get('content'),                                 
                                   'author_id' => $userId,
@@ -121,10 +221,18 @@ class ArticleDAO extends DAO
      */
     public function editArticle(Parameter $post, $articleId, $userId)
     {
+        if((int)$post->get('statusId') === 3){
+            $createdAt = null;
+        } else {
+            $createdAt = date('Y-m-d H:i:s');
+        }
+        $lastModified = date('Y-m-d H:i:s');
         $sql = 'UPDATE article
-        SET last_modified=NOW(), title=:title, lede=:lede, content=:content, author_id=:author_id, category_id=:category_id, status_id=:status_id, allow_comment=:allow_comment
+        SET created_at=:created_at ,last_modified=:last_modified, title=:title, lede=:lede, content=:content, author_id=:author_id, category_id=:category_id, status_id=:status_id, allow_comment=:allow_comment
         WHERE id=:article_id';
-        $this->createQuery($sql, [
+        $this->createQuery($sql,[
+            'created_at' => $createdAt,
+            'last_modified' => $lastModified,
             'title' => $post->get('title'),
             'lede' => $post->get('lede'),
             'content' => $post->get('content'),
@@ -134,6 +242,21 @@ class ArticleDAO extends DAO
             'allow_comment' => $post->get('allowComment'),
             'article_id' => $articleId
         ]);
+    }
+
+    public function updateArticleStatus(int $articleId,int $statusId, $date = null)
+    {
+        $parameters = [
+            'article_id' => $articleId,
+            'status_id' => $statusId
+        ];
+        $sql = 'UPDATE article SET status_id=:status_id';
+        if(isset($date)){
+            $sql .= ' , created_at=:created_at';
+            $parameters['created_at'] = $date ;
+        }
+        $sql .= ' WHERE id=:article_id';
+        $this->createQuery($sql,$parameters);
     }
 
     /**

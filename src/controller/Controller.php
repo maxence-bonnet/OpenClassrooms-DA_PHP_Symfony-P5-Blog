@@ -5,6 +5,7 @@ namespace App\src\controller;
 use App\src\constraint\Validation;
 use App\config\Request;
 use App\config\View;
+use App\config\HTTP;
 use App\src\DAO\ArticleDAO;
 use App\src\DAO\CategoryDAO;
 use App\src\DAO\CommentDAO;
@@ -37,5 +38,13 @@ abstract class Controller
         $this->get = $this->request->getGet();
         $this->post = $this->request->getPost();
         $this->session = $this->request->getSession();
+    }
+
+    protected function checkLoggedIn()
+    {
+        if(!$this->session->get('pseudo')) {
+            $this->session->set('loginNeeded', '<div class="alert alert-danger">Vous devez être connecté pour accèder à cette page</div>');
+            HTTP::redirect('../public/index.php?route=login');
+        }
     }
 }

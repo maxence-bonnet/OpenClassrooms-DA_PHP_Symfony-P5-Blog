@@ -2,7 +2,7 @@
 
 namespace App\src\model;
 
-class Comment
+class Comment extends Model
 {
     /**
      * @var int
@@ -54,13 +54,15 @@ class Comment
      */
     private $answerTo;
 
-    /**
-     * @return string
-     */
-    public function getExtract()
+
+    public function getExcerptContent()
     {
-        // Will return extract of comment content
+        if($this->content === null){
+            return null;
+        }
+        return $this->getExcerpt($this->content, 20);
     }
+
 
     /**
      * @return int

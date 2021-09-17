@@ -3,203 +3,486 @@
 namespace App\src\controller;
 
 use App\config\Parameter;
+use App\config\HTTP;
+use App\src\utils\URL;
 
 class BackController extends Controller
 {
-    private function checkLoggedIn()
-    {
-        if(!$this->session->get('pseudo')) {
-            $this->session->set('loginNeeded', '<div class="alert alert-danger">Vous devez être connecté pour accèder à cette page</div>');
-            header('Location: ../public/index.php?route=login');
-        } else {
-            return true;
-        }
-    }
-
+    // ok
     private function checkAdmin()
     {
         $this->checkLoggedIn();
+
         if(!($this->session->get('role') === 'admin')) {
             $this->session->set('adminOnly', '<div class="alert alert-danger">Vous n\'avez pas le droit d\'accéder à cette page</div>');
-            header('Location: ../public/');
-        } else {
-            return true;
+            HTTP::redirect('?');
         }
     }
 
+    // ARTICLES
     // ok
     public function addArticle(Parameter $post)
     {
-        if($this->checkAdmin()) {
-            if ($post->get('submit')) {
-                $errors = $this->validation->validate($post, 'Article');
-                if (!$errors) {
-                    $this->articleDAO->addArticle($post, $post->get('authorId')); // à l'avenir : $this->session->get('id') plutôt que $post->get('authorId')
-                    $this->session->set('addedArticle', '<div class="alert alert-success">Le nouvel article a bien été ajouté</div>');
-                    header('Location: ../public/index.php?route=articles');
-                }
-                return $this->view->render('edit_article', [
-                    'post' => $post,
-                    'errors' => $errors
-                ]);
+        $this->checkAdmin();
+
+        if ($post->get('submit')) {
+            $errors = $this->validation->validate($post, 'Article');
+            if (!$errors) {
+                $this->articleDAO->addArticle($post, $this->session->get('id'));
+                $this->session->set('addedArticle', '<div class="alert alert-success">Le nouvel article a bien été ajouté</div>');
+                HTTP::redirect('?route=articles');
             }
-            return $this->view->render('edit_article');
+            return $this->view->render('edit_article', [
+                'post' => $post,
+                'errors' => $errors
+            ]);
         }
+        return $this->view->render('edit_article');
     }
 
     // ok
     public function editArticle(Parameter $post, $articleId)
     {
-        if($this->checkAdmin()) {           
-            if ($post->get('submit')) {
-                $errors = $this->validation->validate($post, 'Article');
-                if (!$errors) {
-                    $this->articleDAO->editArticle($post, $articleId, $post->get('authorId')); // à l'avenir : $this->session->get('id') plutôt que $post->get('authorId')
-                    $this->session->set('editedArticle', '<div class="alert alert-success">L\'article a bien été modifié</div>');                
-                    header('Location: ../public/index.php?route=article&articleId=' . $articleId);
-                }
-                return $this->view->render('edit_article', [
-                    'post' => $post,
-                    'errors' => $errors
-                ]);
+        $this->checkAdmin();
+
+        if ($post->get('submit')) {
+            $errors = $this->validation->validate($post, 'Article');
+            if (!$errors) {
+                $this->articleDAO->editArticle($post, $articleId, $post->get('authorId')); // à l'avenir : $this->session->get('id') plutôt que $post->get('authorId')
+                $this->session->set('editedArticle', '<div class="alert alert-success">L\'article a bien été modifié</div>');   
+                HTTP::redirect('?route=article&articleId=' . $articleId);
             }
-            $article = $this->articleDAO->getArticle($articleId);
-            $post->set('id', $article->getId());
-            $post->set('title', $article->getTitle());
-            $post->set('categoryId', $article->getCategoryId());
-            $post->set('categoryName', $article->getCategoryName());
-            $post->set('lede', $article->getLede());
-            $post->set('content', $article->getContent());
-            $post->set('authorPseudo', $article->getAuthorPseudo());
-            $post->set('authorId', $article->getAuthorId());
-            $post->set('statusId', $article->getstatusId());
             return $this->view->render('edit_article', [
-                'post' => $post
+                'post' => $post,
+                'errors' => $errors
             ]);
         }
+        $article = $this->articleDAO->getArticle($articleId);
+        $post->set('id', $article->getId());
+        $post->set('title', $article->getTitle());
+        $post->set('categoryId', $article->getCategoryId());
+        $post->set('categoryName', $article->getCategoryName());
+        $post->set('lede', $article->getLede());
+        $post->set('content', $article->getContent());
+        $post->set('authorPseudo', $article->getAuthorPseudo());
+        $post->set('authorId', $article->getAuthorId());
+        $post->set('statusId', $article->getstatusId());
+        return $this->view->render('edit_article', [
+            'post' => $post
+        ]);
     }
 
+    // ok
+    public function updateArticleStatus(int $articleId,int $statusId)
+    {
+        $this->checkAdmin();
+
+        $date = null;
+        if($statusId === 1 || $statusId === 2){
+            $article = $this->articleDAO->getArticle($articleId);
+            if((int)$article->getStatusId() === 3 && $article->getCreatedAt() === null){
+                $date = date('Y-m-d H:i:s');
+            }
+        }
+        $this->articleDAO->updateArticleStatus($articleId, $statusId, $date);
+        $this->session->set('updatedArticleStatus', '<div class="alert alert-success">Le statut de l\'article a bien été mis à jour</div>');
+        HTTP::redirect('?route=adminArticles');
+    } 
+    
     // ok
     public function deleteArticle($articleId)
     {
-        if($this->checkAdmin()) {
-            $this->articleDAO->deleteArticle($articleId);
-            $this->session->set('deletedArticle', '<div class="alert alert-success">L\' article a bien été supprimé</div>');
-            header('Location: ../public/index.php?route=articles');
+        $this->checkAdmin();
+
+        $this->articleDAO->deleteArticle($articleId);
+        $this->session->set('deletedArticle', '<div class="alert alert-success">L\' article a bien été supprimé</div>');
+        HTTP::redirect('?route=articles');
+    }
+
+    // COMMENTS
+    // ok
+    public function viewSingleComment(int $commentId)
+    {
+        $this->checkAdmin();
+
+        $comment = $this->commentDAO->getComment($commentId);
+        if($comment){
+            return $this->view->render('singleComment', ['comment' => $comment]);
         }
+        $this->session->set('unfoundComment', '<div class="alert alert-danger">Le commentaire recherché n\'existe pas / plus</div>');
+        HTTp::redirect('?route=adminComments');  
     }
 
     // ok
-    public function editComment(Parameter $post, $commentId)
+    public function adminEditComment(Parameter $post, $commentId)
     {
-        if($this->checkAdmin()) {
-            $comment = $this->commentDAO->getComment($commentId);
-            $articleId = $comment->getArticleId();          
-            $article = $this->articleDAO->getArticle($articleId);
-            $comments = $this->commentDAO->getCommentsFromArticle($articleId);
-            if ($post->get('submit')) {
-                $errors = $this->validation->validate($post, 'Comment');
-                if (!$errors) {
-                    $this->commentDAO->editComment($post, $commentId); // à l'avenir : $this->session->get('id') plutôt que $userId
-                    $this->session->set('editedComment', '<div class="alert alert-success">Le commentaire a bien été modifié</div>');                
-                    header('Location: ../public/index.php?route=article&articleId=' . $articleId);
-                    exit();
-                }
-                return $this->view->render('article', [
-                    'article' => $article,
-                    'comments' => $comments,
-                    'post' => $post,
-                    'errors' => $errors
-                ]);
+        $this->checkAdmin();
+
+        $comment = $this->commentDAO->getComment($commentId);
+        $articleId = $comment->getArticleId();
+        if ($post->get('submit')) {
+            $errors = $this->validation->validate($post, 'Comment');
+            if (!$errors) {
+                $this->commentDAO->editComment($post, $commentId);
+                $this->commentDAO->validateComment($commentId);
+                $this->session->set('adminEditedComment', '<div class="alert alert-success">Le commentaire a bien été modifié et publié</div>');
+                HTTP::redirect('?route=administration');                
             }
-            $post->set('id', $comment->getId());
-            $post->set('content', $comment->getContent());
-            return $this->view->render('article', [
-                'article' => $article,
-                'comments' => $comments,
-                'post' => $post
-            ]);
+            return $this->view->render('adminEditComment', ['comment' => $comment]);
+        }   
+        $post->set('id', $comment->getId());
+        $post->set('content', $comment->getContent());
+        return $this->view->render('adminEditComment', [
+            'comment' => $comment,
+            'post' => $post
+        ]);
+    }
+
+    // ok
+    public function updateCommentValidation(int $commentId, int $validation)
+    {
+        $this->checkAdmin();
+
+        if($validation === 1 ||$validation === 0){
+            $this->commentDAO->updateCommentValidation($commentId,$validation);
+            $message = $validation ? 'validé' : 'suspendu';
+            $this->session->set('updatedCommentValidation', '<div class="alert alert-success">Le commentaire a bien été ' . $message . '</div>');            
         }
+        HTTP::redirect('?route=adminComments');
     }
 
     // ok
     public function deleteComment($commentId)
     {
-        if($this->checkAdmin()){
-            $comment = $this->commentDAO->getComment($commentId);
-            $articleId = $comment->getArticleId();
-            $this->commentDAO->deleteComment($commentId);       
-            $this->session->set('deletedComment', '<div class="alert alert-success">Le commentaire a bien été supprimé</div>');
-            header('Location: ../public/index.php?route=article&articleId=' . $articleId);
+        $this->checkAdmin();
+
+        $this->commentDAO->deleteComment($commentId);       
+        $this->session->set('deletedComment', '<div class="alert alert-success">Le commentaire a bien été supprimé</div>');
+        HTTP::redirect('?route=adminComments');
+    }
+
+    // USERS
+    public function updateUserRole(int $userId, int $roleId)
+    {
+        $this->checkAdmin();
+        $roleArray = [1,2,3,4];
+        $user = $this->userDAO->getUser($userId);
+        if($user){
+            if(((int)$user->getRoleId() !== 1) && ((int)$user->getRoleId() !== $roleId) && in_array($roleId, $roleArray)){
+                $this->userDAO->updateUserRole($userId,$roleId);
+                if($roleId === 1){
+                    $roleName = "Administrateur";
+                } elseif($roleId === 2){
+                    $roleName = "Utilisateur";
+                } elseif($roleId === 3){
+                    $roleName = "Éditeur";
+                } elseif($roleId === 4){
+                    $roleName = "Modérateur";
+                }
+                $this->session->set('updatedUserRole', '<div class="alert alert-success"> Le rôle de ' . $user->getPseudo() . ' a bien été mis à jour, nouveau rôle : ' . $roleName . '</div>');
+            }            
         }
+        HTTP::redirect('?route=adminUsers');
+    }
+
+    // GLOBAL ADMIN
+    // ok
+    public function administration()
+    {
+        $this->checkAdmin();
+
+        $comments = $this->commentDAO->getComments(['limit' => 10, 
+                                                    'validated' => "pending"]);
+        $articles = $this->articleDAO->getArticles(['limit' => 10, 'orderby' => 'DESC']);
+        $users = $this->userDAO->getUsers(['limit' => 10, 'orderby' => 'DESC']);
+        return $this->view->render('administration', [
+            'articles' => $articles,
+            'comments' => $comments,
+            'users' => $users
+        ]);
     }
 
     //
-    public function validateComment($commentId)
+    public function adminComments(Parameter $get)
     {
-        if($this->checkAdmin()){
-            $comment = $this->commentDAO->getComment($commentId);
-            $this->commentDAO->validateComment($commentId);       
-            $this->session->set('validatedComment', '<div class="alert alert-success">Le commentaire a bien été validé</div>');
-            header('Location: ../public/index.php?route=administration');
+        $this->checkAdmin();
+
+
+        $limitArray = [10,20,30,40,50,75,100];
+        $page = 1;
+        $parameters['page'] = &$page;
+        $limit = 20;
+        $parameters = [];
+        $author = null;
+        $articleId = null;
+        $afterDatetime = null;
+        $beforeDatetime = null;
+        $validated = null;
+        $previousPageUrl = null;
+        $nextPageUrl = null;
+
+        if(!empty($get->get('q'))){
+            $parameters['q'] = htmlentities($get->get('q'));
         }
-    }
 
-    // 
-    public function administration()
-    {
-        if($this->checkAdmin()){
-            $comments = $this->commentDAO->getPendingComments(['limit' => 10]);
-            $articles = $this->articleDAO->getArticles(['limit' => 10]);
-            $users = $this->userDAO->getUsers(['limit' => 10]);
-            return $this->view->render('administration', [
-                'articles' => $articles,
-                'comments' => $comments,
-                'users' => $users
-            ]);            
+        if(!empty($get->get('author'))){
+            $parameters['author'] = htmlentities($get->get('author'));
         }
-    }
 
-    // ok
-    public function login(Parameter $post)
-    {
-        if($post->get('submit')){
-            if($this->userDAO->pseudoExists($post->get('pseudo'))){
-                $result = $this->userDAO->login($post);
-                if($result && $result['passwordValid']) {
-                    $this->session->set('id', $result['result']['id']);
-                    $this->session->set('role', $result['result']['name']);
-                    $this->session->set('pseudo', $post->get('pseudo'));
+        if(!empty($get->get('articleId'))){
+            $parameters['articleId'] = (int)$get->get('articleId');
+        }
 
-                    $this->session->set('loginSuccess', '<div class="alert alert-success"> Vous êtes connecté en tant que ' . $post->get('pseudo') . '</div>');
+        if(!empty($get->get('afterDatetime'))){
+            $parameters['afterDatetime'] =  htmlentities($get->get('afterDatetime'));
+        }
 
-                    header('Location: ../public/index.php');
-                    exit();
-                }
+        if(!empty($get->get('beforeDatetime'))){
+            $parameters['beforeDatetime'] =  htmlentities($get->get('beforeDatetime'));
+        }
+
+        if(!empty($get->get('validated'))){
+            if($get->get('validated') === "validated" || $get->get('validated') === "pending"){
+                $parameters['validated'] = $get->get('validated');                
             }
-            $this->session->set('LoginError', '<div class="alert alert-danger">Le pseudo ou mot de passe incorrect</div>');
-            return $this->view->render('login', [
-                'post'=> $post
-            ]);    
         }
-        return $this->view->render('login');
+
+        if((int)$get->get('page') > 1){
+            $page = $get->get('page');
+        }
+
+        if(in_array((int)$get->get('limit'),$limitArray)){
+            $limit = $get->get('limit');
+        }
+        $parameters['limit'] = $limit;
+
+        $commentsCount = $this->commentDAO->countComments($parameters);
+
+        $pages = ceil($commentsCount/$limit);
+        if($page <= $pages && $page > 1){
+            $parameters['offset'] = $limit*($page - 1);         
+        } else {
+            $page = 1;
+            $parameters['offset'] = 0;
+        }
+
+        $comments = $this->commentDAO->getComments($parameters);
+
+        $pageCommentsCount = count($comments);
+
+        if($page > 1){
+            $previousPageUrl = URL::mergeOn($_GET, ['page' => $page - 1]);
+        }
+
+        if($page < $pages && $pages !== 1){
+            $nextPageUrl = URL::mergeOn($_GET, ['page' => $page + 1]);
+        }
+
+        $articlesList = $this->articleDAO->getArticles();
+
+        return $this->view->render('adminComments', [
+            'comments' => $comments,
+            'articlesList' => $articlesList,
+            'page' => $page,
+            'pages' => $pages,
+            'totalCommentsCount' => $commentsCount,
+            'pageCommentsCount' => $pageCommentsCount,
+            'previousPageUrl' => $previousPageUrl,
+            'nextPageUrl' => $nextPageUrl
+        ]);             
     }
 
-    // ok
-    public function logout()
+    //
+    public function adminArticles(Parameter $get)
     {
-        $this->checkLoggedIn();
+        $this->checkAdmin();
 
-        $this->userDAO->logout($this->session->get('id'));
+        $limitArray = [10,20,30,40,50];
+        $page = 1;
+        $parameters['page'] = &$page;
+        $limit = 20;
+        $parameters = [];
 
-        $this->session->stop();
-        $this->session->start();
+        if(!empty($get->get('q'))){
+            $parameters['q'] = htmlentities($get->get('q'));
+        }
 
-        $this->session->set('logout', '<div class="alert alert-success">Vous êtes déconnecté, à bientôt !</div>');
+        if(!empty($get->get('author'))){
+            $parameters['author'] = htmlentities($get->get('author'));
+        }
 
-        header('Location: ../public/index.php');
-        exit();
+        if(!empty($get->get('allArticleStatus'))){
+            $parameters['allArticleStatus'] = 1;
+        } else {
+            if(!empty($get->get('published'))){
+                $parameters['published'] = 1;
+            }
+            if(!empty($get->get('private'))){
+                $parameters['private'] = 1;
+            }
+            if(!empty($get->get('standby'))){
+                $parameters['standby'] = 1;
+            }
+        }
+
+        if(!empty($get->get('afterDatetime'))){
+            $parameters['afterDatetime'] =  htmlentities($get->get('afterDatetime'));
+        }
+
+        if(!empty($get->get('beforeDatetime'))){
+            $parameters['beforeDatetime'] =  htmlentities($get->get('beforeDatetime'));
+        }
+
+        if((int)$get->get('page') > 1){
+            $page = $get->get('page');
+        }
+
+        $articlesCount = (int) $this->articleDAO->countArticles($parameters);
+
+        if(in_array((int)$get->get('limit'),$limitArray)){
+            $limit = $get->get('limit');
+        }
+        $parameters['limit'] = $limit; 
+
+        $pages = ceil($articlesCount/$limit);
+        if($page <= $pages && $page > 1){
+            $parameters['offset'] = $limit*($page - 1);     
+        } else {
+            $page = 1;
+            $parameters['offset'] = 0;
+        }
+
+        $articles = $this->articleDAO->getArticles($parameters);
+
+        $pageArticlesCount = count($articles);
+
+        $previousPageUrl = null;
+        $nextPageUrl = null;
+
+        if($page > 1){
+            $previousPageUrl = URL::mergeOn($_GET, ['page' => $page - 1]);
+        }
+
+        if($page < $pages && $pages !== 1){
+            $nextPageUrl = URL::mergeOn($_GET, ['page' => $page + 1]);
+        }
+
+        return $this->view->render('adminArticles', [
+            'articles' => $articles,
+            'page' => $page,
+            'pages' => $pages,
+            'totalArticlesCount' => $articlesCount,
+            'pageArticlesCount' => $pageArticlesCount,
+            'previousPageUrl' => $previousPageUrl,
+            'nextPageUrl' => $nextPageUrl
+        ]);
     }
 
-    
+    //
+    public function adminUsers(Parameter $get)
+    {
+        $this->checkAdmin();
+
+        $limitArray = [10,20,30,40,50,75,100];
+        $page = 1;
+        $parameters['page'] = &$page;
+        $limit = 20;
+        $parameters = [];
+
+        if(!empty($get->get('q'))){
+            $parameters['q'] = htmlentities($get->get('q'));
+        }
+
+        if(!empty($get->get('scoreHigherThan'))){
+            $parameters['scoreHigherThan'] =  (int)$get->get('scoreHigherThan');
+        }
+
+        if(!empty($get->get('scoreLowerThan'))){
+            $parameters['scoreLowerThan'] =  (int)$get->get('scoreLowerThan');
+        }
+
+        if(!empty($get->get('allUserStatus'))){
+            $parameters['allUsersStatus'] = 1;
+        } else {
+            if(!empty($get->get('online'))){
+                $parameters['online'] = 1;
+            }
+            if(!empty($get->get('offline'))){
+                $parameters['offline'] = 1;
+            }
+            if(!empty($get->get('banned'))){
+                $parameters['banned'] = 1;
+            }
+        }
+
+        if(!empty($get->get('allUserRoles'))){
+            $parameters['allUserRoles'] = 1;
+        } else {
+            if(!empty($get->get('admin'))){
+                $parameters['admin'] = 1;
+            }
+            if(!empty($get->get('moderator'))){
+                $parameters['moderator'] = 1;
+            }
+            if(!empty($get->get('editor'))){
+                $parameters['editor'] = 1;
+            }
+            if(!empty($get->get('user'))){
+                $parameters['user'] = 1;
+            }
+        }
+
+        if(!empty($get->get('afterDatetime'))){
+            $parameters['afterDatetime'] =  htmlentities($get->get('afterDatetime'));
+        }
+
+        if(!empty($get->get('beforeDatetime'))){
+            $parameters['beforeDatetime'] =  htmlentities($get->get('beforeDatetime'));
+        }
+
+        if((int)$get->get('page') > 1){
+            $page = $get->get('page');
+        }
+
+        $usersCount = (int) $this->userDAO->countUsers($parameters);
+
+        if(in_array((int)$get->get('limit'),$limitArray)){
+            $limit = $get->get('limit');
+        }
+
+        $parameters['limit'] = $limit; 
+
+        $pages = ceil($usersCount/$limit);
+        if($page <= $pages && $page > 1){
+            $parameters['offset'] = $limit*($page - 1);     
+        } else {
+            $page = 1;
+            $parameters['offset'] = 0;
+        }
+
+        $users = $this->userDAO->getUsers($parameters);
+
+        $pageUsersCount = count($users);
+
+        $previousPageUrl = null;
+        $nextPageUrl = null;
+
+        if($page > 1){
+            $previousPageUrl = URL::mergeOn($_GET, ['page' => $page - 1]);
+        }
+
+        if($page < $pages && $pages !== 1){
+            $nextPageUrl = URL::mergeOn($_GET, ['page' => $page + 1]);
+        }
+
+        return $this->view->render('adminUsers', [
+            'users' => $users,
+            'page' => $page,
+            'pages' => $pages,
+            'totalUsersCount' => $usersCount,
+            'pageUsersCount' => $pageUsersCount,
+            'previousPageUrl' => $previousPageUrl,
+            'nextPageUrl' => $nextPageUrl
+        ]);
+    }
 }

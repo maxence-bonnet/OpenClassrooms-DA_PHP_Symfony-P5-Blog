@@ -2,7 +2,7 @@
 
 namespace App\src\model;
 
-class User
+class User extends Model
 {
     /**
      * @var int        
@@ -40,14 +40,24 @@ class User
     private $phone;
 
     /**
-     * @var string
+     * @var int
      */
-    private $role;
+    private $roleId;
 
     /**
-     * @var boolean
+     * @var string
      */
-    private $status;
+    private $roleName;
+
+    /**
+     * @var int
+     */
+    private $statusId;
+
+    /**
+     * @var string
+     */
+    private $StatusName;
 
     /**
      * @var int
@@ -91,14 +101,24 @@ class User
     public function getPhone(){return $this->phone;}
 
     /**
-     * @return string
+     * @return int
      */
-    public function getRole(){return $this->role;}
+    public function getRoleId(){return $this->roleId;}
 
     /**
-     * @return boolean
+     * @return string
      */
-    public function getStatus(){return $this->status;}
+    public function getRoleName(){return $this->roleName;}
+
+    /**
+     * @return int
+     */
+    public function getStatusId(){return $this->statusId;}
+
+    /**
+     * @return string
+     */
+    public function getStatusName(){return $this->statusName;}
 
     /**
      * @return int
@@ -142,14 +162,24 @@ class User
     public function setPhone($phone){$this->phone = $phone;}
 
     /**
-     * @param string role
+     * @param int roleId
      */
-    public function setRole($role){$this->role = $role;}
+    public function setRoleId($roleId){$this->roleId = $roleId;}
 
     /**
-     * @param boolean status
+     * @param string roleName
      */
-    public function setStatus($status){$this->status = $status;}
+    public function setRoleName($roleName){$this->roleName = $roleName;}
+
+    /**
+     * @param int statusId
+     */
+    public function setStatusId($statusId){$this->statusId = $statusId;}
+
+    /**
+     * @param string statusName
+     */
+    public function setStatusName($statusName){$this->statusName = $statusName;}
 
     /**
      * @param int score

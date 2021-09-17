@@ -6,7 +6,7 @@ if(isset($post) && $post->get('id')) {
     $new = false;
     $statusId = htmlspecialchars($post->get('statusId'));
     $editTitle = "Modification de l'article : " . htmlspecialchars($post->get('title'));
-    $this->title = "Modif :" . htmlspecialchars($post->get('title'));
+    $this->title = "Modif : " . htmlspecialchars($post->get('title'));
     $route = 'editArticle&articleId=' . $post->get('id');
     $submit = 'Mettre à jour';
 } else {

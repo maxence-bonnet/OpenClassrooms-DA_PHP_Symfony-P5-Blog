@@ -12,9 +12,7 @@ class Request
     {
         $this->get = new Parameter($_GET);
         $this->post = new Parameter($_POST);
-        if(isset($_SESSION)){
         $this->session = new Session($_SESSION);
-        }
     }
 
     /**

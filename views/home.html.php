@@ -7,6 +7,7 @@
 
 <?= $this->session->show('loginSuccess'); ?>
 <?= $this->session->show('logout'); ?>
+<?= $this->session->show('alreadyLoggedIn'); ?>
 <?= $this->session->show('adminOnly'); ?>
 
 <h1> Maxence Bonnet</h1>
@@ -16,6 +17,10 @@
 <h2> Slogan </h2>
 
 <p> [...] </p>
+
+<p>
+    <a class="nav-link" href="../public/uploads/CV.pdf" target="_blank">Mon CV</a>
+</p>
 
 <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Ut temporibus nam, quod molestiae ea atque suscipit consequuntur tempora itaque. Quaerat nam facere alias praesentium eveniet ex non incidunt corporis explicabo?
 Error vitae asperiores provident accusantium blanditiis non quidem, aut impedit. Molestias cumque dolorum error voluptas eos similique vitae molestiae quaerat ullam nemo ratione nulla aliquam ipsa, nesciunt modi iusto officia.</p>
