@@ -4,7 +4,7 @@
 
 <div class="col-6">
     <h4 class="text-center text-md-start">Modifier le commentaire</h4>
-    <form method="post" action="../public/index.php?route=adminEditComment&commentId=<?= htmlspecialchars($comment->getId()) ?>">
+    <form method="post" action="?route=adminEditComment&commentId=<?= htmlspecialchars($comment->getId()) ?>">
         <div class="row">
             <div class="col-2">
             </div>

@@ -32,7 +32,7 @@ class Router
                 } elseif($route === 'articles'){
                     $this->frontController->articles($this->request->getGet());
                 } elseif($route === 'article'){
-                    $this->frontController->article((int) $this->request->getGet()->get('articleId'));
+                    $this->frontController->article($this->request->getGet());
                 } elseif($route === 'addArticle'){
                     $this->backController->addArticle($this->request->getPost());
                 } elseif($route === 'editArticle'){

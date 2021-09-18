@@ -112,20 +112,21 @@ class FrontController extends Controller
     }
 
     // ok
-    public function article(int $articleId)
+    public function article(Parameter $get)
     {
-        $article = $this->articleDAO->getArticle($articleId);
+        $article = $this->articleDAO->getArticle((int)$get->get('articleId'));
         if($article){
-            $comments = "";
+            $comments = [];
             if($article->getAllowComment()) {
                 $comments = $this->commentDAO->getComments([
-                    'articleId' => $articleId,
+                    'articleId' => (int)$get->get('articleId'),
                     'validated' => "validated"
                 ]);
             }                        
             return $this->view->render('article', [
                 'article' => $article,
-                'comments' => $comments
+                'comments' => $comments,
+                'answerTo' => $get->get('answerTo')
             ]);
         }
         $this->session->set('unfoundArticle', '<div class="alert alert-danger">L\'article recherché n\'existe pas</div>');
@@ -142,9 +143,23 @@ class FrontController extends Controller
             if($post->get('submit')) {
                 $errors = $this->validation->validate($post, 'Comment');
                 if(!$errors) {
-                    $userId = $this->session->get('id');
-                    $this->commentDAO->addComment($post, $articleId, $userId);   
-                    $this->session->set('addedComment', '<div class="alert alert-success">Le commentaire a bien été envoyé (soumis à validation avant publication)</div>');
+                    $parameters['userId'] = $this->session->get('id');
+                    $parameters['articleId'] = $articleId;
+                    $parameters['content'] = htmlspecialchars($post->get('content'));
+
+                    if($post->get('answerTo')){
+                        $parameters['answerTo'] = (int)$post->get('answerTo');
+                    }
+
+                    if($this->session->get('role') === "admin" || $this->session->get('role') === "moderator"){
+                        $parameters['validated'] = 1;
+                        $this->session->set('addedComment', '<div class="alert alert-success">Le commentaire a bien été publié</div>');
+                    } else {
+                        $parameters['validated'] = 0;
+                        $this->session->set('addedComment', '<div class="alert alert-success">Le commentaire a bien été envoyé (soumis à validation avant publication)</div>');
+                    }
+
+                    $this->commentDAO->addComment($parameters);
                     HTTP::redirect('?route=article&articleId=' . $articleId);
                 }
                 $comments = $this->commentDAO->getComments([
@@ -179,7 +194,7 @@ class FrontController extends Controller
         if($post->get('submit')){
             $errors = $this->validation->validate($post, 'Comment');
             if (!$errors){
-                if($this->session->get('role') !== "admin" || $this->session->get('role') !== "moderator"){
+                if($this->session->get('role') === "admin" || $this->session->get('role') === "moderator"){
                     $validated = 1;
                     $this->session->set('editedComment', '<div class="alert alert-success">Le commentaire a bien été modifié</div>');
                 } else {

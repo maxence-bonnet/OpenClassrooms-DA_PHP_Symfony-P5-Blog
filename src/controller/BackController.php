@@ -123,8 +123,8 @@ class BackController extends Controller
         if ($post->get('submit')) {
             $errors = $this->validation->validate($post, 'Comment');
             if (!$errors) {
-                $this->commentDAO->editComment($post, $commentId);
-                $this->commentDAO->validateComment($commentId);
+                $validated = 1;
+                $this->commentDAO->editComment($post, $commentId, $validated);
                 $this->session->set('adminEditedComment', '<div class="alert alert-success">Le commentaire a bien été modifié et publié</div>');
                 HTTP::redirect('?route=administration');                
             }
@@ -152,12 +152,16 @@ class BackController extends Controller
     }
 
     // ok
-    public function deleteComment($commentId)
+    public function deleteComment(int $commentId)
     {
         $this->checkAdmin();
 
-        $this->commentDAO->deleteComment($commentId);       
-        $this->session->set('deletedComment', '<div class="alert alert-success">Le commentaire a bien été supprimé</div>');
+        if($this->commentDAO->getComment($commentId)){
+            $this->commentDAO->deleteComment($commentId);
+            $this->session->set('deletedComment', '<div class="alert alert-success">Le commentaire a bien été supprimé</div>');
+        } else {
+            $this->session->set('unfoundComment', '<div class="alert alert-danger">Le commentaire à supprimer n\'existe pas / plus</div>');
+        }
         HTTP::redirect('?route=adminComments');
     }
 
@@ -191,10 +195,19 @@ class BackController extends Controller
     {
         $this->checkAdmin();
 
-        $comments = $this->commentDAO->getComments(['limit' => 10, 
-                                                    'validated' => "pending"]);
-        $articles = $this->articleDAO->getArticles(['limit' => 10, 'orderby' => 'DESC']);
-        $users = $this->userDAO->getUsers(['limit' => 10, 'orderby' => 'DESC']);
+        $comments = $this->commentDAO->getComments([
+            'limit' => 10,
+            'validated' => "pending",
+            'orderby' => 'DESC'
+        ]);
+        $articles = $this->articleDAO->getArticles([
+            'limit' => 10,
+            'orderby' => 'DESC'
+        ]);
+        $users = $this->userDAO->getUsers([
+            'limit' => 10,
+            'orderby' => 'DESC'
+        ]);
         return $this->view->render('administration', [
             'articles' => $articles,
             'comments' => $comments,
@@ -213,6 +226,8 @@ class BackController extends Controller
         $parameters['page'] = &$page;
         $limit = 20;
         $parameters = [];
+        // En attendant mieux
+        $parameters['orderby'] = 'DESC';
         $author = null;
         $articleId = null;
         $afterDatetime = null;
