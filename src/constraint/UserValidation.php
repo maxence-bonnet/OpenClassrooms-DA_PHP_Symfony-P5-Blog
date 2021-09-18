@@ -132,7 +132,7 @@ class UserValidation extends Validation
     public function checkMail($name, $value)
     {
         if($this->constraint->isMail($name, $value)) {
-            return $this->constraint->notBlank('Mail', $value);
+            return $this->constraint->isMail('Mail', $value);
         }
     }
 

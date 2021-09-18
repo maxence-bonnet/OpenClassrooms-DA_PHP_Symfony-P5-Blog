@@ -38,11 +38,11 @@
         </div>
         <div class="mb-3">
             <label class="form-label" for="mail">Votre email* :</label>
-            <input type="mail" class="form-control <?= isset($errors['mail']) ? "is-invalid" : ''; ?>" id="mailContent" name="mail" aria-describedby="mailContentHelp" placeholder="exemple@monmail.com" value="<?= isset($post) ? htmlspecialchars($post->get('mail')): ''; ?>">
+            <input type="email" class="form-control <?= isset($errors['mail']) ? "is-invalid" : ''; ?>" id="mailContent" name="mail" aria-describedby="mailContentHelp" placeholder="exemple@monmail.com" value="<?= isset($post) ? htmlspecialchars($post->get('mail')): ''; ?>">
             <?= isset($errors['mail']) ? $errors['mail'] : ''; ?>
         </div>
         <div class="mb-3">
-            <label class="form-label" for="phone">Votre numéro de téléphone* :</label>
+            <label class="form-label" for="phone">Votre numéro de téléphone :</label>
             <input type="phone" class="form-control <?= isset($errors['phone']) ? "is-invalid" : ''; ?>" id="phoneContent" name="phone" aria-describedby="phoneContentHelp" placeholder="0612345678" value="<?= isset($post) ? htmlspecialchars($post->get('phone')): ''; ?>" maxlength="10">
             <?= isset($errors['phone']) ? $errors['phone'] : ''; ?>
             <div id="phoneContentHelp" class="form-text">format 06.12.34.56.78</div>
