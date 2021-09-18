@@ -84,7 +84,7 @@
                     <?php foreach($comments as $comment) : ?>
                         <tr>
                             <td>
-                                <a href="../public/index.php?route=profile&userId=<?= htmlspecialchars($comment->getUserId()) ?>"><?= htmlspecialchars($comment->getUserPseudo()) ?></a>
+                                <a href="../public/index.php?route=profile&userId=<?= (int)$comment->getUserId() ?>"><?= htmlspecialchars($comment->getUserPseudo()) ?></a>
                             </td>
                             <td>
                                 <?= htmlspecialchars($comment->getExcerptContent()) ?>
@@ -93,18 +93,18 @@
                                 <?= $comment->getFormatedDate($comment->getCreatedAt()) ?>
                             </td>
                             <td>
-                                <a href="../public/index.php?route=article&articleId=<?= htmlspecialchars($comment->getArticleId()) ?>"><?= htmlspecialchars($comment->getArticleTitle()) ?> </a> 
+                                <a href="../public/index.php?route=article&articleId=<?= (int)$comment->getArticleId() ?>"><?= htmlspecialchars($comment->getArticleTitle()) ?> </a> 
                             </td>
                             <td>
-                                <a href="../public/index.php?route=viewSingleComment&commentId=<?= htmlspecialchars($comment->getId()) ?>"> Voir </a>
+                                <a href="../public/index.php?route=viewSingleComment&commentId=<?= (int)$comment->getId() ?>"> Voir </a>
                                 <?php if(!$comment->getValidated()) : ?>
-                                    | <a href="?route=updateCommentValidation&commentId=<?= htmlspecialchars($comment->getId()) ?>&validation=1"> Valider </a>
+                                    | <a href="?route=updateCommentValidation&commentId=<?= (int)$comment->getId() ?>&validation=1"> Valider </a>
                                 <?php else : ?>
-                                    | <a href="?route=updateCommentValidation&commentId=<?= htmlspecialchars($comment->getId()) ?>&validation=0"> Suspendre </a>
+                                    | <a href="?route=updateCommentValidation&commentId=<?= (int)$comment->getId() ?>&validation=0"> Suspendre </a>
                                 <?php endif ?>                         
                             </td>
                             <td>
-                                <a href="../public/index.php?route=deleteComment&commentId=<?= htmlspecialchars($comment->getId()) ?>"> Supprimer </a>
+                                <a href="../public/index.php?route=deleteComment&commentId=<?= (int)$comment->getId() ?>"> Supprimer </a>
                             </td>
                         </tr>
                     <?php endforeach ?>
