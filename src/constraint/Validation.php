@@ -28,6 +28,10 @@ class Validation
             $userValidation = new UserValidation();
             $errors = $userValidation->check($data);
             return $errors;
+        } elseif ($name === 'ContactForm') {
+            $contactFormValidation = new ContactFormValidation();
+            $errors = $contactFormValidation->check($data);
+            return $errors;
         }
     }
 

@@ -11,6 +11,7 @@ use App\src\DAO\CategoryDAO;
 use App\src\DAO\CommentDAO;
 use App\src\DAO\ReactionDAO;
 use App\src\DAO\UserDAO;
+use App\src\model\Mailer;
 
 
 abstract class Controller
@@ -20,6 +21,7 @@ abstract class Controller
     protected $userDAO;
     protected $view;
     private $request;
+    protected $mailer;
     protected $get;
     protected $post;
     protected $session;
@@ -35,6 +37,7 @@ abstract class Controller
         $this->view = new View();
         $this->validation = new Validation();
         $this->request = new Request();
+        $this->mailer = new Mailer();
         $this->get = $this->request->getGet();
         $this->post = $this->request->getPost();
         $this->session = $this->request->getSession();
@@ -44,7 +47,7 @@ abstract class Controller
     {
         if(!$this->session->get('pseudo')) {
             $this->session->set('loginNeeded', '<div class="alert alert-danger">Vous devez être connecté pour accèder à cette page</div>');
-            HTTP::redirect('../public/index.php?route=login');
+            HTTP::redirect('?route=login');
         }
     }
 }

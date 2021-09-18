@@ -27,14 +27,16 @@ class Router
         $route = $this->request->getGet()->get('route');
         try{            
             if(isset($route)){
-                if($route === 'articles'){
+                if($route === 'home'){
+                    $this->frontController->home($this->request->getPost());
+                } elseif($route === 'articles'){
                     $this->frontController->articles($this->request->getGet());
                 } elseif($route === 'article'){
                     $this->frontController->article((int) $this->request->getGet()->get('articleId'));
                 } elseif($route === 'addArticle'){
                     $this->backController->addArticle($this->request->getPost());
                 } elseif($route === 'editArticle'){
-                    $this->backController->editArticle((int)$this->request->getPost(),$this->request->getGet()->get('articleId'));
+                    $this->backController->editArticle($this->request->getPost(),(int)$this->request->getGet()->get('articleId'));
                 } elseif($route === 'updateArticleStatus'){
                     $this->backController->updateArticleStatus((int)$this->request->getGet()->get('articleId'),(int)$this->request->getGet()->get('statusId'));
                 } elseif($route === 'deleteArticle'){
@@ -70,9 +72,6 @@ class Router
                 } else {
                     $this->errorController->errorNotFound();
                 }
-                /**
-                 * EN TRAVAUX
-                 */
             } else {
                 $this->frontController->home($this->request->getPost());
             }

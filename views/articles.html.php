@@ -32,12 +32,12 @@
             <?php
             if($page > 1){
                 ?>
-                <a href="?route=articles&page=<?= $page - 1 ?>" class="btn btn-primary"> Page précédente </a>
+                <a href="?route=articles&page=<?= $page - 1 ?>" class="btn btn-primary">&#10094; Page précédente </a>
                 <?php
             }
             if($page < $pages && $pages !== 1){
                 ?>
-                <a href="?route=articles&page=<?= $page + 1 ?>" class="btn btn-primary ms-auto"> Page suivante </a>
+                <a href="?route=articles&page=<?= $page + 1 ?>" class="btn btn-primary ms-auto"> Page suivante &#10095;</a>
                 <?php                
             }
             ?>

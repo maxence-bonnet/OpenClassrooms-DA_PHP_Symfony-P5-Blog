@@ -24,5 +24,9 @@ class Text
         }
         return mb_substr($content, 0, $lastSpace) . '...';        
     }
-}
 
+    public static function formatMailMessage(string $message) : string
+    {
+        return str_replace("\n.", "\n..", wordwrap(nl2br(htmlspecialchars($message)), 70, "\r\n"));
+    }
+}
