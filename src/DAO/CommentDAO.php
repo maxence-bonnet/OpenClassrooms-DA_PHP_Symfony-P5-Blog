@@ -61,12 +61,12 @@ class CommentDAO extends DAO
     }
 
     // ok
-    public function editComment (Parameter $post, int $commentId) : void
+    public function editComment (Parameter $post, int $commentId, $validated = 0) : void
     {
         $sql = 'UPDATE comment SET content = :content, last_modified = NOW(), validated = :validated WHERE id = :comment_id';
         $this->createQuery($sql,['content' => $post->get('content'),
                                  'comment_id' => $commentId,
-                                 'validated' => 0
+                                 'validated' => $validated
                                 ]);
     }
 

@@ -118,7 +118,10 @@ class FrontController extends Controller
         if($article){
             $comments = "";
             if($article->getAllowComment()) {
-                $comments = $this->commentDAO->getComments(['articleId' => $articleId]);
+                $comments = $this->commentDAO->getComments([
+                    'articleId' => $articleId,
+                    'validated' => "validated"
+                ]);
             }                        
             return $this->view->render('article', [
                 'article' => $article,
@@ -144,7 +147,10 @@ class FrontController extends Controller
                     $this->session->set('addedComment', '<div class="alert alert-success">Le commentaire a bien été envoyé (soumis à validation avant publication)</div>');
                     HTTP::redirect('?route=article&articleId=' . $articleId);
                 }
-                $comments = $this->commentDAO->getCommentsFromArticle($articleId);
+                $comments = $this->commentDAO->getComments([
+                    'articleId' => $articleId,
+                    'validated' => "validated"
+                ]);
                 return $this->view->render('article', [
                     'article' => $article,
                     'comments' => $comments,
@@ -161,11 +167,26 @@ class FrontController extends Controller
     {
         $this->checkLoggedIn();
 
-        if ($post->get('submit')) {
+        $comment = $this->commentDAO->getComment($commentId);
+        $articleId = $comment->getArticleId();
+        if($this->session->get('role') !== "admin"){
+            if($this->session->get('role') !== "moderator" && $this->session->get('id') !== $comment->getUserId()){
+                $this->session->set('canNotEditComment', '<div class="alert alert-danger">Vous ne pouvez pas modifier les commentaires d\'autres personnes</div>');
+                HTTP::redirect('?route=article&articleId=' . $articleId);
+            }
+        }
+
+        if($post->get('submit')){
             $errors = $this->validation->validate($post, 'Comment');
-            if (!$errors) {
-                $this->commentDAO->editComment($post, $commentId);
-                $this->session->set('editedComment', '<div class="alert alert-success">Le commentaire a bien été modifié</div>');
+            if (!$errors){
+                if($this->session->get('role') !== "admin" || $this->session->get('role') !== "moderator"){
+                    $validated = 1;
+                    $this->session->set('editedComment', '<div class="alert alert-success">Le commentaire a bien été modifié</div>');
+                } else {
+                    $validated = 0;
+                    $this->session->set('editedComment', '<div class="alert alert-success">Le commentaire a bien été modifié (en attente d\'une nouvelle validation avant publication)</div>');
+                }
+                $this->commentDAO->editComment($post, $commentId, $validated);
                 HTTP::redirect('?route=article&articleId=' . $articleId);
             }
             return $this->view->render('article', [
@@ -175,10 +196,12 @@ class FrontController extends Controller
                 'errors' => $errors
             ]);
         }
-        $comment = $this->commentDAO->getComment($commentId);
-        $articleId = $comment->getArticleId();          
+
         $article = $this->articleDAO->getArticle($articleId);
-        $comments = $this->commentDAO->getCommentsFromArticle($articleId);
+        $comments = $this->commentDAO->getComments([
+            'articleId' => $articleId,
+            'validated' => "validated"
+        ]);
 
         $post->set('id', $comment->getId());
         $post->set('content', $comment->getContent());

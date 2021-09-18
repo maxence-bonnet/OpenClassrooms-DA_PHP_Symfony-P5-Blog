@@ -10,8 +10,11 @@
 <p>En construction</p>
 
 <?= $this->session->show('editedArticle'); ?>
+
 <?= $this->session->show('addedComment'); ?>
 <?= $this->session->show('editedComment'); ?>
+
+<?= $this->session->show('canNotEditComment'); ?>
 
 <section class="container bg-light">
     <div class="row">
@@ -20,8 +23,8 @@
             <h5 class="text-center text-md-start"><?= htmlspecialchars($article->getAuthorPseudo()) . " " . ($article->getFormatedDate($article->getCreatedAt()) ? : '-> En attente avant publication') . $modified ?></h5>
             <p><?= htmlspecialchars($article->getLede()) ?></p>
             <p><?= htmlspecialchars($article->getContent()) ?></p>
-            <!-- <a href="../public/index.php?route=editArticle&articleId=<?= htmlspecialchars($article->getId()) ?>" class="btn btn-primary">Modifier cet article</a> -->
-            <!-- <a href="../public/index.php?route=deleteArticle&articleId=<?= htmlspecialchars($article->getId()) ?>" class="btn btn-primary">Supprimer cet article</a>      -->
+            <!-- <a href="?route=editArticle&articleId=<?= htmlspecialchars($article->getId()) ?>" class="btn btn-primary">Modifier cet article</a> -->
+            <!-- <a href="?route=deleteArticle&articleId=<?= htmlspecialchars($article->getId()) ?>" class="btn btn-primary">Supprimer cet article</a>      -->
         </div>
         <div class="col-12 col-lg-4 p-2 px-md-5 shadow-sm">
             <h3 class="text-center text-md-start">A propos de l'auteur(e):</h3>
@@ -52,8 +55,14 @@
                         <div class="<?= (isset($post) && ($post->get('id') === $comment->getId())) ? 'alert alert-warning' : '' ?> ">
                             <h6><?= htmlspecialchars($comment->getUserPseudo()) . " " . $comment->getFormatedDate($comment->getCreatedAt()) . $modified ?></h6>
                             <p><?= nl2br(htmlspecialchars($comment->getContent()))?></p>
-                            <!-- <a href="../public/index.php?route=editComment&commentId=<?= htmlspecialchars($comment->getId()) ?>" class="btn btn-primary">Modifier ce commentaire</a> -->
-                            <!-- <a href="../public/index.php?route=deleteComment&commentId=<?= htmlspecialchars($comment->getId()) ?>" class="btn btn-primary">Supprimer ce commentaire</a>                                 -->
+
+                            <?php if($this->session->get('id') && ($this->session->get('id') === $comment->getUserId()) || $this->session->get('role') === "admin" || $this->session->get('role') === "moderator") : ?>          
+                                <a href="?route=editComment&commentId=<?= (int)$comment->getId() ?>" class="btn btn-primary">Modifier</a>
+                                    <?php if($this->session->get('role') === "admin" || $this->session->get('role') === "moderator") : ?>
+                                        <a href="?route=updateCommentValidation&commentId=<?= (int)$comment->getId() ?>&validation=0" class="btn btn-primary">Masquer</a>
+                                    <?php endif ?>
+                                <a href="?route=deleteComment&commentId=<?= (int)$comment->getId() ?>" class="btn btn-primary">Supprimer</a>
+                            <?php endif ?>
                         </div>
                     </div>                
                 </div>
@@ -66,7 +75,7 @@
             ?>
                 <div class="col-6">
                     <h4 class="text-center text-md-start"><?= isset($post) && isset($comment) ? 'Modifier le commentaire' : 'Ajouter un commentaire' ?></h4>
-                    <form method="post" action="../public/index.php?route=<?= isset($post) && isset($comment) ? "editComment&commentId=" . htmlspecialchars($comment->getId()) : "addComment&articleId=" . htmlspecialchars($article->getId()); ?>">
+                    <form method="post" action="?route=<?= isset($post) && isset($comment) ? "editComment&commentId=" . (int)$post->get('id') : "addComment&articleId=" . (int)$article->getId(); ?>">
                         <div class="row">
                             <div class="col-2">
                             <h5> <?= $this->session->get('pseudo') ?> </h5>
@@ -89,7 +98,7 @@
             ?>
              <div class="col-6 alert alert-dark d-flex" role="alert">
                 Vous devez être connecté pour commenter un article.
-                <a href="../public/index.php?route=login" class="btn btn-primary ms-auto"> Se connecter </a>
+                <a href="?route=login" class="btn btn-primary ms-auto"> Se connecter </a>
             </div>
             <?php
         }
