@@ -5,6 +5,8 @@
 
 <p>En construction</p>
 
+<?= $this->session->show('deletedComment'); ?>
+<?= $this->session->show('adminEditedComment'); ?>
 <?= $this->session->show('updatedCommentValidation'); ?>
 <?= $this->session->show('unfoundComment'); ?>
 

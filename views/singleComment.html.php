@@ -12,16 +12,13 @@
         }
         ?>
             <div class="row mb-2">
-                <div class="col-6 bg-light shadow-sm">
-                    <div class="<?= (isset($post) && ($post->get('id') === $comment->getId())) ? 'alert alert-warning' : '' ?> ">
-                        <h6><?= htmlspecialchars($comment->getUserPseudo()) . " le " . $createdAt?></h6>
-                        <p><?= nl2br(htmlspecialchars($comment->getContent()))?></p>
-                        <!-- <a href="../public/index.php?route=editComment&commentId=<?= htmlspecialchars($comment->getId()) ?>" class="btn btn-primary">Modifier ce commentaire</a> -->
-                        <!-- <a href="../public/index.php?route=deleteComment&commentId=<?= htmlspecialchars($comment->getId()) ?>" class="btn btn-primary">Supprimer ce commentaire</a>                                 -->
-                    </div>
+                <div class="col-6 bg-light shadow">
+                    <h6><?= htmlspecialchars($comment->getUserPseudo()) . " le " . $createdAt?></h6>
+                    <p><?= nl2br(htmlspecialchars($comment->getContent()))?></p>
                 </div>
             </div>
-            <a class="btn btn-primary" href="../public/index.php?route=validateComment&commentId=<?= htmlspecialchars($comment->getId()) ?>"> Valider </a>
-            <a class="btn btn-primary" href="../public/index.php?route=adminEditComment&commentId=<?= htmlspecialchars($comment->getId()) ?>"> Modifier </a>               
-            <a class="btn btn-primary" href="../public/index.php?route=deleteComment&commentId=<?= htmlspecialchars($comment->getId()) ?>"> Supprimer </a>                
+            <a class="btn btn-primary" href="?route=updateCommentValidation&commentId=<?= (int)$comment->getId() ?>&validation=1"> Valider </a>
+            <a class="btn btn-primary" href="?route=updateCommentValidation&commentId=<?= (int)$comment->getId() ?>&validation=0"> Suspendre </a>
+            <a class="btn btn-primary" href="?route=adminEditComment&commentId=<?= (int)$comment->getId() ?>"> Modifier </a>               
+            <a class="btn btn-primary" href="?route=deleteComment&commentId=<?= (int)$comment->getId() ?>"> Supprimer </a>                
         <?php

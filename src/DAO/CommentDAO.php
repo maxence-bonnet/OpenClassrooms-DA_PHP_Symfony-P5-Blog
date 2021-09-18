@@ -45,23 +45,25 @@ class CommentDAO extends DAO
     }
 
     // ok
-    public function addComment (Parameter $post, int $articleId, int $userId) : void
+    public function addComment (array $parameters) : void
     {
-        $answerTo = null;
-        if($post->get('answer_to')){
-            $answerTo = $post->get('answer_to');
+        extract($parameters);
+
+        if(!isset($answerTo)){
+            $answerTo = null;
         }
+        
         $sql ='INSERT INTO comment (user_id, article_id, created_at, last_modified, content, validated, answer_to)
                VALUES (:user_id, :article_id, NOW(), null, :content, :validated, :answer_to)';
         $this->createQuery($sql, [ 'user_id' => $userId,
                                    'article_id' => $articleId,
-                                   'content' => $post->get('content'),
-                                   'validated' => "0",
+                                   'content' => $content,
+                                   'validated' => $validated,
                                    'answer_to' => $answerTo]);
     }
 
     // ok
-    public function editComment (Parameter $post, int $commentId, $validated = 0) : void
+    public function editComment (Parameter $post, int $commentId,int $validated = 0) : void
     {
         $sql = 'UPDATE comment SET content = :content, last_modified = NOW(), validated = :validated WHERE id = :comment_id';
         $this->createQuery($sql,['content' => $post->get('content'),
@@ -71,7 +73,7 @@ class CommentDAO extends DAO
     }
 
     // ok
-    public function deleteComment(int $commentId) : void
+    public function deleteComment(int $commentId)
     {
         $sql = 'DELETE FROM comment WHERE id = :comment_id';
         $this->createQuery($sql, ['comment_id' => $commentId]);
@@ -188,7 +190,7 @@ class CommentDAO extends DAO
         if(isset($orderby)){
             $sql .= ' ORDER BY created_at ' . $orderby;
         } else {
-            $sql .= ' ORDER BY created_at DESC';
+            $sql .= ' ORDER BY created_at ASC';
         }
         
         if(isset($limit)){

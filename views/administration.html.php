@@ -5,8 +5,12 @@
 
 <p>En construction</p>
 
-<?= $this->session->show('deletedComment'); ?>
+<?= $this->session->show('updatedCommentValidation'); ?>
 <?= $this->session->show('adminEditedComment'); ?>
+<?= $this->session->show('deletedComment'); ?>
+<?= $this->session->show('unfoundComment'); ?>
+
+
 <?= $this->session->show('updatedArticle'); ?>
 <?= $this->session->show('deletedArticle'); ?>
 
