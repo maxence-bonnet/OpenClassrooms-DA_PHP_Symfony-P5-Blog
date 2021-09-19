@@ -5,7 +5,7 @@
         <meta charset="UTF-8" />
         <link rel="stylesheet" href="../public/css/bootstrap.min.css">
         <link rel="stylesheet" href="../public/css/style.css">
-        <title><?= $title ?></title>
+        <title><?= $title ?? ''?></title>
     </head>
     <body class="d-flex flex-column h-100">
         <header>
@@ -70,10 +70,10 @@
                 <a href="#" class="p-2">Github</a>
                 <a href="#" class="p-2">Linkedin</a>
                 <a href="#" class="p-2">Twitter</a>
-                <?php if($this->session->get('role') === 'admin') { ?>
+                <?php if($this->session->get('role') === 'admin') : ?>
                     <a href="?route=administration" class="p-2"> Administration </a>
-                <?php } ?>
-                <span class="d-inline-block ms-auto p-2"> Généré en <?= round(1000*(microtime(true)-PAGE_GENERATING_TIME)) ?> ms </span>
+                    <span class="d-inline-block ms-auto p-2"> Généré en <?=  round(1000*(microtime(true)-PAGE_GENERATING_TIME)) ?> ms </span>
+                <?php endif ?>
             </div>
         </footer>
         <script src="../public/js/bootstrap.min.js"></script>

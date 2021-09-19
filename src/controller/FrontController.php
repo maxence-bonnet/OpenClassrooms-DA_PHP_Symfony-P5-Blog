@@ -17,10 +17,6 @@ class FrontController extends Controller
                 $result = $this->mailer->sendContactForm($post);
                 if($result){
                     $this->session->set('messageSent', '<div class="alert alert-success">Votre message a bien été envoyé</div>');
-                    return $this->view->render('home', [
-                        'post' =>$post,
-                        'errors' => $errors
-                    ]); 
                     HTTP::redirect('?');
                 }
                 $this->session->set('messageFailure', '<div class="alert alert-danger">Échec lors de l\'envoi du message</div>');       

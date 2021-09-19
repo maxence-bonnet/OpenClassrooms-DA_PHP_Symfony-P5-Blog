@@ -1,0 +1,45 @@
+#AuthName "[...]"
+#AuthType Basic
+#AuthUserFile "...\...\...\...\.htpasswd"
+#Require valid-user
+
+# Deny access to .htaccess
+<Files .htaccess>
+Order allow,deny
+Deny from all
+</Files>
+
+# Disable directory browsing 
+Options -Indexes 
+
+# Deny access to files with extensions
+<FilesMatch "\.(pdf|jpg|jpeg|png|php|json|lock|md|gitignore|sql|js|css|map)$">
+Order allow,deny
+Deny from all
+</FilesMatch>
+
+# Deny access to filenames starting with dot(.)
+<FilesMatch "^\.">
+Order allow,deny
+Deny from all
+</FilesMatch>
+
+# Allow access to index.php
+<FilesMatch "^index.php$">
+Order allow,deny
+Allow from all
+</FilesMatch>
+
+# Allow access to CV.pdf
+<FilesMatch "^CV.pdf$">
+Order allow,deny
+Allow from all
+</FilesMatch>
+
+# Password protect files
+#<FilesMatch "^()*$">
+#AuthType Basic
+#AuthName "Mypassword"
+#AuthUserFile <Full Server Path to .htpasswd file>/.htpasswd
+#Require valid-user
+#</FilesMatch>
