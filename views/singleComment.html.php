@@ -17,8 +17,12 @@
                     <p><?= nl2br(htmlspecialchars($comment->getContent()))?></p>
                 </div>
             </div>
-            <a class="btn btn-primary" href="?route=updateCommentValidation&commentId=<?= (int)$comment->getId() ?>&validation=1"> Valider </a>
-            <a class="btn btn-primary" href="?route=updateCommentValidation&commentId=<?= (int)$comment->getId() ?>&validation=0"> Suspendre </a>
-            <a class="btn btn-primary" href="?route=adminEditComment&commentId=<?= (int)$comment->getId() ?>"> Modifier </a>               
-            <a class="btn btn-primary" href="?route=deleteComment&commentId=<?= (int)$comment->getId() ?>"> Supprimer </a>                
+            <?php if(!$comment->getValidated()) : ?>
+                <a class="btn btn-primary" href="?route=updateCommentValidation&commentId=<?= (int)$comment->getId() ?>&validation=1"> Valider </a>
+            <?php else : ?>
+                <a class="btn btn-primary" href="?route=updateCommentValidation&commentId=<?= (int)$comment->getId() ?>&validation=0"> Suspendre </a>
+                <a class="btn btn-primary" href="?route=article&articleId=<?= (int)$comment->getarticleId() ?>#comment<?= (int)$comment->getId() ?>"> Voir dans son contexte </a>  
+            <?php endif ?>
+                <a class="btn btn-primary" href="?route=adminEditComment&commentId=<?= (int)$comment->getId() ?>"> Modifier </a>               
+                <a class="btn btn-primary" href="?route=deleteComment&commentId=<?= (int)$comment->getId() ?>"> Supprimer </a>      
         <?php

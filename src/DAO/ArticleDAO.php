@@ -7,7 +7,6 @@ use App\src\model\Article;
 
 class ArticleDAO extends DAO
 {
-
     private function buildObject($row)
     {
         $article = new Article();
@@ -221,17 +220,16 @@ class ArticleDAO extends DAO
      */
     public function editArticle(Parameter $post, $articleId, $userId)
     {
-        if((int)$post->get('statusId') === 3){
-            $createdAt = null;
-        } else {
-            $createdAt = date('Y-m-d H:i:s');
-        }
+        // if((int)$post->get('statusId') === 3){
+        //     $createdAt = null;
+        // } else {
+        //     $createdAt = date('Y-m-d H:i:s');
+        // }
         $lastModified = date('Y-m-d H:i:s');
         $sql = 'UPDATE article
-        SET created_at=:created_at ,last_modified=:last_modified, title=:title, lede=:lede, content=:content, author_id=:author_id, category_id=:category_id, status_id=:status_id, allow_comment=:allow_comment
+        SET last_modified=:last_modified, title=:title, lede=:lede, content=:content, author_id=:author_id, category_id=:category_id, status_id=:status_id, allow_comment=:allow_comment
         WHERE id=:article_id';
         $this->createQuery($sql,[
-            'created_at' => $createdAt,
             'last_modified' => $lastModified,
             'title' => $post->get('title'),
             'lede' => $post->get('lede'),

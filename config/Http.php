@@ -4,9 +4,17 @@ namespace App\config;
 
 class HTTP
 {
-    public static function redirect(string $url): void 
+    public static function redirect(string $url) : void 
     {
         header("Location: $url");
         exit();
+    }
+
+    public static function dynamicRedirect(string $url, Session $session) : void 
+    {
+        if($session->get('previousURL')){
+            $url = $session->show('previousURL');
+        }
+        self::redirect($url);
     }
 }

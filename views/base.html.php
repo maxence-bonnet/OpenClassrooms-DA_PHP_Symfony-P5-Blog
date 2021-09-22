@@ -3,8 +3,9 @@
 <html lang="fr" class="h-100">
     <head>
         <meta charset="UTF-8" />
-        <link rel="stylesheet" href="../public/css/bootstrap.min.css">
-        <link rel="stylesheet" href="../public/css/style.css">
+        <base href="http://localhost/P5_blog/public/">
+        <link rel="stylesheet" href="css/bootstrap.min.css">
+        <link rel="stylesheet" href="css/style.css">
         <title><?= $title ?? ''?></title>
     </head>
     <body class="d-flex flex-column h-100">
@@ -18,7 +19,7 @@
                     <div class="collapse navbar-collapse" id="navbarNav">
                     <ul class="navbar-nav mb-2 mb-lg-0 w-100 px-2">
                         <li class="nav-item">
-                            <a class="nav-link" href="../public">Accueil</a>
+                            <a class="nav-link" href="?">Accueil</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="?route=articles">Les articles</a>
@@ -27,7 +28,7 @@
                     if ($this->session->get('pseudo')) {
                             ?>
                             <li class="nav-item">
-                                <a class="nav-link" href="?route=profile">Profil</a>
+                                <a class="nav-link" href="profile">Profil</a>
                             </li>
                             <?php if($this->session->get('role') === 'admin') { ?>
                                 <li class="nav-item">
@@ -71,12 +72,12 @@
                 <a href="#" class="p-2">Linkedin</a>
                 <a href="#" class="p-2">Twitter</a>
                 <?php if($this->session->get('role') === 'admin') : ?>
-                    <a href="?route=administration" class="p-2"> Administration </a>
+                    <a href="administration" class="p-2"> Administration </a>
                     <span class="d-inline-block ms-auto p-2"> Généré en <?=  round(1000*(microtime(true)-PAGE_GENERATING_TIME)) ?> ms </span>
                 <?php endif ?>
             </div>
         </footer>
-        <script src="../public/js/bootstrap.min.js"></script>
+        <script src="js/bootstrap.min.js"></script>
     </body>
 </html>
 

@@ -86,7 +86,7 @@ class BackController extends Controller
         }
         $this->articleDAO->updateArticleStatus($articleId, $statusId, $date);
         $this->session->set('updatedArticleStatus', '<div class="alert alert-success">Le statut de l\'article a bien été mis à jour</div>');
-        HTTP::redirect('?route=adminArticles');
+        HTTP::dynamicRedirect('?route=adminArticles',$this->session);
     } 
     
     // ok
@@ -96,7 +96,7 @@ class BackController extends Controller
 
         $this->articleDAO->deleteArticle($articleId);
         $this->session->set('deletedArticle', '<div class="alert alert-success">L\' article a bien été supprimé</div>');
-        HTTP::redirect('?route=articles');
+        HTTP::dynamicRedirect('?route=articles',$this->session);
     }
 
     // COMMENTS
@@ -110,14 +110,14 @@ class BackController extends Controller
             return $this->view->render('singleComment', ['comment' => $comment]);
         }
         $this->session->set('unfoundComment', '<div class="alert alert-danger">Le commentaire recherché n\'existe pas / plus</div>');
-        HTTp::redirect('?route=adminComments');  
+        HTTP::dynamicRedirect('?route=adminComments',$this->session);  
     }
 
     // ok
     public function adminEditComment(Parameter $post, $commentId)
     {
         $this->checkAdmin();
-
+        
         $comment = $this->commentDAO->getComment($commentId);
         $articleId = $comment->getArticleId();
         if ($post->get('submit')) {
@@ -125,8 +125,8 @@ class BackController extends Controller
             if (!$errors) {
                 $validated = 1;
                 $this->commentDAO->editComment($post, $commentId, $validated);
-                $this->session->set('adminEditedComment', '<div class="alert alert-success">Le commentaire a bien été modifié et publié</div>');
-                HTTP::redirect('?route=administration');                
+                $this->session->set('adminEditedComment', '<div class="alert alert-success">Le commentaire a bien été modifié et publié</div>');  
+                HTTP::dynamicRedirect('?route=adminComments',$this->session);                
             }
             return $this->view->render('adminEditComment', ['comment' => $comment]);
         }   
@@ -148,7 +148,7 @@ class BackController extends Controller
             $message = $validation ? 'validé' : 'suspendu';
             $this->session->set('updatedCommentValidation', '<div class="alert alert-success">Le commentaire a bien été ' . $message . '</div>');            
         }
-        HTTP::redirect('?route=adminComments');
+        HTTP::dynamicRedirect('?route=adminComments',$this->session);
     }
 
     // ok
@@ -162,7 +162,7 @@ class BackController extends Controller
         } else {
             $this->session->set('unfoundComment', '<div class="alert alert-danger">Le commentaire à supprimer n\'existe pas / plus</div>');
         }
-        HTTP::redirect('?route=adminComments');
+        HTTP::dynamicRedirect('?route=adminComments',$this->session);
     }
 
     // USERS
@@ -186,7 +186,30 @@ class BackController extends Controller
                 $this->session->set('updatedUserRole', '<div class="alert alert-success"> Le rôle de ' . $user->getPseudo() . ' a bien été mis à jour, nouveau rôle : ' . $roleName . '</div>');
             }            
         }
-        HTTP::redirect('?route=adminUsers');
+        HTTP::dynamicRedirect('?route=adminUsers',$this->session);
+    }
+
+    public function updateUserStatus(int $userId, int $statusId)
+    {
+        $this->checkAdmin();
+        $statusArray = [1,2,3,4];
+        $user = $this->userDAO->getUser($userId);
+        if($user){
+            if(((int)$user->getRoleId() !== 1) && in_array($statusId, $statusArray)){
+                $this->userDAO->updateUserStatus($userId,$statusId);
+                if($statusId === 1){
+                    $statusName= "Relaxé";
+                } elseif($statusId === 2){
+                    $statusName = "???";
+                } elseif($statusId === 3){
+                    $statusName = "Banni";
+                } else{
+                    $statusName = "???";
+                }
+                $this->session->set('updatedUserStatus', '<div class="alert alert-success">' . $user->getPseudo() . ' a bien été ' . $statusName . '</div>');
+            }            
+        }
+        HTTP::dynamicRedirect('?route=adminUsers',$this->session);
     }
 
     // GLOBAL ADMIN
@@ -194,6 +217,8 @@ class BackController extends Controller
     public function administration()
     {
         $this->checkAdmin();
+
+        $this->session->set('previousURL', $_SERVER['REQUEST_URI']);
 
         $comments = $this->commentDAO->getComments([
             'limit' => 10,
@@ -215,11 +240,12 @@ class BackController extends Controller
         ]);
     }
 
-    //
+    // ok
     public function adminComments(Parameter $get)
     {
         $this->checkAdmin();
 
+        $this->session->set('previousURL', $_SERVER['REQUEST_URI']);
 
         $limitArray = [10,20,30,40,50,75,100];
         $page = 1;
@@ -307,10 +333,12 @@ class BackController extends Controller
         ]);             
     }
 
-    //
+    // ok
     public function adminArticles(Parameter $get)
     {
         $this->checkAdmin();
+
+        $this->session->set('previousURL', $_SERVER['REQUEST_URI']);
 
         $limitArray = [10,20,30,40,50];
         $page = 1;
@@ -393,10 +421,12 @@ class BackController extends Controller
         ]);
     }
 
-    //
+    // ok
     public function adminUsers(Parameter $get)
     {
         $this->checkAdmin();
+
+        $this->session->set('previousURL', $_SERVER['REQUEST_URI']);
 
         $limitArray = [10,20,30,40,50,75,100];
         $page = 1;

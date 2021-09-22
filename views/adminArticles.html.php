@@ -1,7 +1,11 @@
 <!-- Waiting for Twig -->
 <?php $this->title = "Administration Articles"; ?>
 
-<h1><?= $this->title ?></h1>
+<h1 class="d-flex">
+    <?= $this->title ?> 
+    <a href="?route=adminComments" class="btn btn-primary ms-auto my-auto">Les commentaires</a>
+    <a href="?route=adminUsers" class="btn btn-primary mx-2 my-auto">Les utilisateurs</a>
+</h1>
 
 <p>En construction</p>
 
@@ -128,13 +132,13 @@
                 <?php
                 if($previousPageUrl){
                     ?>
-                    <a href="?<?= $previousPageUrl ?>" class="btn btn-primary"> Page précédente </a>
+                    <a href="?<?= $previousPageUrl ?>" class="btn btn-primary">&#10094; Page précédente </a>
                     <?php
                 }
 
                 if($nextPageUrl){
                     ?>
-                    <a href="?<?= $nextPageUrl ?>" class="btn btn-primary ms-auto"> Page suivante </a>
+                    <a href="?<?= $nextPageUrl ?>" class="btn btn-primary ms-auto"> Page suivante &#10095;</a>
                     <?php                
                 }
                 ?>

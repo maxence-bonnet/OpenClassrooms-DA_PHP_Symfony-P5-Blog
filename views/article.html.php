@@ -20,7 +20,7 @@
     <div class="row">
         <div class="col-12 col-lg-8 p-2 shadow-sm">
             <h2 class="text-center text-md-start"><?= $this->title ?></h2>
-            <h5 class="text-center text-md-start"><?= htmlspecialchars($article->getAuthorPseudo()) . " " . ($article->getFormatedDate($article->getCreatedAt()) ? : '-> En attente avant publication') . $modified ?></h5>
+            <h5 class="text-center text-md-start"><?= htmlspecialchars($article->getAuthorPseudo()) . " " . ($article->getFormatedDate($article->getCreatedAt()) ? : '-> En attente avant publication') . " " . $modified ?></h5>
             <p><?= htmlspecialchars($article->getLede()) ?></p>
             <p><?= htmlspecialchars($article->getContent()) ?></p>
             <!-- <a href="?route=editArticle&articleId=<?= htmlspecialchars($article->getId()) ?>" class="btn btn-primary">Modifier cet article</a> -->
@@ -56,7 +56,11 @@
                                     <?php endif ?>
                                 <a href="?route=deleteComment&commentId=<?= (int)$comment->getId() ?>" class="btn btn-primary mx-1">Supprimer</a>
                             <?php endif ?>
-                            <a href="?route=article&articleId=<?= (int)$article->getId(); ?>&answerTo=<?= (int)$comment->getId() ?>#comment<?= (int)$comment->getId() ?>" class="btn btn-primary ms-auto">Répondre</a>                            
+                            <?php if($this->session->get('pseudo')) : ?>
+                            <!-- <a href="?route=article&articleId=<?= (int)$article->getId(); ?>&answerTo=<?= (int)$comment->getId() ?>#comment<?= (int)$comment->getId() ?>" class="btn btn-primary ms-auto">Répondre</a>                             -->
+                            <a href="?route=article&articleId=<?= (int)$article->getId(); ?>&answerTo=<?= (int)$comment->getId() ?>#answerForm" class="btn btn-primary ms-auto">Répondre</a>                            
+
+                            <?php endif ?>
                         </div>
                     </div>
                     <!-- ANSWERS -->
@@ -75,7 +79,9 @@
                                                     <?php endif ?>
                                                 <a href="?route=deleteComment&commentId=<?= (int)$answer->getId() ?>" class="btn btn-primary mx-1">Supprimer</a>
                                             <?php endif ?>
+                                            <?php if($this->session->get('pseudo')) : ?>
                                             <a href="?route=article&articleId=<?= (int)$article->getId(); ?>&answerTo=<?= (int)$comment->getId() ?>#comment<?= (int)$comment->getId() ?>" class="btn btn-primary ms-auto">Répondre</a>                            
+                                            <?php endif ?>  
                                         </div>
                                     </div>
                                 </div>
@@ -155,9 +161,11 @@
                     </div>
                 </div>        
             <?php else : ?>
-                <div class="col-6 alert alert-dark d-flex" role="alert">
-                    Vous devez être connecté pour commenter un article.
-                    <a href="?route=login" class="btn btn-primary ms-auto"> Se connecter </a>
+                <div class="col-8" role="alert">
+                    <div class="alert alert-dark d-flex" role="alert">
+                        Vous devez être connecté pour commenter, ou répondre à un commentaire sur un article
+                        <a href="?route=login" class="btn btn-primary ms-auto"> Se connecter </a>
+                    </div>
                 </div>
             <?php endif ?>
         </div>

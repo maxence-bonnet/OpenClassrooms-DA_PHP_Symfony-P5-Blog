@@ -1,11 +1,17 @@
 <!-- Waiting for Twig -->
 <?php $this->title = "Administration Utilisateurs"; ?>
 
-<h1><?= $this->title ?></h1>
+<h1 class="d-flex">
+    <?= $this->title ?> 
+    <a href="?route=adminComments" class="btn btn-primary ms-auto my-auto">Les commentaires</a>
+    <a href="?route=adminArticles" class="btn btn-primary mx-2 my-auto">Les articles</a>
+</h1>
 
 <p>En construction</p>
 
 <?= $this->session->show('updatedUserRole'); ?>
+<?= $this->session->show('updatedUserStatus'); ?>
+
 
 <section class="container bg-light">
     <h2>Tous les Utilisateurs</h2>
@@ -97,7 +103,7 @@
                         <td> Score </td>
                         <td> Statut </td>
                         <td> Modifier le role </td>
-                        <td> Bannir / Supprimer </td>
+                        <td> Modifier le statut / Supprimer </td>
                     </tr>
                 </thead>
                 <tbody>
@@ -130,7 +136,7 @@
                                 <?php elseif((int)$user->getRoleId() === 4): ?>
                                     <a href="?route=updateUserRole&userId=<?= htmlspecialchars($user->getId()) ?>&roleId=2"> Utilisateur </a>
                                     | 
-                                    <a href="?route=updateUserRole&userId=<?= htmlspecialchars($user->getId()) ?>&roleId="> Éditeur </a>
+                                    <a href="?route=updateUserRole&userId=<?= htmlspecialchars($user->getId()) ?>&roleId=3"> Éditeur </a>
                                 <?php else : ?>    
                                     <a href="#"> Ø </a>
                                 <?php endif ?>  
@@ -138,8 +144,12 @@
                             <td>
                                 <?php if((int)$user->getRoleId() === 1): ?>
                                     <a href="#"> Ø </a>
-                                <?php else : ?>    
-                                    <a href="?route=banUser&userId=<?= htmlspecialchars($user->getId()) ?>">Bannir</a>
+                                <?php else : ?>
+                                    <?php if ((int)$user->getStatusId() !== 3) : ?>   
+                                    <a href="?route=updateUserStatus&userId=<?= htmlspecialchars($user->getId()) ?>&statusId=3">Bannir</a>
+                                    <?php else : ?>
+                                        <a href="?route=updateUserStatus&userId=<?= htmlspecialchars($user->getId()) ?>&statusId=1">Relaxer</a>
+                                    <?php endif ?>   
                                     | 
                                     <a href="?route=deleteUser&userId=<?= htmlspecialchars($user->getId()) ?>">Supprimer</a>
                                 <?php endif ?> 

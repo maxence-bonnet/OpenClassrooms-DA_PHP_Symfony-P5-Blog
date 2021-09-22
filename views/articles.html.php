@@ -9,7 +9,11 @@
 <?= $this->session->show('deletedArticle'); ?>
 <?= $this->session->show('unfoundArticle'); ?>
 
+<?= $this->session->show('privateArticle'); ?>
+<?= $this->session->show('standbyArticle'); ?>
+
 <div class="row">
+        <h5><?= $pageArticlesCount ?> / <?= $totalArticlesCount ?> Résultat(s) - Page <?= $page ?> / <?= $pages > 0 ? $pages : '1' ?></h5>
         <?php
         foreach($articles as $article)
         {
@@ -17,7 +21,7 @@
                 <div class="col-sm-4">
                     <div class="card my-2">
                         <div class="card-body">
-                            <h5 class="card-title"><a href="../public/index.php?route=article&articleId=<?= htmlspecialchars($article->getId()) ?>"><?= htmlspecialchars($article->getTitle()) ?></a></h5>
+                            <h5 class="card-title"><a href="?route=article&articleId=<?= htmlspecialchars($article->getId()) ?>"><?= htmlspecialchars($article->getTitle()) ?></a></h5>
                             <p class="card-text"><?= htmlspecialchars($article->getLedeExcerpt()) ?></p>
                         </div>
                         <div class="card-footer">
@@ -30,16 +34,17 @@
         ?>
         <div class="d-flex justify-content-between my-4">
             <?php
-            if($page > 1){
-                ?>
-                <a href="?route=articles&page=<?= $page - 1 ?>" class="btn btn-primary">&#10094; Page précédente </a>
-                <?php
-            }
-            if($page < $pages && $pages !== 1){
-                ?>
-                <a href="?route=articles&page=<?= $page + 1 ?>" class="btn btn-primary ms-auto"> Page suivante &#10095;</a>
-                <?php                
-            }
+                if($previousPageUrl){
+                    ?>
+                    <a href="?<?= $previousPageUrl ?>" class="btn btn-primary">&#10094; Page précédente </a>
+                    <?php
+                }
+
+                if($nextPageUrl){
+                    ?>
+                    <a href="?<?= $nextPageUrl ?>" class="btn btn-primary ms-auto"> Page suivante &#10095;</a>
+                    <?php                
+                }
             ?>
         </div>
 </div>

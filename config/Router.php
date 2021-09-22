@@ -21,7 +21,7 @@ class Router
         $this->backController = new BackController();
         $this->errorController = new ErrorController();
     }
-
+    
     public function run()
     {
         $route = $this->request->getGet()->get('route');
@@ -69,9 +69,15 @@ class Router
                     $this->backController->adminUsers($this->request->getGet());
                 } elseif($route === 'updateUserRole'){
                     $this->backController->updateUserRole((int)$this->request->getGet()->get('userId'),(int)$this->request->getGet()->get('roleId'));
-                } else {
+                } elseif($route === 'updateUserStatus'){
+                    $this->backController->updateUserStatus((int)$this->request->getGet()->get('userId'),(int)$this->request->getGet()->get('statusId'));
+                } // -- TEST TWIG
+                elseif($route === 'testTwig'){
+                    $this->frontController->testTwig($this->request->getPost());
+                } // -- FIN TEST TWIG
+                else {
                     $this->errorController->errorNotFound();
-                }
+                }       
             } else {
                 $this->frontController->home($this->request->getPost());
             }

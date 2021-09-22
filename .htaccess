@@ -1,19 +1,35 @@
-#AuthName "[...]"
-#AuthType Basic
-#AuthUserFile "...\...\...\...\.htpasswd"
-#Require valid-user
+# AuthName "[...]"
+# AuthType Basic
+# AuthUserFile "...\...\...\...\.htpasswd"
+# Require valid-user
 
-# Deny access to .htaccess
-<Files .htaccess>
-Order allow,deny
-Deny from all
-</Files>
+Options +FollowSymlinks 
+RewriteEngine off
+# 
+
+# RewriteCond %{REQUEST_FILENAME} !-f
+# RewriteCond %{REQUEST_FILENAME} !-d
+
+# RewriteRule ^article-([0-9]+)$     public/index.php?route=article&articleId=$1
+# TRAVAUX
+RewriteRule ^article-([0-9]+)/?([a-z0-9]+=.+)?$     public/index.php?route=article&articleId=$1&$2 [NC]
+RewriteRule ^([a-z0-9]+)$                           public/index.php?route=$1 [NC]
+RewriteRule ^([a-z0-9]+)\+?([a-z0-9]+=.+)?$         public/index.php?route=$1&$2 [NC]
+# RewriteRule ^([a-z0-9]+)/(.+)?$                                  public/index.php?route=$1$2 [NC]
+
+
+
+# RewriteRule ^([a-z0-9]+\?)(.+)?$         public/index.php?route=$1 [NC]
+
+ErrorDocument 404 /P5_blog/public/index.php?route=notFound
+#ErrorDocument 403 /P5_blog/public/index.php?route=forbidden
+#ErrorDocument 500 /P5_blog/public/index.php?route=errorServer
 
 # Disable directory browsing 
 Options -Indexes 
 
 # Deny access to files with extensions
-<FilesMatch "\.(pdf|jpg|jpeg|png|php|json|lock|md|gitignore|sql|js|css|map)$">
+<FilesMatch "\.(pdf|jpg|jpeg|png|php|json|lock|md|gitignore|sql)$">
 Order allow,deny
 Deny from all
 </FilesMatch>

@@ -1,27 +1,23 @@
-<!-- Waiting for Twig -->
-<?php $this->title = "Accueil"; ?>
+{% extends 'baseTest.twig' %}
 
-<h1><?= $this->title ?></h1>
 
-<p>En construction</p>
+{% block head %}
+    <title>{{ title }}</title>
+{% endblock %}
+
+
+
+{% block content %}
+    {{ dump(session) }}
 
 <section class="container-fluid bg-light">
 
-    <?= $this->session->show('loginSuccess'); ?>
-    <?= $this->session->show('banned'); ?>
-    <?= $this->session->show('logout'); ?>
-
-    <?= $this->session->show('messageSent'); ?>
-    <?= $this->session->show('messageFailure'); ?>
-    
-    <?= $this->session->show('alreadyLoggedIn'); ?>
-    <?= $this->session->show('adminOnly'); ?>
-    
-
+    {{ session.show('loginSuccess') | raw }}
+    {{ session.show('logout') | raw }}
 
     <h1> Maxence Bonnet</h1>
 
-    <!-- <img src="../public/uploads/photo.jpg" alt="Ceci est une photo"> -->
+        <!-- <img src="../public/uploads/photo.jpg" alt="Ceci est une photo"> -->
 
     <h2> Slogan </h2>
 
@@ -43,8 +39,8 @@
         <form action="" method="post">
             <div class="mb-3">
                 <label class="form-label" for="firstname">Votre nom :</label>
-                <input type="text" class="form-control <?= isset($errors['lastname']) ? "is-invalid" : ''; ?>" id="lastnameContent" name="lastname" placeholder="Dupont" value="<?= isset($post) ? htmlspecialchars($post->get('lastname')): ''; ?>">
-                <?= isset($errors['lastname']) ? $errors['lastname'] : ''; ?>
+                <input type="text" class="form-control {{ errors.lastname ?'is-invalid':''}}" id="lastnameContent" name="lastname" placeholder="Dupont" value="{{ post.get('lastname') ?:''}}" >
+                {{ errors.lastname | raw }}
             </div>
             <div class="mb-3">
                 <label class="form-label" for="firstname">Votre prénom :</label>
@@ -69,3 +65,4 @@
         </div>
     </div>
 </section>
+{% endblock %}

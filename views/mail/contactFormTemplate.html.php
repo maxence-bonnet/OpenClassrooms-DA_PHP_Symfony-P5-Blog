@@ -54,9 +54,9 @@
     </style>
 
   </head>
-  <body bgcolor="#F5F8FA" style="width: 100%; margin: auto 0; padding:0; font-family:Lato, sans-serif; font-size:18px; color:#33475B; word-break:break-word">      
+  <body bgcolor="#F5F8FA" style="width: 100%; margin: auto 0; padding:0; font-family:Lato, sans-serif; font-size:18px; color:#33475B; word-break:break-word" >      
     <div id="email"> 
-      <table role="presentation" border="0" bgcolor="#c1cbd4" cellpadding="0" cellspacing="10px" style="padding: 20px 20px 20px 30px;">
+      <table role="presentation" border="0" bgcolor="#c1cbd4" cellpadding="0" cellspacing="10px" style="padding: 20px 20px 20px 30px;" width="100%">
         <tr>
           <td>
             <h2> Nouveau message de : <?= $firstname ?> <?= $lastname ?></h2>

@@ -5,16 +5,19 @@
 
 <p>En construction</p>
 
-<?= $this->session->show('updatedCommentValidation'); ?>
-<?= $this->session->show('adminEditedComment'); ?>
 <?= $this->session->show('deletedComment'); ?>
+<?= $this->session->show('adminEditedComment'); ?>
+<?= $this->session->show('updatedCommentValidation'); ?>
 <?= $this->session->show('unfoundComment'); ?>
 
-
+<?= $this->session->show('updatedArticleStatus'); ?>
 <?= $this->session->show('updatedArticle'); ?>
 <?= $this->session->show('deletedArticle'); ?>
 
-<section class="container bg-light">
+<?= $this->session->show('updatedUserRole'); ?>
+<?= $this->session->show('updatedUserStatus'); ?>
+
+<section class="container bg-light shadow-lg p-2 mb-4">
     <h2 class="d-flex">Commentaires en attente de validation <a href="?route=adminComments" class="btn btn-primary ms-auto">Section Commentaires</a></h2>
     <div class="row">
         <div class="col">
@@ -70,7 +73,7 @@
         </div>    
 </section>
 
-<section class="container bg-light">
+<section class="container bg-light shadow-lg p-2 mb-4">
     <h2 class="d-flex">Les articles <a href="?route=adminArticles" class="btn btn-primary ms-auto">Section Articles</a></h2>
     <div class="row">
         <div class="col">
@@ -114,7 +117,7 @@
     </div>
 </section>
 
-<section class="container bg-light">
+<section class="container bg-light shadow-lg p-2 mb-4">
     <h2 class="d-flex">Les utilisateurs <a href="?route=adminUsers" class="btn btn-primary ms-auto">Section Utilisateurs</a></h2>
     <div class="row">
         <div class="col">
@@ -171,7 +174,11 @@
                                 <?php if((int)$user->getRoleId() === 1): ?>
                                     <a href="#"> Ø </a>
                                 <?php else : ?>    
-                                    <a href="?route=banUser&userId=<?= htmlspecialchars($user->getId()) ?>">Bannir</a>
+                                    <?php if ((int)$user->getStatusId() !== 3) : ?>   
+                                    <a href="?route=updateUserStatus&userId=<?= htmlspecialchars($user->getId()) ?>&statusId=3">Bannir</a>
+                                    <?php else : ?>
+                                        <a href="?route=updateUserStatus&userId=<?= htmlspecialchars($user->getId()) ?>&statusId=1">Relaxer</a>
+                                    <?php endif ?>
                                     | 
                                     <a href="?route=deleteUser&userId=<?= htmlspecialchars($user->getId()) ?>">Supprimer</a>
                                 <?php endif ?> 

@@ -5,9 +5,32 @@ namespace App\src\controller;
 use App\config\Parameter;
 use App\src\constraint\Constraint;
 use App\config\HTTP;
+use App\src\utils\URL;
 
 class FrontController extends Controller
 {
+
+    // TEST TWIG
+    public function testTwig(Parameter $post)
+    {
+        if($post->get('submit')){
+            $errors = $this->validation->validate($post, 'ContactForm');
+            if(!$errors){
+                $result = $this->mailer->sendContactForm($post);
+                if($result){
+                    $this->session->set('messageSent', '<div class="alert alert-success">Votre message a bien été envoyé</div>');
+                    HTTP::redirect('?');
+                }
+                $this->session->set('messageFailure', '<div class="alert alert-danger">Échec lors de l\'envoi du message</div>');       
+            }
+            return $this->view->renderTwig('testTwig.twig', [
+                'post' => $post,
+                'errors' => $errors
+            ]);            
+        }
+        return $this->view->renderTwig('testTwig.twig', $post->all());
+    }
+
     // ok
     public function home(Parameter $post)
     {
@@ -100,10 +123,27 @@ class FrontController extends Controller
             'offset' => $offset,
         ]);
 
+        $pageArticlesCount = count($articles);
+
+        $previousPageUrl = null;
+        $nextPageUrl = null;
+        
+        if($page > 1){
+            $previousPageUrl = URL::mergeOn($_GET, ['page' => $page - 1]);
+        }
+
+        if($page < $pages && $pages !== 1){
+            $nextPageUrl = URL::mergeOn($_GET, ['page' => $page + 1]);
+        }
+
         return $this->view->render('articles', [
             'articles' => $articles,
             'page' => $page,
-            'pages' => $pages
+            'pages' => $pages,
+            'totalArticlesCount' => $articlesCount,
+            'pageArticlesCount' => $pageArticlesCount,
+            'previousPageUrl' => $previousPageUrl,
+            'nextPageUrl' => $nextPageUrl        
         ]);
     }
 
@@ -112,13 +152,28 @@ class FrontController extends Controller
     {
         $article = $this->articleDAO->getArticle((int)$get->get('articleId'));
         if($article){
+            $this->session->set('previousURL', $_SERVER['REQUEST_URI']);
+            if($this->session->get('pseudo')){
+                if($article->getStatusName() === "standby" && ($this->session->get('role') !== "admin" && $this->session->get('role') !== "editor")){
+                    $this->session->set('standbyArticle', '<div class="alert alert-danger">L\'article recherché est n\'est pas encore publié ou n\'est plus disponnible</div>');
+                    HTTP::redirect('?route=articles');                  
+                }
+            } else {
+                if($article->getStatusName() === "private"){
+                    $this->session->set('privateArticle', '<div class="alert alert-danger">L\'article recherché est privé, vous devez vous connecter pour pouvoir le consulter</div>');
+                    HTTP::redirect('?route=articles');
+                } elseif($article->getStatusName() === "standby"){
+                    $this->session->set('standbyArticle', '<div class="alert alert-danger">L\'article recherché est n\'est pas encore publié ou n\'est plus disponnible</div>');
+                    HTTP::redirect('?route=articles');                  
+                }             
+            }
             $comments = [];
             if($article->getAllowComment()) {
                 $comments = $this->commentDAO->getComments([
                     'articleId' => (int)$get->get('articleId'),
                     'validated' => "validated"
                 ]);
-            }                        
+            }       
             return $this->view->render('article', [
                 'article' => $article,
                 'comments' => $comments,
@@ -235,11 +290,18 @@ class FrontController extends Controller
             if($this->userDAO->pseudoExists($post->get('pseudo'))){
                 $result = $this->userDAO->login($post);
                 if($result && $result['passwordValid']) {
-                    $this->session->set('id', $result['result']['id']);
-                    $this->session->set('role', $result['result']['role_name']);
-                    $this->session->set('pseudo', $post->get('pseudo'));
-                    $this->session->set('loginSuccess', '<div class="alert alert-success"> Vous êtes connecté en tant que ' . $post->get('pseudo') . '</div>');
-                    HTTP::redirect('?');
+                    if($result['result']['status_name'] === "banned"){
+                        $this->session->set('banned', '<div class="alert alert-danger"> Vous avez été banni du blog </div>');
+                    } else {
+                        $this->session->set('id', $result['result']['id']);
+                        $this->session->set('role', $result['result']['role_name']);
+                        $this->session->set('pseudo', $post->get('pseudo'));
+                        $this->session->set('loginSuccess', '<div class="alert alert-success"> Vous êtes connecté en tant que ' . $post->get('pseudo') . '</div>');     
+                        if($this->session->get('previousURL')){
+                            HTTP::redirect($this->session->show('previousURL'));
+                        }                   
+                    }
+                    HTTP::redirect('?route=testTwig');
                 }
             }
             $this->session->set('LoginError', '<div class="alert alert-danger">Le pseudo ou mot de passe incorrect</div>');

@@ -1,7 +1,11 @@
 <!-- Waiting for Twig -->
 <?php $this->title = "Administration Commentaires"; ?>
 
-<h1><?= $this->title ?></h1>
+<h1 class="d-flex">
+    <?= $this->title ?> 
+    <a href="?route=adminArticles" class="btn btn-primary ms-auto my-auto">Les articles</a>
+    <a href="?route=adminUsers" class="btn btn-primary mx-2 my-auto">Les utilisateurs</a>
+</h1>
 
 <p>En construction</p>
 
@@ -86,7 +90,7 @@
                     <?php foreach($comments as $comment) : ?>
                         <tr>
                             <td>
-                                <a href="../public/index.php?route=profile&userId=<?= (int)$comment->getUserId() ?>"><?= htmlspecialchars($comment->getUserPseudo()) ?></a>
+                                <a href="?route=profile&userId=<?= (int)$comment->getUserId() ?>"><?= htmlspecialchars($comment->getUserPseudo()) ?></a>
                             </td>
                             <td>
                                 <?= htmlspecialchars($comment->getExcerptContent()) ?>
@@ -95,10 +99,10 @@
                                 <?= $comment->getFormatedDate($comment->getCreatedAt()) ?>
                             </td>
                             <td>
-                                <a href="../public/index.php?route=article&articleId=<?= (int)$comment->getArticleId() ?>"><?= htmlspecialchars($comment->getArticleTitle()) ?> </a> 
+                                <a href="?route=article&articleId=<?= (int)$comment->getArticleId() ?>"><?= htmlspecialchars($comment->getArticleTitle()) ?> </a> 
                             </td>
                             <td>
-                                <a href="../public/index.php?route=viewSingleComment&commentId=<?= (int)$comment->getId() ?>"> Voir </a>
+                                <a href="?route=viewSingleComment&commentId=<?= (int)$comment->getId() ?>"> Voir </a>
                                 <?php if(!$comment->getValidated()) : ?>
                                     | <a href="?route=updateCommentValidation&commentId=<?= (int)$comment->getId() ?>&validation=1"> Valider </a>
                                 <?php else : ?>

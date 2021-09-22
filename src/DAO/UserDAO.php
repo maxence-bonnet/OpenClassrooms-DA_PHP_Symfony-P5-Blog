@@ -55,6 +55,16 @@ class UserDAO extends DAO
         ]);
     }
 
+    public function updateUserStatus(int $userId, int $statusId) : void
+    {
+        $sql = 'UPDATE user SET status_id = :status_id WHERE id = :user_id';
+        $this->createQuery($sql,[
+            'user_id' => $userId,
+            'status_id' => $statusId
+        ]);
+    }
+
+
     public function pseudoExists(string $pseudo) : ?int
     {
         $sql = 'SELECT COUNT(pseudo) FROM user WHERE pseudo = :pseudo';
@@ -81,14 +91,15 @@ class UserDAO extends DAO
 
     public function login(Parameter $post) : array
     {
-        $sql = 'SELECT user.id, user.pseudo, user.password, user_role.name as role_name
+        $sql = 'SELECT user.id, user.pseudo, user.password, user_status.name as status_name, user_role.name as role_name
                 FROM user
                 INNER JOIN user_role ON user.role_id = user_role.id
+                INNER JOIN user_status ON user.status_id = user_status.id
                 WHERE user.pseudo = :pseudo';
         $data = $this->createQuery($sql, ['pseudo' => $post->get('pseudo')]);
         $result = $data->fetch();
         $passwordValid = password_verify($post->get('password'), $result['password']);
-        if($passwordValid){
+        if($passwordValid && $result['status_name'] !== "banned"){
             $sql = 'UPDATE user 
                     SET status_id = 2 
                     WHERE pseudo = :pseudo';
@@ -104,7 +115,8 @@ class UserDAO extends DAO
     {
         $sql ='UPDATE user
                SET status_id = 1
-               WHERE id = :id';
+               WHERE id = :id
+               AND status_id != 3' ;
         $this->createQuery($sql, ['id' => $userId]);
     }
 

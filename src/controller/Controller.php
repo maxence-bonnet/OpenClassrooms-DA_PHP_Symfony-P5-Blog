@@ -47,6 +47,7 @@ abstract class Controller
     {
         if(!$this->session->get('pseudo')) {
             $this->session->set('loginNeeded', '<div class="alert alert-danger">Vous devez être connecté pour accèder à cette page</div>');
+            $this->session->set('previousURL', $_SERVER['REQUEST_URI']);
             HTTP::redirect('?route=login');
         }
     }
