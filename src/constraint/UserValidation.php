@@ -26,9 +26,6 @@ class UserValidation extends Validation
         } elseif ($name === 'pseudo') {
             $error = $this->checkPseudo($name, $value);
             $this->addError($name, $error);
-        } elseif ($name === 'pseudoExists') {
-            $error = $this->checkPseudoExists($value);
-            $this->addError($name, $error);
         } elseif ($name === 'password') {
             $this->setPassword1($value);
             $error = $this->checkPassword($name, $value);
@@ -37,8 +34,8 @@ class UserValidation extends Validation
             $this->setPassword2($value);
             $error = $this->checkPassword2($name, $value);
             $this->addError($name, $error);
-        } elseif ($name === 'mail') {
-            $error = $this->checkMail($name, $value);
+        } elseif ($name === 'email') {
+            $error = $this->checkEmail($name, $value);
             $this->addError($name, $error);
         } elseif ($name === 'phone') {
             $error = $this->checkPhone($name, $value);
@@ -51,6 +48,8 @@ class UserValidation extends Validation
             $this->setPassword1(null);
             $this->setPassword2(null);
         }
+
+        // Add required fields
     }
 
     public function checkLastname($name, $value)
@@ -90,10 +89,6 @@ class UserValidation extends Validation
         if($this->constraint->maxLength($name, $value, 60)) {
             return $this->constraint->maxLength('Pseudo', $value, 60);
         }
-    }
-
-    public function checkPseudoExists($value)
-    {
         if($this->constraint->pseudoExists($value)) {
             return $this->constraint->pseudoExists($value);
         }
@@ -129,10 +124,10 @@ class UserValidation extends Validation
         }   
     }
 
-    public function checkMail($name, $value)
+    public function checkEmail($name, $value)
     {
-        if($this->constraint->isMail($name, $value)) {
-            return $this->constraint->isMail('Mail', $value);
+        if($this->constraint->isEmail($name, $value)) {
+            return $this->constraint->isEmail('Mail', $value);
         }
     }
 

@@ -1,0 +1,18 @@
+{# {% import 'twigMacro/linkMacro.twig' as link %} #}
+
+{#  #}
+{% macro navLink(name, href, options = []) %}
+    <li class="nav-item mx-1 {{ options.position }}">
+        <a class="nav-link {{ options.page is same as(name) ? 'active' }}" href="{{ href }}"><i class="{{ options.icon}}"></i> {{ name }}</a>
+    </li>
+{% endmacro %}
+
+{#  #}
+{% macro buttonLink(content,href,options = []) %}
+    <a href="{{ href }}" class="btn btn-primary {{ options.position }}">{{ content | raw }}</a>
+{% endmacro %}
+
+{#  #}
+{% macro link(content,href,options = []) %}
+    <a href="{{ href }}" class="{{ options.class }}" title="{{ options.title }}">{{ content | raw }}</a>
+{% endmacro %}

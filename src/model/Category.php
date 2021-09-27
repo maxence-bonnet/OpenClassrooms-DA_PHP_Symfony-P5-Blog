@@ -22,7 +22,7 @@ class Category
     /**
      * @var string/null
      */
-    private $parentName;
+    // private $parentName;
 
 
     /**
@@ -40,10 +40,10 @@ class Category
      */
     public function getParentId(){return $this->parentId;}
 
-    /**
-     * @return string/null
-     */
-    public function getParentName(){return $this->parentName;}
+    // /**
+    //  * @return string/null
+    //  */
+    // public function getParentName(){return $this->parentName;}
 
  
     /**
@@ -61,8 +61,8 @@ class Category
      */
     public function setParentId($parentId){$this->parentId = $parentId;}
 
-    /**
-     * @param string $parent
-     */
-    public function setParentName($parentName){$this->parentName = $parentName;}
+    // /**
+    //  * @param string $parentName
+    //  */
+    // public function setParentName($parentName){$this->parentName = $parentName;}
 }

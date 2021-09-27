@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+
+<html lang="fr" class="h-100">
+    <head>
+        <meta charset="UTF-8" />
+        <base href="http://localhost/P5_blog/public/">
+        <link href='css/boxicons.min.css' rel='stylesheet'>
+        <link href="css/bootstrap.min.css" rel="stylesheet" >
+        <link href="css/style.css" rel="stylesheet">
+        <title>{{ title ?? 'Blog'}}</title>
+        {% block head %}{% endblock %}
+    </head>
+    <body class="d-flex flex-column h-100">
+        <header>
+            <nav class="navbar navbar-expand-md navbar-dark bg-dark">
+                <div class="container-fluid">
+                <a class="navbar-brand" href="?"><i class='bx bx-cube-alt fs-1' ></i></a>
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse" id="navbarNav">
+                        <ul class="navbar-nav mb-2 mb-lg-0 w-100 px-2">
+
+                            {% import 'twigMacro/linkMacro.twig' as link %}
+
+                            {{ link.navLink('Accueil', '?', {page : title, icon : "bx bx-home"}) }}
+
+                            {{ link.navLink('Les Articles', '?route=articles', {page : title, icon : "bx bx-book-open"}) }}
+                            
+                            {% if session.get('pseudo') %}
+
+                                {{ link.navLink('Profil', '?route=profile', {page : title, icon : "bx bx-user"})}}
+
+                                {% if session.get('role') is same as("admin") %}
+
+                                    {{ link.navLink('Nouvel article', '?route=addArticle', {page : title, icon : "bx bx-pencil"}) }}
+
+                                    {{ link.navLink('Administration', '?route=administration', {page : title, icon : "bx bx-crown"}) }}
+
+                                {% endif %}
+
+                                {{ link.navLink(session.get('pseudo'), '?route=profile', {icon : "bx bx-user", position : 'ms-auto'}) }}
+
+                                {{ link.navLink('Déconnexion', '?route=logout', {icon : "bx bx-log-out-circle"}) }}
+
+                            {% else %}
+                            
+                                {{ link.navLink('Inscription', '?route=register', {page : title, icon : "bx bx-user", position : 'ms-auto'}) }}
+
+                                {{ link.navLink('Connexion', '?route=login', {page : title, icon : "bx bx-log-in-circle"}) }}
+
+                            {% endif %}
+
+                        </ul>
+                </div>
+            </nav>
+        </header>
+
+        <div class="container mt-3" id="content">
+
+            {{ session.messages() | raw }}
+
+            {% block content %}
+
+            {% endblock %}
+
+        </div>
+        <footer class="bg-light py-4 footer mt-auto">
+            <div class="container d-flex">
+            
+                <a href="https://github.com/maxence-bonnet/OpenClassrooms-DA_PHP_Symfony-P5-Blog" class="p-2"><i class='bx bxl-github fs-3'></i></a>
+                <a href="https://www.linkedin.com/in/maxence-bonnet-b28a32203/" class="p-2"><i class='bx bxl-linkedin-square fs-3' ></i></a>
+                <a href="https://twitter.com/" class="p-2"><i class='bx bxl-twitter fs-3' ></i></a>
+
+                {% if session.get('role') is same as("admin") %}
+
+                    <a href="?route=administration" class="ms-auto p-2 d-flex text-decoration-none"><i class='bx bxs-crown fs-3' ></i> Administration </a>
+
+                    <span class="d-inline-block p-2"> Généré en {{ (1000*("now" | date('U.u') - constant('PAGE_GENERATING_TIME'))) | round }} ms <i class='bx bxl-php'></i></span>
+
+                {% endif %}
+
+            </div>
+        </footer>
+        <script src="js/bootstrap.min.js"></script>
+    </body>
+</html>
+

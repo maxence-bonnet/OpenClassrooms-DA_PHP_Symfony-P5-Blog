@@ -17,7 +17,7 @@ class UserDAO extends DAO
         $user->setFirstname($row['firstname']);
         $user->setLastname($row['lastname']);  
         $user->setPseudo($row['pseudo']);      
-        $user->setMail($row['mail']);
+        $user->setEmail($row['email']);
         $user->setPhone($row['phone']);
         $user->setRoleId($row['role_id']);
         $user->setRoleName($row['role_name']);
@@ -29,7 +29,7 @@ class UserDAO extends DAO
 
     public function getUser(int $userId)
     {
-        $sql = 'SELECT user.id, user.created_at, user.firstname, user.lastname, user.pseudo, user.mail, user.phone, user.score, user.status_id, user.role_id,
+        $sql = 'SELECT user.id, user.created_at, user.firstname, user.lastname, user.pseudo, user.email, user.phone, user.score, user.status_id, user.role_id,
         user_status.name as status_name,
         user_role.name as role_name
         FROM user
@@ -64,24 +64,23 @@ class UserDAO extends DAO
         ]);
     }
 
-
     public function pseudoExists(string $pseudo) : ?int
     {
         $sql = 'SELECT COUNT(pseudo) FROM user WHERE pseudo = :pseudo';
-        $result = $this->createQuery($sql, [':pseudo' => htmlentities($pseudo)]);
+        $result = $this->createQuery($sql, [':pseudo' => htmlspecialchars($pseudo)]);
         return $result->fetchColumn();;
     }
 
     public function register(Parameter $post) : void
     {
-        $sql = 'INSERT INTO user (created_at, firstname, lastname, pseudo, password, mail, phone, role_id, status_id, score)
-                VALUES(NOW(), :firstname, :lastname, :pseudo, :password, :mail, :phone, :role_id, :status_id, :score)';
+        $sql = 'INSERT INTO user (created_at, firstname, lastname, pseudo, password, email, phone, role_id, status_id, score)
+                VALUES(NOW(), :firstname, :lastname, :pseudo, :password, :email, :phone, :role_id, :status_id, :score)';
         $this->createQuery($sql, [
             'firstname' => $post->get('firstname'),
             'lastname' => $post->get('lastname'),
             'pseudo' => $post->get('pseudo'),
             'password' => password_hash($post->get('password'),PASSWORD_BCRYPT),
-            'mail' => $post->get('mail'),
+            'email' => $post->get('email'),
             'phone' => $post->get('phone'),
             'role_id' => 2,
             'status_id' => 1,
@@ -207,7 +206,7 @@ class UserDAO extends DAO
 
         extract($parameters);
 
-        $sql = 'SELECT user.id, user.created_at, user.firstname, user.lastname, user.pseudo, user.mail, user.phone, user.score, user.status_id, user.role_id,
+        $sql = 'SELECT user.id, user.created_at, user.firstname, user.lastname, user.pseudo, user.email, user.phone, user.score, user.status_id, user.role_id,
                 user_status.name as status_name,
                 user_role.name as role_name
                 FROM user

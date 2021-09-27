@@ -1,0 +1,25 @@
+{% extends 'base.twig' %}
+
+{% import 'twigMacro/linkMacro.twig' as link %}
+
+{% import 'twigMacro/formMacro.twig' as form %}
+
+{% block head %}
+    <title>{{ title }}</title>
+{% endblock %}
+
+{% block content %}
+
+<section class="container ps-5">
+    <div class="col-6">
+        <form method="post" action="?route=adminEditComment&commentId={{ post.get('id') }}">
+            <div class="row">
+                    {{ form.textarea('Modifier le commentaire','comment', 'commentContent', { errors : errors.comment, value : post.get('comment'), help : '0/500'}) }}
+                    {{ form.submit('Valider', { position : 'me-auto' }) }}
+                </div>
+            </div>
+        </form>                       
+    </div>
+</section>
+
+{% endblock %}

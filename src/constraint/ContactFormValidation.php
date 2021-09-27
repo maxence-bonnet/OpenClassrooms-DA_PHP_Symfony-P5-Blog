@@ -9,18 +9,20 @@ class ContactFormValidation extends Validation
     public function checkField($name, $value)
     {
         if($name === 'firstname') {
-            $error = $this->checkLastname($name, $value);
-            $this->addError($name, $error);
-        } elseif ($name === 'lastname') {
             $error = $this->checkFirstname($name, $value);
             $this->addError($name, $error);
-        } elseif ($name === 'mail') {
-            $error = $this->checkMail($name, $value);
+        } elseif ($name === 'lastname') {
+            $error = $this->checkLastname($name, $value);
+            $this->addError($name, $error);
+        } elseif ($name === 'email') {
+            $error = $this->checkEmail($name, $value);
             $this->addError($name, $error);
         } elseif ($name === 'message') {
             $error = $this->checkMessage($name, $value);
             $this->addError($name, $error);
         }
+
+        // Add required fields
     }
 
     public function checkLastname($name, $value)
@@ -62,10 +64,10 @@ class ContactFormValidation extends Validation
         }
     }
 
-    public function checkMail($name, $value)
+    public function checkEmail($name, $value)
     {
-        if($this->constraint->isMail($name, $value)) {
-            return $this->constraint->isMail('Mail', $value);
+        if($this->constraint->isEmail($name, $value)) {
+            return $this->constraint->isEmail('Mail', $value);
         }
     }
 }

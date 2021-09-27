@@ -2,6 +2,8 @@
 
 namespace App\src\model;
 
+use App\src\utils\Text;
+
 class Article extends Model
 {
     /**
@@ -77,7 +79,8 @@ class Article extends Model
         if($this->lede === null){
             return null;
         }
-        return $this->getExcerpt($this->lede, 120);
+        $content = Text::removeMarkdown($this->lede);
+        return $this->getExcerpt($content, 120);
     }
 
 
@@ -134,12 +137,12 @@ class Article extends Model
     /**
      * @return int
      */
-    public function getstatusId(){return $this->statusId;}
+    public function getStatusId(){return $this->statusId;}
 
     /**
      * @return string
      */
-    public function getstatusName(){return $this->statusName;}
+    public function getStatusName(){return $this->statusName;}
 
     /**
      * @return boolean
@@ -200,12 +203,12 @@ class Article extends Model
     /**
      * @param int $statusId
      */
-    public function setstatusId($statusId){$this->statusId = $statusId;}
+    public function setStatusId($statusId){$this->statusId = $statusId;}
 
     /**
      * @param string $statusName
      */
-    public function setstatusName($statusName){$this->statusName = $statusName;}
+    public function setStatusName($statusName){$this->statusName = $statusName;}
 
     /**
      * @param boolean $allowComment

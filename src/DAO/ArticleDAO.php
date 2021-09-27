@@ -80,7 +80,7 @@ class ArticleDAO extends DAO
             $where = "AND";
         }
 
-        if(!isset($allArticleStatus)){
+        if(!isset($all)){
             if(isset($published) || isset($private) || isset($standby)){
                 $or = "";
                 $sql .= ' ' . $where . ' (' ;
@@ -146,7 +146,7 @@ class ArticleDAO extends DAO
             $where = "AND";
         }
 
-        if(!isset($allArticleStatus)){
+        if(!isset($all)){
             if(isset($published) || isset($private) || isset($standby)){
                 $or = "";
                 $sql .= ' ' . $where . ' (' ;
@@ -196,35 +196,37 @@ class ArticleDAO extends DAO
     /**
      * Insert one new article
      */
-    public function addArticle(Parameter $post, int $userId)
+    public function addArticle(Parameter $post)
     {
         if((int)$post->get('statusId') === 3){
             $date = null;
         } else {
             $date = date('Y-m-d H:i:s');
         }
+
         $sql = 'INSERT INTO article (created_at, last_modified, title, lede, content, author_id, category_id, status_id, allow_comment) 
                 VALUES (:created_at, null, :title, :lede, :content, :author_id, :category_id, :status_id, :allow_comment)';
         $this->createQuery($sql, ['created_at' => $date,
                                   'title' => $post->get('title'),
                                   'lede' => $post->get('lede'),
                                   'content' => $post->get('content'),                                 
-                                  'author_id' => $userId,
-                                  'category_id' => $post->get('categoryId'),
-                                  'status_id' => $post->get('statusId'),
-                                  'allow_comment' => $post->get('allowComment')]);
+                                  'author_id' => (int)$post->get('authorId'),
+                                  'category_id' => (int)$post->get('categoryId'),
+                                  'status_id' => (int)$post->get('statusId'),
+                                  'allow_comment' => (int)$post->get('allowComment')]);
     }
 
     /**
      * Update one article
      */
-    public function editArticle(Parameter $post, $articleId, $userId)
+    public function editArticle(Parameter $post, $articleId)
     {
         // if((int)$post->get('statusId') === 3){
         //     $createdAt = null;
         // } else {
         //     $createdAt = date('Y-m-d H:i:s');
         // }
+
         $lastModified = date('Y-m-d H:i:s');
         $sql = 'UPDATE article
         SET last_modified=:last_modified, title=:title, lede=:lede, content=:content, author_id=:author_id, category_id=:category_id, status_id=:status_id, allow_comment=:allow_comment
@@ -234,11 +236,11 @@ class ArticleDAO extends DAO
             'title' => $post->get('title'),
             'lede' => $post->get('lede'),
             'content' => $post->get('content'),
-            'author_id' => $userId,
-            'category_id'  => $post->get('categoryId'),
-            'status_id' => $post->get('statusId'),
-            'allow_comment' => $post->get('allowComment'),
-            'article_id' => $articleId
+            'author_id' => (int)$post->get('authorId'),
+            'category_id'  => (int)$post->get('categoryId'),
+            'status_id' => (int)$post->get('statusId'),
+            'allow_comment' => (int)$post->get('allowComment'),
+            'article_id' => (int)$articleId
         ]);
     }
 

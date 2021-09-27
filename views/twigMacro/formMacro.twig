@@ -1,0 +1,102 @@
+{# {% import 'twigMacro/formMacro.twig' as form %} #}
+
+{# #}
+{% macro input(type, label, name, options = [] ) %}
+    <div class="form-group mb-3 {{ options.col | default('col-md')}}">
+        <label class="form-label {{ options.labelposition }}" for="{{ name }}">{{ label }} :</label>
+        <input type="{{ type }}" class="form-control {{ options.errors ? 'is-invalid' : '' }}" id="{{ name }}" name="{{ name }}" {% if options.help %} aria-describedby="{{ name ~ 'ContentHelp' }}" {% endif %} placeholder="{{ options.placeholder }}" value="{{ options.value }}" >
+        {% if options.help %}
+            <div id="{{ name ~ 'ContentHelp' }}" class="form-text">{{ options.help | raw }}</div>
+        {% endif %}
+        {{ options.errors | raw }}
+    </div>
+{% endmacro %}
+
+{# #}
+{% macro hiddenInput(name, options = [] ) %}
+        <input type="hidden" name="{{ name }}" value="{{ options.value }}" >
+{% endmacro %}
+
+{# #}
+{% macro textarea(label, name, id, options = [] ) %}
+    <div class="form-group mb-3 col">
+        <label class="form-label" for="{{ name }}">{{ label }} :</label>
+        <textarea class="form-control {{ options.errors ? 'is-invalid' : '' }}" id="{{ id }}" name="{{ name }}" {% if options.help %} aria-describedby="{{ name ~ 'ContentHelp' }}" {% endif %} style="height: {{ options.size ?? '120' }}px" placeholder="...">{{ options.value }}</textarea>
+        {% if options.help %}
+            <div id="{{ name ~ 'ContentHelp' }}" class="form-text">{{ options.help | raw }}</div>
+        {% endif %}
+        {{ options.errors | raw }}
+    </div>
+{% endmacro %}
+
+{# #}
+{% macro select(label, name, data, options = [] ) %}
+    <div class="form-group mb-3 col">
+        <label class="form-label" for="{{ name }}">{{ label }} :</label>
+        <select class="form-select form-select" name="{{ name }}" id="{{ name }}">
+            <option value="0" disabled selected></option>
+            {% for sample in data %}
+                <option value="{{ sample.value }}" {{ sample.value is same as(options.selected) ? 'selected' }}>{{ sample.name }}</option>
+            {% endfor %}
+        </select>
+        {{ options.errors | raw }}
+    </div>
+{% endmacro %}
+
+{# #}
+{% macro checkbox(data) %}
+    <div class="form-group mb-3 col">
+        {% for sample in data %}
+        <label class="form-label" for="{{ sample.name }}">{{ sample.label }}</label>
+        <input type="checkbox" class="form-check-input" id="{{ sample.name }}" name="{{ sample.name }}" value="{{ sample.value }}" {{ sample.value is same as(sample.checked) ? 'checked'}}>
+        {% endfor %}
+    </div>
+{% endmacro %}
+
+{# #}
+{% macro radio(name, data, options) %}
+    <div class="form-group mb-3 col">
+        {% for sample in data %}
+            <div class="form-check-inline">
+                <input class="form-check-input {{ options.errors ? 'is-invalid' : '' }} " type="radio" name="{{ name }}" id="{{ sample.name }}" value="{{ sample.value }}" {{ sample.value is same as(sample.checked) or sample.default ? 'checked'}}>
+                <label class="form-check-label" for="{{ sample.name }}">{{ sample.label }}</label>
+                {% if loop.last %} {{ options.errors | raw }} {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+{% endmacro %}
+
+{# #}
+{% macro submit(value = 'Valider', options = [] ) %}
+    <div class="mb-3 d-flex">
+        <input type="submit" class="btn btn-primary {{ options.position }}" id="submit" name="submit" value="{{ value }}">
+    </div>
+{% endmacro %}
+
+{# #}
+{% macro inputGroup(data) %}
+    <div class="input-group mb-3">
+        {% for sample in data %}
+            {% if sample.type is same as('radio') or sample.type is same as('checkbox') %}
+                <div class="form-check-inline">
+                    <input class="form-check-input" type="{{ sample.type }}" name="{{ sample.name }}" id="{{ sample.id }}" value="{{ sample.value }}" {{ sample.checked is same as(sample.value) ? 'checked'}}>
+                    <label class="form-check-label" for="{{ sample.id }}">{{ sample.label }}</label>
+                </div>
+            {% else %}
+                <label class="input-group-text {{ sample.options.labelPosition }}" for="{{ sample.name }}">{{ sample.label }} : </label>
+                {% if sample.type is same as('select') %}
+                    <select class="form-select" name ="{{ sample.name }}" id="{{ sample.name }}">
+                        {% if sample.options.genericOption %}
+                            <option value="{{ sample.options.genericOption.value }}">{{ sample.options.genericOption.name }}</option>
+                        {% endif %}
+                        {% for dataListSample in sample.dataList %}                       
+                            <option value="{{ dataListSample.value }}" {% if sample.options.selected is empty and dataListSample.value is same as(sample.options.default) or dataListSample.value is same as(sample.options.selected) %} selected {# selected here = raw text , not var #} {% endif %}>{{ dataListSample.name }}</option>
+                        {% endfor %}
+                    </select>
+                {% else %}
+                    <input type="{{ sample.type }}" class="form-control" name="{{ sample.name }}" id="{{ sample.name }}" placeholder="{{ sample.placeholder }}" value="{{ sample.value }}">                   
+                {% endif %}
+            {% endif %}
+        {% endfor %}
+    </div>
+{% endmacro %}

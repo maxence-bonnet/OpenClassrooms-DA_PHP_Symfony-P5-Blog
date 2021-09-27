@@ -8,6 +8,7 @@ class Constraint
 
     public function notBlank($name, $value)
     {
+        $value = preg_replace("#([\t\n\r\s])#","$2",$value);
         if(empty($value)) {
             return '<div class="invalid-feedback">Le champ '.$name.' saisi est vide.</div>';
         }
@@ -48,10 +49,17 @@ class Constraint
         }
     }
 
-    public function isMail($name, $value)
+    public function isEmail($name, $value)
     {
         if(!filter_var($value,FILTER_VALIDATE_EMAIL)){
             return '<div class="invalid-feedback">Le champ '.$name.' est invalide.</div>';
+        }
+    }
+
+    public function inArray($name, $value, $array)
+    {
+        if(!in_array($value, $array)){
+            return '<div class="invalid-feedback">Le champ '.$name.' n\'est pas correctement saisi.</div>';
         }
     }
 }

@@ -13,7 +13,7 @@ class HTTP
     public static function dynamicRedirect(string $url, Session $session) : void 
     {
         if($session->get('previousURL')){
-            $url = $session->show('previousURL');
+            $url = $session->use('previousURL');
         }
         self::redirect($url);
     }
