@@ -1,0 +1,173 @@
+{% extends 'base.twig' %}
+
+{% import 'twigMacro/formMacro.twig' as form %}
+
+{% import 'twigMacro/linkMacro.twig' as link %}
+
+{% block content %}
+
+<section class="container bg-light mb-3">
+    <div class="row">
+        <div class="col-12 col-lg-8 p-2 shadow-sm">
+            <h2 class="text-center text-md-start">{{ title }}</h2>
+
+    
+            <h5 class="text-center text-md-start">
+
+                {{ article.getCreatedAt() ? article.getAuthorPseudo() ~ " le " ~ article.getFormatedDate(article.getCreatedAt()) : '<i class=\'bx bx-hourglass\'></i> En attente avant publication' }}
+
+                {% if article.getCreatedAt() < article.getLastModified() %} 
+                    <span class="fs-6 fw-lighter fst-italic"> (dernière modification le {{ article.getFormatedDate(article.getLastModified()) }} )</span>
+                {% endif %}
+
+            </h5>
+            
+            <div id="#articleLede" class="ms-3 mt-3">{{ article.getLede() | markdown_to_html }}</div>
+
+            <div id="#articleContent">{{ article.getContent() | markdown_to_html }}</div>
+
+        </div>
+
+        <div class="col-12 col-lg-4 p-2 px-md-5 shadow-sm">
+            <h3 class="text-center text-md-start">A propos de l'auteur(e):</h3>
+            <div class="w-50 text-center m-auto">
+                <img class="img-thumbnail rounded mx-auto d-block" src="img/author.jpg" alt="image-auteur">
+            </div>
+            <p>Mgnam laudantium corporis nisi consectetur, non repudiandae natus voluptatum sapiente consequatur dicta. Quidem possimus repudiandae commodi rerum cupiditate!</p>
+        </div>          
+    </div>
+</section>
+
+<section class="container ps-5 mb-3">
+    {% if article.getAllowComment() %}
+        <h3 class="text-center text-md-start">Les commentaires :</h3>
+        <!-- COMMENTS -->
+        {% for comment in comments %}
+            {% if not comment.getAnswerTo() %}
+            <div class="row mb-2">
+                <div class="col-8">
+                    <div class="p-2 shadow mb-2 {{ post and post.get('id') is same as(comment.getId()) ? 'selected' : 'bg-light' }}" id="comment{{ comment.getId() }}">
+
+                        <h6>{{ comment.getUserPseudo() ~ " " ~ comment.getFormatedDate(comment.getCreatedAt()) }} {{ comment.getLastModified() ? '(modifié)' }}</h6>
+
+                        <p>{{ comment.getContent() | nl2br }}</p>
+                        <div class="d-flex p-2">
+                            {% if session.get('id') and session.get('id') is same as(comment.getUserId()) or session.get('role') is same as("admin") or session.get('role') is same as("moderator") %}
+                                
+                                {{ link.buttonLink('Modifier','?route=editComment&commentId=' ~ comment.getId() ~ '#commentForm',{ position : 'mx-1'}) }}
+
+                                    {% if session.get('role') is same as("admin") or session.get('role') is same as("moderator") %}
+
+                                        {{ link.buttonLink('Masquer','?route=updateCommentValidation&commentId=' ~ comment.getId() ~ '&validation=0',{ position : 'mx-1'}) }}
+
+                                    {% endif %}
+
+                                {{ link.buttonLink('Supprimer','?route=deleteComment&commentId=' ~ comment.getId(),{ position : 'mx-1'}) }}
+                            
+                            {% endif %}
+
+                            {% if session.get('pseudo') %}
+                            
+                                {{ link.buttonLink('Répondre','?route=article&articleId=' ~ article.getId() ~ '&answerTo=' ~ comment.getId() ~ '#answerForm',{ position : 'ms-auto'}) }}                        
+
+                            {% endif %}
+                        </div>
+                    </div>
+                    <!-- ANSWERS -->
+                    {% for answer in comments %}
+                        {% if answer.getAnswerTo() is same as(comment.getId()) %}
+                            <div class="row mb-2 d-flex justify-content-end">
+                                <div class="col-11">
+                                
+                                    <div class="p-4 shadow mb-2 {{ post and post.get('id') is same as(answer.getId()) ? 'selected' : 'bg-light' }}" id="comment{{ answer.getId() }}">
+                                        
+                                        <h6>{{ answer.getUserPseudo() ~ " " ~ answer.getFormatedDate(answer.getCreatedAt()) }} {{ answer.getLastModified() ? '(modifié)' }}</h6>
+                                        
+                                        <p>{{ answer.getContent() | nl2br }}</p>
+                                        
+                                        <div class="d-flex p-2">
+                                            {% if session.get('id') and session.get('id') is same as(answer.getUserId()) or session.get('role') is same as("admin") or session.get('role') is same as("moderator") %}
+                                                
+                                                {{ link.buttonLink('Modifier','?route=editComment&commentId=' ~ answer.getId() ~ '#commentForm',{ position : 'mx-1'}) }}
+
+                                                    {% if session.get('role') is same as("admin") or session.get('role') is same as("moderator") %}
+
+                                                        {{ link.buttonLink('Masquer','?route=updateCommentValidation&commentId=' ~ answer.getId() ~ '&validation=0',{ position : 'mx-1'}) }}
+
+                                                    {% endif %}
+
+                                                {{ link.buttonLink('Supprimer','?route=deleteComment&commentId=' ~ answer.getId(),{ position : 'mx-1'}) }}
+                                            
+                                            {% endif %}
+
+                                            {% if session.get('pseudo') %}
+                                            
+                                                {{ link.buttonLink('Répondre','?route=article&articleId=' ~ article.getId() ~ '&answerTo=' ~ comment.getId() ~ '#answerForm',{ position : 'ms-auto'}) }}                        
+
+                                            {% endif %}  
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endfor %} 
+                    <!-- END ANSWERS -->
+                    <!-- ANSWER FORM -->
+                    {% if answerTo and answerTo | number_format is same as(comment.getId()) %}
+                        <div class="row mb-2 d-flex justify-content-end">
+                            <div class="col-10">
+                                <div class="py-2 px-5 shadow bg-light">
+                                    <form method="post" action="{{ '?route=addComment&articleId=' ~ article.getId() ~ '#comment' ~ comment.getId() }}" id="answerForm">
+                                        <div class="row d-flex justify-content-center">
+                                            <div class="row d-flex justify-content-center">
+
+                                            {{ form.hiddenInput('answerTo',{ value : answerTo}) }}
+
+                                            {{ form.textarea('Votre réponse','answer', 'answerContent', { errors : errors.answer, value : post.get('answer'), placeholder : '...', help : 'Ce commentaire sera soumis à relecture avant publication <br> 500 caractères maximum : 0/500'}) }}
+
+                                            {{ form.submit('Répondre', { position : 'ms-auto'}) }}
+
+                                            </div>
+                                        </div>
+                                    </form>                                    
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                    <!-- END ANSWER FORM -->
+                </div>             
+            </div>
+            {% endif %}
+        {% endfor %}
+        <!-- END COMMENTS -->
+        <div class="row mb-2 ">
+            <!-- COMMENT FORM -->
+            {% if session.get('pseudo') %}
+                <div class="col-8 d-flex justify-content-center">
+                    <div class="col-10">
+                        <div class="py-2 px-5 shadow bg-light ">
+                            <h4 class="text-center text-md-start">{{ post ? 'Modifier le commentaire' : 'Ajouter un commentaire' }}</h4>
+                            <form method="post" action="?route={{ post and not post.get('submit') ? 'editComment&commentId=' ~ post.get('id') ~ '#commentForm' : 'addComment&articleId=' ~ article.getId() ~ '#commentForm'}}" id="commentForm">
+
+                                {{ form.textarea(session.get('pseudo'), 'comment', 'commentContent', { errors : errors.comment, value : post.get('comment'), placeholder : 'C\'est énorme j\'adore !', help : 'Ce commentaire sera soumis à relecture avant publication <br> 500 caractères maximum : 0/500'}) }}
+                                
+                                {{ form.submit('Valider', { position : 'mx-auto'}) }}
+
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            <!-- END COMMENT FORM -->       
+            {% else %}
+                <div class="col-8">
+                    <p>Vous devez être connecté pour commenter, ou répondre à un commentaire sur un article</p>
+                    {{ link.buttonLink('Se connecter','?route=login', { position : 'ms-auto' }) }}
+                </div>
+            {% endif %}
+        </div>
+    {% else %}
+        <h3 class="text-center text-md-start">Les commentaires sont désactivés pour cet article</h3>
+    {% endif %}
+</section>
+
+{% endblock %}

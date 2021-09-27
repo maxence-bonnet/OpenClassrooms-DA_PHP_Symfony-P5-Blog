@@ -1,0 +1,27 @@
+{% extends 'base.twig' %}
+
+{% import 'twigMacro/formMacro.twig' as form %}
+
+{% block content %}
+
+<section class="container mb-3">
+    <div class="row justify-content-md-center">
+        <div class="col-6  bg-light shadow-lg">
+            <h4 class="text-center text-md-start">Connexion</h4>
+            <form method="post">
+                <div class="row">
+
+                    {{ form.input('text','Pseudo','pseudo', { value : post.get('pseudo') }) }}
+                
+                    {{ form.input('password','Mot de passe*','password') }}
+
+                </div>
+
+                {{ form.submit('Se connecter', { position : 'mx-auto'}) }}
+
+            </form>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

@@ -32,7 +32,7 @@ class User extends Model
     /**
      * @var string
      */
-    private $mail;
+    private $email;
 
     /**
      * @var string
@@ -93,7 +93,7 @@ class User extends Model
     /**
      * @return string
      */
-    public function getMail(){return $this->mail;}
+    public function getEmail(){return $this->email;}
 
     /**
      * @return string
@@ -152,9 +152,9 @@ class User extends Model
     public function setPseudo($pseudo){$this->pseudo = $pseudo;}
 
     /**
-     * @param string mail
+     * @param string email
      */
-    public function setMail($mail){$this->mail = $mail;}
+    public function setEmail($email){$this->email = $email;}
 
     /**
      * @param string phone

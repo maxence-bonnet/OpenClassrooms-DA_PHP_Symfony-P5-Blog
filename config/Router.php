@@ -33,20 +33,8 @@ class Router
                     $this->frontController->articles($this->request->getGet());
                 } elseif($route === 'article'){
                     $this->frontController->article($this->request->getGet());
-                } elseif($route === 'addArticle'){
-                    $this->backController->addArticle($this->request->getPost());
-                } elseif($route === 'editArticle'){
-                    $this->backController->editArticle($this->request->getPost(),(int)$this->request->getGet()->get('articleId'));
-                } elseif($route === 'updateArticleStatus'){
-                    $this->backController->updateArticleStatus((int)$this->request->getGet()->get('articleId'),(int)$this->request->getGet()->get('statusId'));
-                } elseif($route === 'deleteArticle'){
-                    $this->backController->deleteArticle((int)$this->request->getGet()->get('articleId'));
                 } elseif($route === 'addComment'){
                     $this->frontController->addComment($this->request->getPost(),(int)$this->request->getGet()->get('articleId'));
-                } elseif($route === 'deleteComment'){
-                    $this->backController->deleteComment((int)$this->request->getGet()->get('commentId'));
-                } elseif($route === 'updateCommentValidation'){
-                    $this->backController->updateCommentValidation((int)$this->request->getGet()->get('commentId'),(int)$this->request->getGet()->get('validation'));
                 } elseif($route === 'editComment'){
                     $this->frontController->editComment($this->request->getPost(),(int)$this->request->getGet()->get('commentId'));
                 } elseif($route === 'register'){
@@ -55,6 +43,18 @@ class Router
                     $this->frontController->login($this->request->getPost());
                 } elseif($route === 'logout'){
                     $this->frontController->logout();
+                } elseif($route === 'addArticle'){
+                    $this->backController->addArticle($this->request->getPost());
+                } elseif($route === 'editArticle'){
+                    $this->backController->editArticle($this->request->getPost(),(int)$this->request->getGet()->get('articleId'));
+                } elseif($route === 'updateArticleStatus'){
+                    $this->backController->updateArticleStatus((int)$this->request->getGet()->get('articleId'),(int)$this->request->getGet()->get('statusId'));
+                } elseif($route === 'deleteArticle'){
+                    $this->backController->deleteArticle((int)$this->request->getGet()->get('articleId'));
+                } elseif($route === 'deleteComment'){
+                    $this->backController->deleteComment((int)$this->request->getGet()->get('commentId'));
+                } elseif($route === 'updateCommentValidation'){
+                    $this->backController->updateCommentValidation((int)$this->request->getGet()->get('commentId'),(int)$this->request->getGet()->get('validation'));
                 } elseif($route === 'administration'){
                     $this->backController->administration();
                 } elseif($route === 'viewSingleComment'){
@@ -71,11 +71,7 @@ class Router
                     $this->backController->updateUserRole((int)$this->request->getGet()->get('userId'),(int)$this->request->getGet()->get('roleId'));
                 } elseif($route === 'updateUserStatus'){
                     $this->backController->updateUserStatus((int)$this->request->getGet()->get('userId'),(int)$this->request->getGet()->get('statusId'));
-                } // -- TEST TWIG
-                elseif($route === 'testTwig'){
-                    $this->frontController->testTwig($this->request->getPost());
-                } // -- FIN TEST TWIG
-                else {
+                } else {
                     $this->errorController->errorNotFound();
                 }       
             } else {

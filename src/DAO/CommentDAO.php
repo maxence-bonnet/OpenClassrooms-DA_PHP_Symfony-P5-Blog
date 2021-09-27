@@ -60,13 +60,14 @@ class CommentDAO extends DAO
                                    'content' => $content,
                                    'validated' => $validated,
                                    'answer_to' => $answerTo]);
+                                   
     }
 
     // ok
-    public function editComment (Parameter $post, int $commentId,int $validated = 0) : void
+    public function editComment (string $content, int $commentId,int $validated = 0) : void
     {
         $sql = 'UPDATE comment SET content = :content, last_modified = NOW(), validated = :validated WHERE id = :comment_id';
-        $this->createQuery($sql,['content' => $post->get('content'),
+        $this->createQuery($sql,['content' => $content,
                                  'comment_id' => $commentId,
                                  'validated' => $validated
                                 ]);
@@ -75,16 +76,17 @@ class CommentDAO extends DAO
     // ok
     public function deleteComment(int $commentId)
     {
-        $sql = 'DELETE FROM comment WHERE id = :comment_id';
+        $sql = 'DELETE FROM comment WHERE answer_to = :comment_id;
+                DELETE FROM comment WHERE id = :comment_id';
         $this->createQuery($sql, ['comment_id' => $commentId]);
     }
 
     // ok
-    public function updateCommentValidation(int $commentId, int $validation) : void
-    {
+    public function updateCommentValidation(int $commentId, int $validated) : void
+    {       
         $sql = 'UPDATE comment SET validated = :validated WHERE id = :comment_id';
         $this->createQuery($sql,[
-            'validated' => $validation,
+            'validated' => $validated,
             'comment_id' => $commentId
         ]);
     }
@@ -104,8 +106,8 @@ class CommentDAO extends DAO
             $where = "AND";
         }
 
-        if(isset($author)){
-            $sql .= ' ' . $where . ' user.pseudo LIKE "%' . $author . '%"';
+        if(isset($userId)){
+            $sql .= ' ' . $where . ' user.id =' . $userId ;
             $where = "AND";
         }
 
@@ -157,8 +159,8 @@ class CommentDAO extends DAO
             $where = "AND";
         }
 
-        if(isset($author)){
-            $sql .= ' ' . $where . ' user.pseudo LIKE "%' . $author . '%"';
+        if(isset($userId)){
+            $sql .= ' ' . $where . ' user.id =' . $userId ;
             $where = "AND";
         }
 

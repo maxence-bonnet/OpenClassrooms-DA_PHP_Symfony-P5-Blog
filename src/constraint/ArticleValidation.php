@@ -8,18 +8,21 @@ class ArticleValidation extends Validation
 {   
     public function checkField($name, $value)
     {
-        if($name === 'title') {
+        if($name === 'title'){
             $error = $this->checkTitle($name, $value);
             $this->addError($name, $error);
-        }
-        elseif ($name === 'lede') {
-            $error = $this->checkLede($name, $value);
+        } elseif ($name === 'lede'){
+            $error = $this->checkLede($name, strip_tags($value));
+            $this->addError($name, $error);
+        } elseif ($name === 'content'){
+            $error = $this->checkContent($name, strip_tags($value));
+            $this->addError($name, $error);
+        } elseif ($name === 'statusId'){
+            $error = $this->checkStatusId($name, $value);
             $this->addError($name, $error);
         }
-        elseif ($name === 'content') {
-            $error = $this->checkContent($name, $value);
-            $this->addError($name, $error);
-        }
+
+        // Add required fields
     }
 
     public function checkTitle($name, $value)
@@ -61,7 +64,11 @@ class ArticleValidation extends Validation
         }
     }
 
-    /**
-     * EN TRAVAUX
-     */
+    public function checkStatusId($name, $value)
+    {
+        $valuesArray = [1,2,3];
+        if($this->constraint->inArray($name, (int)$value, $valuesArray)) {
+            return $this->constraint->inArray('Statut de publication', (int)$value, $valuesArray);
+        }
+    }
 }

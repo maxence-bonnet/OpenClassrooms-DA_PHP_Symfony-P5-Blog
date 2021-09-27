@@ -32,7 +32,7 @@ class Mailer
     /**
      * @var string
      */
-    private $userMail;
+    private $userEmail;
 
     /**
      * from $data => $firstname / $lastname / $mail / $message
@@ -45,7 +45,7 @@ class Mailer
         $this->setTo(self::CONTACT_MAIL);
         $this->setSubject('Blog Contact Form : ' . $firstname . ' ' . $lastname);
         $this->setHeaders(self::HEADERS_CONTENT_TYPE);
-        $this->setUserMail(htmlspecialchars($data->get('mail')));
+        $this->setuserEmail(htmlspecialchars($data->get('email')));
         $this->setMessage(Text::formatMailMessage($data->get('message')));
         
         ob_start();
@@ -83,7 +83,7 @@ class Mailer
     /**
      * @return string
      */
-    public function getUserMail(){return $this->userMail;}
+    public function getUserEmail(){return $this->userEmail;}
 
     
     /**
@@ -107,8 +107,8 @@ class Mailer
     public function setMessage($message){$this->message = $message;}
 
     /**
-     * @param string $userMail
+     * @param string $userEmail
      */
-    public function setUserMail($userMail){$this->userMail = $userMail;}
+    public function setUserEmail($userEmail){$this->userEmail = $userEmail;}
 
 }

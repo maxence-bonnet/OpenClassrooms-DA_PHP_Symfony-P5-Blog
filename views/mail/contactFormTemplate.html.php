@@ -61,7 +61,7 @@
           <td>
             <h2> Nouveau message de : <?= $firstname ?> <?= $lastname ?></h2>
             <p>
-              <a class="subtle-link" href="#"><span class="entity">&#9993; </span> <?= $this->getUserMail() ?> </a>
+              <a class="subtle-link" href="#"><span class="entity">&#9993; </span> <?= $this->getUserEmail() ?> </a>
             </p>
             <p>
               <?= $this->getMessage() ?> 
@@ -73,7 +73,7 @@
       <table role="presentation" bgcolor="#F5F8FA" width="100%" >
         <tr>
           <td align="left" style="padding: 10px 10px;">
-            <p style="color:#798797"> Envoyé depuis le formulaire de contact du Blog <span class="entity">&copy;</span>  </p>    
+            <p style="color:#798797"> Envoyé depuis le formulaire de contact du Blog </p>    
           </td>
         </tr>
       </table> 

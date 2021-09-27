@@ -5,59 +5,105 @@ namespace App\src\controller;
 use App\config\Parameter;
 use App\config\HTTP;
 use App\src\utils\URL;
+use App\src\utils\Text;
+
 
 class BackController extends Controller
 {
-    // ok
+    // ok twig
     private function checkAdmin()
     {
         $this->checkLoggedIn();
 
-        if(!($this->session->get('role') === 'admin')) {
-            $this->session->set('adminOnly', '<div class="alert alert-danger">Vous n\'avez pas le droit d\'accéder à cette page</div>');
+        if(!($this->session->get('role') === 'admin')){
+            $this->session->addMessage('danger', 'Vous n\'avez pas le droit d\'accéder à cette page');
             HTTP::redirect('?');
         }
     }
 
     // ARTICLES
-    // ok
+    // ok twig
     public function addArticle(Parameter $post)
     {
         $this->checkAdmin();
 
-        if ($post->get('submit')) {
+        if($post->get('submit')){
             $errors = $this->validation->validate($post, 'Article');
-            if (!$errors) {
-                $this->articleDAO->addArticle($post, $this->session->get('id'));
-                $this->session->set('addedArticle', '<div class="alert alert-success">Le nouvel article a bien été ajouté</div>');
+            if(!$errors){
+                $post->set('lede', Text::HtmlToMarkdown($post->get('lede')));
+                $post->set('content',Text::HtmlToMarkdown($post->get('content')));
+                $this->articleDAO->addArticle($post);
+                $this->session->addMessage('success', 'Le nouvel article a bien été ajouté');
                 HTTP::redirect('?route=articles');
             }
-            return $this->view->render('edit_article', [
-                'post' => $post,
-                'errors' => $errors
-            ]);
+            $data['post'] = $post;
+            $data['errors'] = $errors;
         }
-        return $this->view->render('edit_article');
+
+        $users = $this->userDAO->getUsers();
+        $i = 0;
+        foreach($users as $user){  
+            $data['users'][$i]['value'] = $user->getId();
+            $data['users'][$i]['name'] = $user->getPseudo();
+            $i ++;
+        }
+        
+        $categories = $this->categoryDAO->getCategories();
+        $i = 0;
+        foreach($categories as $category){
+            $data['categories'][$i]['value'] = $category->getId();
+            $data['categories'][$i]['name'] = $category->getName();
+            $i ++;
+        }
+
+        $data['title'] = 'Nouvel article';
+
+        return $this->view->renderTwig('editArticle', $data);
     }
 
-    // ok
+    // ok twig
     public function editArticle(Parameter $post, $articleId)
     {
         $this->checkAdmin();
 
-        if ($post->get('submit')) {
+        // Users list for <select>
+        $users = $this->userDAO->getUsers();
+        $i = 0;
+        foreach($users as $user){  
+            $data['users'][$i]['value'] = $user->getId();
+            $data['users'][$i]['name'] = $user->getPseudo();
+            $i ++;
+        }
+        
+        // Categories list for <select>
+        $categories = $this->categoryDAO->getCategories();
+        $i = 0;
+        foreach($categories as $category){
+            $data['categories'][$i]['value'] = $category->getId();
+            $data['categories'][$i]['name'] = $category->getName();
+            $i ++;
+        }
+
+        if($post->get('submit')){
             $errors = $this->validation->validate($post, 'Article');
-            if (!$errors) {
-                $this->articleDAO->editArticle($post, $articleId, $post->get('authorId')); // à l'avenir : $this->session->get('id') plutôt que $post->get('authorId')
-                $this->session->set('editedArticle', '<div class="alert alert-success">L\'article a bien été modifié</div>');   
+            if(!$errors){
+                $post->set('lede', Text::HtmlToMarkdown($post->get('lede')));
+                $post->set('content',Text::HtmlToMarkdown($post->get('content')));
+                if(!$post->get('categoryId')){
+                    $post->set('categoryId',"1");
+                }
+                $this->articleDAO->editArticle($post, $articleId);
+                $this->session->addMessage('success', 'L\'article a bien été modifié');   
                 HTTP::redirect('?route=article&articleId=' . $articleId);
             }
-            return $this->view->render('edit_article', [
-                'post' => $post,
-                'errors' => $errors
-            ]);
+            $data['title'] = 'Modification : ' . $post->get('Title');
+            $data['post'] = $post;
+            $data['errors'] = $errors;
+            return $this->view->renderTwig('editArticle', $data);
         }
+
         $article = $this->articleDAO->getArticle($articleId);
+
         $post->set('id', $article->getId());
         $post->set('title', $article->getTitle());
         $post->set('categoryId', $article->getCategoryId());
@@ -66,13 +112,16 @@ class BackController extends Controller
         $post->set('content', $article->getContent());
         $post->set('authorPseudo', $article->getAuthorPseudo());
         $post->set('authorId', $article->getAuthorId());
-        $post->set('statusId', $article->getstatusId());
-        return $this->view->render('edit_article', [
-            'post' => $post
-        ]);
+        $post->set('allowComment', $article->getAllowComment());
+        $post->set('statusId', $article->getStatusId());
+
+        $data['title'] = 'Modification : ' . $article->getTitle();
+        $data['post'] = $post;
+
+        return $this->view->renderTwig('editArticle', $data);
     }
 
-    // ok
+    // ok twig
     public function updateArticleStatus(int $articleId,int $statusId)
     {
         $this->checkAdmin();
@@ -85,87 +134,93 @@ class BackController extends Controller
             }
         }
         $this->articleDAO->updateArticleStatus($articleId, $statusId, $date);
-        $this->session->set('updatedArticleStatus', '<div class="alert alert-success">Le statut de l\'article a bien été mis à jour</div>');
+        $this->session->addMessage('success', 'Le statut de l\'article a bien été mis à jour');
         HTTP::dynamicRedirect('?route=adminArticles',$this->session);
     } 
     
-    // ok
+    // ok twig
     public function deleteArticle($articleId)
     {
         $this->checkAdmin();
 
         $this->articleDAO->deleteArticle($articleId);
-        $this->session->set('deletedArticle', '<div class="alert alert-success">L\' article a bien été supprimé</div>');
-        HTTP::dynamicRedirect('?route=articles',$this->session);
+        $this->session->addMessage('success', 'L\' article a bien été supprimé');
+        HTTP::dynamicRedirect('?route=adminArticles',$this->session);
     }
 
     // COMMENTS
-    // ok
+
+    // ok twig
     public function viewSingleComment(int $commentId)
     {
         $this->checkAdmin();
 
         $comment = $this->commentDAO->getComment($commentId);
         if($comment){
-            return $this->view->render('singleComment', ['comment' => $comment]);
+            $data['comment'] = $comment;
+            $data['title'] = 'Commentaire de : ' . $comment->getUserPseudo();
+            return $this->view->renderTwig('singleComment', $data);
         }
-        $this->session->set('unfoundComment', '<div class="alert alert-danger">Le commentaire recherché n\'existe pas / plus</div>');
+        $this->session->addMessage('danger', 'Le commentaire recherché n\'existe pas / plus');
         HTTP::dynamicRedirect('?route=adminComments',$this->session);  
     }
 
-    // ok
+    // ok twig
     public function adminEditComment(Parameter $post, $commentId)
     {
         $this->checkAdmin();
         
         $comment = $this->commentDAO->getComment($commentId);
-        $articleId = $comment->getArticleId();
-        if ($post->get('submit')) {
+
+        if($post->get('submit')){
             $errors = $this->validation->validate($post, 'Comment');
-            if (!$errors) {
+            if(!$errors){
                 $validated = 1;
-                $this->commentDAO->editComment($post, $commentId, $validated);
-                $this->session->set('adminEditedComment', '<div class="alert alert-success">Le commentaire a bien été modifié et publié</div>');  
+                $this->commentDAO->editComment(htmlspecialchars($post->get('comment')), $commentId, $validated);
+                $this->session->addMessage('success', 'Le commentaire a bien été modifié et publié');  
                 HTTP::dynamicRedirect('?route=adminComments',$this->session);                
             }
-            return $this->view->render('adminEditComment', ['comment' => $comment]);
-        }   
-        $post->set('id', $comment->getId());
-        $post->set('content', $comment->getContent());
-        return $this->view->render('adminEditComment', [
-            'comment' => $comment,
-            'post' => $post
-        ]);
+            $data['errors'] = $errors ;
+        } else {
+            $post->set('comment', $comment->getContent());
+        }
+
+        $data['title'] = 'Modifier le commentaire';
+        $data['post'] = $post;
+
+        return $this->view->renderTwig('adminEditComment', $data);
     }
 
-    // ok
-    public function updateCommentValidation(int $commentId, int $validation)
+    // ok twig
+    public function updateCommentValidation(int $commentId, int $validated)
     {
         $this->checkAdmin();
-
-        if($validation === 1 ||$validation === 0){
-            $this->commentDAO->updateCommentValidation($commentId,$validation);
-            $message = $validation ? 'validé' : 'suspendu';
-            $this->session->set('updatedCommentValidation', '<div class="alert alert-success">Le commentaire a bien été ' . $message . '</div>');            
+        
+        if($validated === 1 || $validated === 0){
+            $this->commentDAO->updateCommentValidation($commentId, $validated);
+            $message = $validated ? 'validé' : 'suspendu';
+            $this->session->addMessage('success', 'Le commentaire a bien été ' . $message);            
         }
         HTTP::dynamicRedirect('?route=adminComments',$this->session);
     }
 
-    // ok
+    // ok twig
     public function deleteComment(int $commentId)
     {
         $this->checkAdmin();
 
         if($this->commentDAO->getComment($commentId)){
             $this->commentDAO->deleteComment($commentId);
-            $this->session->set('deletedComment', '<div class="alert alert-success">Le commentaire a bien été supprimé</div>');
+            $this->session->addMessage('success', 'Le commentaire a bien été supprimé');
         } else {
-            $this->session->set('unfoundComment', '<div class="alert alert-danger">Le commentaire à supprimer n\'existe pas / plus</div>');
+            $this->session->addMessage('danger', 'Le commentaire à supprimer n\'existe pas / plus');
         }
         HTTP::dynamicRedirect('?route=adminComments',$this->session);
     }
 
     // USERS
+
+    // ok twig
     public function updateUserRole(int $userId, int $roleId)
     {
         $this->checkAdmin();
@@ -173,7 +228,9 @@ class BackController extends Controller
         $user = $this->userDAO->getUser($userId);
         if($user){
             if(((int)$user->getRoleId() !== 1) && ((int)$user->getRoleId() !== $roleId) && in_array($roleId, $roleArray)){
+
                 $this->userDAO->updateUserRole($userId,$roleId);
+
                 if($roleId === 1){
                     $roleName = "Administrateur";
                 } elseif($roleId === 2){
@@ -183,64 +240,64 @@ class BackController extends Controller
                 } elseif($roleId === 4){
                     $roleName = "Modérateur";
                 }
-                $this->session->set('updatedUserRole', '<div class="alert alert-success"> Le rôle de ' . $user->getPseudo() . ' a bien été mis à jour, nouveau rôle : ' . $roleName . '</div>');
+                $this->session->addMessage('success', 'Le rôle de ' . $user->getPseudo() . ' a bien été mis à jour, nouveau rôle : ' . $roleName);
             }            
         }
         HTTP::dynamicRedirect('?route=adminUsers',$this->session);
     }
 
+    // ok twig
     public function updateUserStatus(int $userId, int $statusId)
     {
         $this->checkAdmin();
-        $statusArray = [1,2,3,4];
+        $statusArray = [1,3];
         $user = $this->userDAO->getUser($userId);
+
         if($user){
             if(((int)$user->getRoleId() !== 1) && in_array($statusId, $statusArray)){
+
                 $this->userDAO->updateUserStatus($userId,$statusId);
+
                 if($statusId === 1){
                     $statusName= "Relaxé";
-                } elseif($statusId === 2){
-                    $statusName = "???";
                 } elseif($statusId === 3){
                     $statusName = "Banni";
                 } else{
                     $statusName = "???";
                 }
-                $this->session->set('updatedUserStatus', '<div class="alert alert-success">' . $user->getPseudo() . ' a bien été ' . $statusName . '</div>');
+                $this->session->addMessage('success', $user->getPseudo() . ' a bien été ' . $statusName);
             }            
         }
         HTTP::dynamicRedirect('?route=adminUsers',$this->session);
     }
 
     // GLOBAL ADMIN
-    // ok
+    // ok twig
     public function administration()
     {
         $this->checkAdmin();
 
         $this->session->set('previousURL', $_SERVER['REQUEST_URI']);
 
-        $comments = $this->commentDAO->getComments([
+        $data['comments'] = $this->commentDAO->getComments([
             'limit' => 10,
             'validated' => "pending",
             'orderby' => 'DESC'
         ]);
-        $articles = $this->articleDAO->getArticles([
+        $data['articles'] = $this->articleDAO->getArticles([
             'limit' => 10,
             'orderby' => 'DESC'
         ]);
-        $users = $this->userDAO->getUsers([
+        $data['users'] = $this->userDAO->getUsers([
             'limit' => 10,
             'orderby' => 'DESC'
         ]);
-        return $this->view->render('administration', [
-            'articles' => $articles,
-            'comments' => $comments,
-            'users' => $users
-        ]);
+
+        $data['title'] = 'Administration';
+        return $this->view->renderTwig('administration', $data);
     }
 
-    // ok
+    // ok twig
     public function adminComments(Parameter $get)
     {
         $this->checkAdmin();
@@ -259,15 +316,15 @@ class BackController extends Controller
         $afterDatetime = null;
         $beforeDatetime = null;
         $validated = null;
-        $previousPageUrl = null;
-        $nextPageUrl = null;
+        $previousPageURL = null;
+        $nextPageURL = null;
 
         if(!empty($get->get('q'))){
             $parameters['q'] = htmlentities($get->get('q'));
         }
 
-        if(!empty($get->get('author'))){
-            $parameters['author'] = htmlentities($get->get('author'));
+        if(!empty($get->get('userId'))){
+            $parameters['userId'] = htmlentities($get->get('userId'));
         }
 
         if(!empty($get->get('articleId'))){
@@ -312,28 +369,56 @@ class BackController extends Controller
         $pageCommentsCount = count($comments);
 
         if($page > 1){
-            $previousPageUrl = URL::mergeOn($_GET, ['page' => $page - 1]);
+            $previousPageURL = URL::mergeOn($_GET, ['page' => $page - 1]) . "#resultsTable";
         }
 
         if($page < $pages && $pages !== 1){
-            $nextPageUrl = URL::mergeOn($_GET, ['page' => $page + 1]);
+            $nextPageURL = URL::mergeOn($_GET, ['page' => $page + 1]) . "#resultsTable";
         }
 
+        // Articles list for <select>
         $articlesList = $this->articleDAO->getArticles();
+        $i = 0;
+        foreach($articlesList as $article){  
+            $data['articles'][$i]['value'] = $article->getId();
+            $data['articles'][$i]['name'] = $article->getTitle();
+            $i ++;
+        }
 
-        return $this->view->render('adminComments', [
+        // Users list for <select>
+        $users = $this->userDAO->getUsers();
+        $i = 0;
+        foreach($users as $user){  
+            $data['users'][$i]['value'] = $user->getId();
+            $data['users'][$i]['name'] = $user->getPseudo();
+            $i ++;
+        }
+
+        // Limits list for <select>
+        $is = 0;
+        foreach($limitArray as $key => $limit){  
+            $data['limit'][$i]['value'] = (string)$limit;
+            $data['limit'][$i]['name'] = (string)$limit;
+            $i ++;
+        }
+
+        return $this->view->renderTwig('adminComments', [
+            'title' => 'Administration des commentaires',
+            'get' => $get,
             'comments' => $comments,
-            'articlesList' => $articlesList,
+            'articles' => $data['articles'],
+            'limits' => $data['limit'],
+            'users' => $data['users'],
             'page' => $page,
             'pages' => $pages,
             'totalCommentsCount' => $commentsCount,
             'pageCommentsCount' => $pageCommentsCount,
-            'previousPageUrl' => $previousPageUrl,
-            'nextPageUrl' => $nextPageUrl
+            'previousPageURL' => $previousPageURL,
+            'nextPageURL' => $nextPageURL
         ]);             
     }
 
-    // ok
+    // ok twig
     public function adminArticles(Parameter $get)
     {
         $this->checkAdmin();
@@ -354,8 +439,8 @@ class BackController extends Controller
             $parameters['author'] = htmlentities($get->get('author'));
         }
 
-        if(!empty($get->get('allArticleStatus'))){
-            $parameters['allArticleStatus'] = 1;
+        if(!empty($get->get('all'))){
+            $parameters['all'] = 1;
         } else {
             if(!empty($get->get('published'))){
                 $parameters['published'] = 1;
@@ -399,25 +484,46 @@ class BackController extends Controller
 
         $pageArticlesCount = count($articles);
 
-        $previousPageUrl = null;
-        $nextPageUrl = null;
+        $previousPageURL = null;
+        $nextPageURL = null;
 
         if($page > 1){
-            $previousPageUrl = URL::mergeOn($_GET, ['page' => $page - 1]);
+            $previousPageURL = URL::mergeOn($_GET, ['page' => $page - 1]);
         }
 
         if($page < $pages && $pages !== 1){
-            $nextPageUrl = URL::mergeOn($_GET, ['page' => $page + 1]);
+            $nextPageURL = URL::mergeOn($_GET, ['page' => $page + 1]);
         }
 
-        return $this->view->render('adminArticles', [
+        // Users list for <select>
+        $users = $this->userDAO->getUsers();
+        $i = 0;
+        foreach($users as $user){  
+            $data['users'][$i]['value'] = $user->getId();
+            $data['users'][$i]['name'] = $user->getPseudo();
+            $i ++;
+        }
+
+        // Limits list for <select>
+        $is = 0;
+        foreach($limitArray as $key => $limit){  
+            $data['limit'][$i]['value'] = (string)$limit;
+            $data['limit'][$i]['name'] = (string)$limit;
+            $i ++;
+        }
+
+        return $this->view->renderTwig('adminArticles', [
+            'title' => 'Administration des articles',
+            'get' => $get,
             'articles' => $articles,
+            'users' => $data['users'],
+            'limits' => $data['limit'],
             'page' => $page,
             'pages' => $pages,
             'totalArticlesCount' => $articlesCount,
             'pageArticlesCount' => $pageArticlesCount,
-            'previousPageUrl' => $previousPageUrl,
-            'nextPageUrl' => $nextPageUrl
+            'previousPageURL' => $previousPageURL,
+            'nextPageURL' => $nextPageURL
         ]);
     }
 
@@ -447,7 +553,7 @@ class BackController extends Controller
         }
 
         if(!empty($get->get('allUserStatus'))){
-            $parameters['allUsersStatus'] = 1;
+            $parameters['allUserStatus'] = 1;
         } else {
             if(!empty($get->get('online'))){
                 $parameters['online'] = 1;
@@ -509,25 +615,39 @@ class BackController extends Controller
 
         $pageUsersCount = count($users);
 
-        $previousPageUrl = null;
-        $nextPageUrl = null;
+        $previousPageURL = null;
+        $nextPageURL = null;
 
         if($page > 1){
-            $previousPageUrl = URL::mergeOn($_GET, ['page' => $page - 1]);
+            $previousPageURL = URL::mergeOn($_GET, ['page' => $page - 1]) . "#resultsTable";
         }
 
         if($page < $pages && $pages !== 1){
-            $nextPageUrl = URL::mergeOn($_GET, ['page' => $page + 1]);
+            $nextPageURL = URL::mergeOn($_GET, ['page' => $page + 1]) . "#resultsTable";
         }
 
-        return $this->view->render('adminUsers', [
+        // Limits list for <select>
+        $i = 0;
+        foreach($limitArray as $key => $limit){  
+            $data['limit'][$i]['value'] = (string)$limit;
+            $data['limit'][$i]['name'] = (string)$limit;
+            $i ++;
+        }
+
+        $data['users'] = $users;
+        
+        return $this->view->renderTwig('adminUsers', [
+            'title' => 'Administration des utilisateurs',
+            'get' => $get,
+            'users' => $data['users'],
+            'limits' => $data['limit'],
             'users' => $users,
             'page' => $page,
             'pages' => $pages,
             'totalUsersCount' => $usersCount,
             'pageUsersCount' => $pageUsersCount,
-            'previousPageUrl' => $previousPageUrl,
-            'nextPageUrl' => $nextPageUrl
+            'previousPageURL' => $previousPageURL,
+            'nextPageURL' => $nextPageURL
         ]);
     }
 }

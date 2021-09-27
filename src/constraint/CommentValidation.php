@@ -8,22 +8,24 @@ class CommentValidation extends Validation
 {
     public function checkField($name, $value)
     {
-        if ($name === 'content') {
-            $error = $this->checkContent($name, $value);
+        if ($name === 'comment' || $name === 'answer') {
+            $error = $this->checkComment($name, $value);
             $this->addError($name, $error);
         }
+        
+        // Add required fields
     }
 
-    public function checkContent($name, $value)
+    public function checkComment($name, $value)
     {
         if($this->constraint->notBlank($name, $value)) {
-            return $this->constraint->notBlank('contenu', $value);
+            return $this->constraint->notBlank('Contenu', $value);
         }
         if($this->constraint->minLength($name, $value, 6)) {
-            return $this->constraint->minLength('contenu', $value, 6);
+            return $this->constraint->minLength('Contenu', $value, 6);
         }
         if($this->constraint->maxLength($name, $value, 500)) {
-            return $this->constraint->minLength('contenu', $value, 500);
+            return $this->constraint->minLength('Contenu', $value, 500);
         }
     }
 }

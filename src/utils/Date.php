@@ -9,6 +9,6 @@ class Date
         $date = new \DateTime($datetime);
         $day = $date->format('d/m/Y');
         $time = $date->format('H:i');
-        return "le " . $day . " à " . $time;
+        return $day . " à " . $time;
     }
 }
