@@ -320,16 +320,20 @@ class FrontController extends Controller
             $this->session->addMessage('danger', 'Utilisateur inexistant');
             HTTP::redirect('?');
         }
-       
-        $themesList = [];
-        $exclude = ['.','..'];
-        $themes = scandir('../public/bootstrap_themes/');
-        foreach ($themes as $theme) {
-            if (!in_array($theme,$exclude) && preg_match("#^bootstrap-[a-z]+\.min\.css$#",$theme)){                   
-                    $themesList[] = preg_replace("#^bootstrap-([a-z]+)\.min\.css$#","$1",$theme);
-                }
-        }
 
+        $data['title'] = 'Profil de ' . $user->getPseudo() ;
+        if($user->getPseudo() === $this->session->get('pseudo')){
+            $themesList = [];
+            $exclude = ['.','..'];
+            $themes = scandir('../public/bootstrap_themes/');
+            foreach ($themes as $theme) {
+                if (!in_array($theme,$exclude) && preg_match("#^bootstrap-[a-z]+\.min\.css$#",$theme)){                   
+                        $themesList[] = preg_replace("#^bootstrap-([a-z]+)\.min\.css$#","$1",$theme);
+                    }
+            }
+            $data['title'] = 'Profil';
+        }
+       
         if($get->get('theme')){
             if(in_array($get->get('theme'),$themesList) || $get->get('theme') === "default"){
                 if($get->get('theme') === "default" && $this->session->get('theme')){
@@ -341,10 +345,7 @@ class FrontController extends Controller
             }
         }
 
-        $data['title'] = 'Profil de ' . $user->getPseudo() ;
-        if($user->getPseudo() === $this->session->get('pseudo')){
-            $data['title'] = 'Profil';
-        }     
+     
         $data['user'] = $user;
         $data['themesList'] = $themesList;
         return $this->view->renderTwig('profile', $data);

@@ -15,23 +15,23 @@
                 <tbody>
                     <tr>
                         <td>Pseudo : </td>
-                        <td>{{ user.getPseudo() }}</td>
+                        <td class="text-center">{{ user.getPseudo() }}</td>
                     </tr>
                     <tr>
                         <td>Nom : </td>
-                        <td>{{ user.getLastname() }}</td>
+                        <td class="text-center">{{ user.getLastname() }}</td>
                     </tr>
                     <tr>
                         <td>Prénom : </td>
-                        <td>{{ user.getFirstname() }}</td>
+                        <td class="text-center">{{ user.getFirstname() }}</td>
                     </tr>                    
                     <tr>
                         <td>Inscrit le : </td>
-                        <td>{{ user.getFormatedDate(user.getCreatedAt()) }}</td>
+                        <td class="text-center">{{ user.getFormatedDate(user.getCreatedAt()) }}</td>
                     </tr>
                     <tr>
                         <td>Rôle : </td>
-                        <td>
+                        <td class="text-center">
                             {% if user.getRoleId() is same as("2") %}
                                 <i class='bx bx-user' ></i> Utilisateur
                             {% elseif user.getRoleId() is same as("3") %}
@@ -45,7 +45,7 @@
                     </tr>
                     <tr>
                         <td>Statut : </td>
-                        <td>        
+                        <td class="text-center">        
                             {% if user.getStatusId() is same as("1") %}
                                 Déconnecté
                             {% elseif user.getStatusId() is same as("2") %}
@@ -57,11 +57,12 @@
                     </tr>
                     <tr>
                         <td>Score : </td>
-                        <td>{{ user.getScore() }}</td>
+                        <td class="text-center">{{ user.getScore() }}</td>
                     </tr>
                     <tr>
                         <td>Description :</td>
-                        <td>{{ user.getDescription() ? '' : 'Aucune description' }}</td>
+                        <!-- User description not added yet -->
+                        <td class="text-center">{{ user.getDescription() ? '' : 'Aucune description pour l\'instant' }}</td>
                 </tbody>
             </table>   
             <div class="mt-auto d-flex">
@@ -70,6 +71,7 @@
         </div>
         <div class="col-12 col-md-6 col-lg border-start">
             <h4 class="text-center text-md-start">Dernières activités :</h4>
+                <!-- STATIC EXEMPLE FOR LATEST ACTIVITIES -->
                 <table class="table table-borderless table-striped">
                 <tbody>
                     <tr>
