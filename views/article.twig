@@ -31,7 +31,7 @@
         <div class="col-12 col-lg-4 p-2 px-md-5 shadow-sm">
             <h3 class="text-center text-md-start">A propos de l'auteur(e):</h3>
             <div class="w-50 text-center m-auto">
-                <img class="img-thumbnail rounded mx-auto d-block" src="img/author.jpg" alt="image-auteur">
+                <i class='bx bx-user-circle bx-lg'></i>
             </div>
             <p>Mgnam laudantium corporis nisi consectetur, non repudiandae natus voluptatum sapiente consequatur dicta. Quidem possimus repudiandae commodi rerum cupiditate!</p>
         </div>          
@@ -48,7 +48,7 @@
                 <div class="col-8">
                     <div class="p-2 shadow mb-2 {{ post and post.get('id') is same as(comment.getId()) ? 'selected' }}" id="comment{{ comment.getId() }}">
 
-                        <h6>{{ comment.getUserPseudo() ~ " " ~ comment.getFormatedDate(comment.getCreatedAt()) }} {{ comment.getLastModified() ? '(modifié)' }}</h6>
+                        <h6>{{ link.link(comment.getUserPseudo(),'?route=profile&userId=' ~ comment.getUserId(), { class : 'text-decoration-none' }) }} {{comment.getFormatedDate(comment.getCreatedAt()) }} {{ comment.getLastModified() ? '(modifié)' }}</h6>
 
                         <p>{{ comment.getContent() | nl2br }}</p>
                         <div class="d-flex p-2">
@@ -81,7 +81,7 @@
                                 
                                     <div class="p-4 shadow mb-2 {{ post and post.get('id') is same as(answer.getId()) ? 'selected' }}" id="comment{{ answer.getId() }}">
                                         
-                                        <h6>{{ answer.getUserPseudo() ~ " " ~ answer.getFormatedDate(answer.getCreatedAt()) }} {{ answer.getLastModified() ? '(modifié)' }}</h6>
+                                        <h6>{{ link.link(answer.getUserPseudo(),'?route=profile&userId=' ~ answer.getUserId(), { class : 'text-decoration-none' }) }} {{ answer.getFormatedDate(answer.getCreatedAt()) }} {{ answer.getLastModified() ? '(modifié)' }}</h6>
                                         
                                         <p>{{ answer.getContent() | nl2br }}</p>
                                         

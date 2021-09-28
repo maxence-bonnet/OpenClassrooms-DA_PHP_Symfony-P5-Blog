@@ -43,13 +43,13 @@
 
                                 {% endif %}
 
-                                {{ link.navLink(session.get('pseudo'), '?route=profile', {icon : "bx bx-user", position : 'ms-auto'}) }}
+                                {{ link.navLink(session.get('pseudo'), '?route=profile&userId=' ~ session.get('id'), {icon : "bx bx-user", position : 'ms-md-auto'}) }}
 
                                 {{ link.navLink('Déconnexion', '?route=logout', {icon : "bx bx-log-out-circle"}) }}
 
                             {% else %}
                             
-                                {{ link.navLink('Inscription', '?route=register', {page : title, icon : "bx bx-user", position : 'ms-auto'}) }}
+                                {{ link.navLink('Inscription', '?route=register', {page : title, icon : "bx bx-user", position : 'ms-md-auto'}) }}
 
                                 {{ link.navLink('Connexion', '?route=login', {page : title, icon : "bx bx-log-in-circle"}) }}
 
@@ -60,7 +60,7 @@
             </nav>
         </header>
 
-        <div class="container mt-3" id="content">
+        <div class="container-fluid mt-3" id="content">
 
             {{ session.messages() | raw }}
 

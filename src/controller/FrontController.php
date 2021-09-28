@@ -60,63 +60,58 @@ class FrontController extends Controller
     public function articles(Parameter $get)
     {
         $page = 1;
+        $offset = 0;
         $limit = 9;
-        $published = 1;
-        $private = null;
+        $parameters['page'] = &$page;
+        $parameters['limit'] = &$limit;
+        $parameters['offset'] = &$offset;
+        $parameters['published'] = 1;
+        $parameters['private'] = null;
+        $parameters['oderby'] = 'DESC';
+        $data = &$parameters;
+
+        if(!empty($get->get('q'))){
+            $parameters['q'] = htmlentities($get->get('q'));
+        }
 
         if($this->session->get('role')){
-            $private = 1;
+            $parameters['private'] = 1;
         }
 
         if((int)$get->get('page') > 1){
             $page = $get->get('page');
         }
 
-        $articlesCount = (int) $this->articleDAO->countArticles([
-            'published' => $published,
-            'private' => $private,
-        ]);
+        $data['totalArticlesCount'] = (int) $this->articleDAO->countArticles($parameters);
 
-        $pages = ceil($articlesCount/$limit);
+        $pages = ceil($data['totalArticlesCount']/$limit);
 
         if($page <= $pages && $page > 1){
             $offset = $limit*($page - 1);         
         } else {
-            $page = 1;
-            $offset = 0;
+            $page = 1;      
         }
 
-        $articles = $this->articleDAO->getArticles([
-            'published' => $published,
-            'private' => $private,
-            'orderby' => 'DESC',
-            'limit' => $limit,
-            'offset' => $offset,
-        ]);
+        $data['articles'] = $this->articleDAO->getArticles($parameters);
 
-        $pageArticlesCount = count($articles);
+        $data['pageArticlesCount'] = count($data['articles']);
 
-        $previousPageURL = null;
-        $nextPageURL = null;
+        $data['previousPageURL'] = null;
+        $data['nextPageURL'] = null;
         
         if($page > 1){
-            $previousPageURL = URL::mergeOn($_GET, ['page' => $page - 1]);
+            $data['previousPageURL'] = URL::mergeOn($_GET, ['page' => $page - 1]);
         }
 
         if($page < $pages && $pages !== 1){
-            $nextPageURL = URL::mergeOn($_GET, ['page' => $page + 1]);
+            $data['nextPageURL'] = URL::mergeOn($_GET, ['page' => $page + 1]);
         }
 
-        return $this->view->renderTwig('articles', [
-            'title' => 'Les Articles',
-            'articles' => $articles,
-            'page' => $page,
-            'pages' => $pages,
-            'totalArticlesCount' => $articlesCount,
-            'pageArticlesCount' => $pageArticlesCount,
-            'previousPageURL' => $previousPageURL,
-            'nextPageURL' => $nextPageURL        
-        ]);
+        $data['pages'] = $pages;
+        $data['title'] = 'Les Articles';
+        $data['get'] = $get;
+
+        return $this->view->renderTwig('articles', $data);
     }
 
     // ok twig
@@ -320,7 +315,7 @@ class FrontController extends Controller
     {
         $this->checkLoggedIn();
 
-        $user = $this->userDAO->getUser($get->get('userId'));
+        $user = $this->userDAO->getUser((int)$get->get('userId'));
         if(!$user){
             $this->session->addMessage('danger', 'Utilisateur inexistant');
             HTTP::redirect('?');
@@ -341,12 +336,15 @@ class FrontController extends Controller
                     $this->session->remove('theme');
                 } else {
                     $this->session->set('theme', $get->get('theme'));
-                }               
+                } 
+                $this->session->addMessage('success','Le thème a été mis à jour : ' . $get->get('theme'));          
             }
-            $this->session->addMessage('success','Le thème a été mis à jour : ' . $get->get('theme'));
         }
 
-        $data['title'] = 'Profil';
+        $data['title'] = 'Profil de ' . $user->getPseudo() ;
+        if($user->getPseudo() === $this->session->get('pseudo')){
+            $data['title'] = 'Profil';
+        }     
         $data['user'] = $user;
         $data['themesList'] = $themesList;
         return $this->view->renderTwig('profile', $data);

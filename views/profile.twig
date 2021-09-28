@@ -6,25 +6,106 @@
 
 {% block content %}
 
-<section class="container mb-3">
-    <div class="row justify-content-md-center">
-        <div class="col-6 shadow">
-            <h4 class="text-center text-md-start">Profil {{ session.get('pseudo') }}</h4>
+<section class="container-fluid shadow p-2 mb-3 border-top">
+    <h2 class="text-center text-md-start">Profil : {{ user.getPseudo() }}</h2>
+    <div class="row">
+        <div class="col-12 col-md-6 col-lg d-flex flex-column">
+            <h4 class="text-center text-md-start">Résumé :</h4>
+            <table class="table table-borderless table-striped">
+                <tbody>
+                    <tr>
+                        <td>Pseudo : </td>
+                        <td>{{ user.getPseudo() }}</td>
+                    </tr>
+                    <tr>
+                        <td>Nom : </td>
+                        <td>{{ user.getLastname() }}</td>
+                    </tr>
+                    <tr>
+                        <td>Prénom : </td>
+                        <td>{{ user.getFirstname() }}</td>
+                    </tr>                    
+                    <tr>
+                        <td>Inscrit le : </td>
+                        <td>{{ user.getFormatedDate(user.getCreatedAt()) }}</td>
+                    </tr>
+                    <tr>
+                        <td>Rôle : </td>
+                        <td>
+                            {% if user.getRoleId() is same as("2") %}
+                                <i class='bx bx-user' ></i> Utilisateur
+                            {% elseif user.getRoleId() is same as("3") %}
+                                <i class='bx bx-pencil' ></i> Éditeur
+                            {% elseif user.getRoleId() is same as("4") %}
+                                <i class='bx bx-glassses' ></i> Modérateur
+                            {% else %}
+                                <i class='bx bx-crown' ></i> Administrateur
+                            {% endif %}                           
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Statut : </td>
+                        <td>        
+                            {% if user.getStatusId() is same as("1") %}
+                                Déconnecté
+                            {% elseif user.getStatusId() is same as("2") %}
+                                Connecté
+                            {% elseif user.getStatusId()  is same as("3") %}
+                                Banni
+                            {% endif %} 
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Score : </td>
+                        <td>{{ user.getScore() }}</td>
+                    </tr>
+                    <tr>
+                        <td>Description :</td>
+                        <td>{{ user.getDescription() ? '' : 'Aucune description' }}</td>
+                </tbody>
+            </table>   
+            <div class="mt-auto d-flex">
+                {{ link.buttonLink('Modifier mon profil','?route=editProfile', { position : 'mx-auto mb-2' }) }}
+            </div>                                                                       
         </div>
-    </div>
-</section>
-
-<section class="container mb-3">
-    <div class="row justify-content-md-center">
-        <div class="col-6 shadow-lg">
+        <div class="col-12 col-md-6 col-lg border-start">
+            <h4 class="text-center text-md-start">Dernières activités :</h4>
+                <table class="table table-borderless table-striped">
+                <tbody>
+                    <tr>
+                        <td>27/09/2021 à 16:15 : </td>
+                        <td>Ajout d'un <a href="#">Commentaire</a> sur l'article <a href="#">Article</a></td>
+                    </tr>
+                    <tr>
+                        <td>25/09/2021 à 18:34 : </td>
+                        <td>Publication d'un article <a href="#">Article</a></td>
+                    </tr>
+                    <tr>
+                        <td>24/09/2021 à 12:21 : </td>
+                        <td>Réaction à un <a href="#">Commentaire</a></td>
+                    </tr>
+                    <tr>
+                        <td>24/09/2021 à 12:20 : </td>
+                        <td>Réaction à un <a href="#">Commentaire</a></td>
+                    </tr>
+                    <tr>
+                        <td>24/09/2021 à 12:10 : </td>
+                        <td>Réaction à un <a href="#">Article</a></td>
+                    </tr>
+                </tbody>
+            </table> 
+        </div>
+        {% if user.getPseudo() is same as(session.get('pseudo')) %}
+        <div class="col-12 col-md-6 col-lg border-start">
             <h4 class="text-center text-md-start">Choisir un thème :</h4>
             <ul class="list-group p-3">
                 {% for theme in themesList %}
-                    <li class="list-group-item">{{ link.link(theme | capitalize,'?route=profile&userId=' ~ session.get('id') ~ '&theme=' ~ theme, { class : 'text-decoration-none' }) }}</li>
+                    <li class="list-group-item">{{ link.link(theme | capitalize,'?route=profile&userId=' ~ session.get('id') ~ '&theme=' ~ theme, { class : 'text-decoration-none' }) }}{{ session.get('theme') is same as(theme) ? '<i class=\'bx bx-check\'></i>'}}</li>
                 {% endfor %}
-                <li class="list-group-item">{{ link.link('Par défaut' | capitalize,'?route=profile&userId=' ~ session.get('id') ~ '&theme=default', { class : 'text-decoration-none' }) }}</li>
+                <li class="list-group-item">{{ link.link('Par défaut' | capitalize,'?route=profile&userId=' ~ session.get('id') ~ '&theme=default', { class : 'text-decoration-none' }) }}{{ session.get('theme') ? '' : '<i class=\'bx bx-check\'></i>'}}</li>
             </ul>
         </div>
+        {% endif %}
     </div>
 </section>
 
