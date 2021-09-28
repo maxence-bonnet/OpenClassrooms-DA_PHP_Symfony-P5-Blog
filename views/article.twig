@@ -6,7 +6,7 @@
 
 {% block content %}
 
-<section class="container bg-light mb-3">
+<section class="container mb-3">
     <div class="row">
         <div class="col-12 col-lg-8 p-2 shadow-sm">
             <h2 class="text-center text-md-start">{{ title }}</h2>
@@ -31,7 +31,8 @@
         <div class="col-12 col-lg-4 p-2 px-md-5 shadow-sm">
             <h3 class="text-center text-md-start">A propos de l'auteur(e):</h3>
             <div class="w-50 text-center m-auto">
-                <img class="img-thumbnail rounded mx-auto d-block" src="img/author.jpg" alt="image-auteur">
+                <i class='bx bx-user-circle bx-lg'></i>
+                <p>{{ article.getAuthorPseudo() }}</p>
             </div>
             <p>Mgnam laudantium corporis nisi consectetur, non repudiandae natus voluptatum sapiente consequatur dicta. Quidem possimus repudiandae commodi rerum cupiditate!</p>
         </div>          
@@ -46,9 +47,9 @@
             {% if not comment.getAnswerTo() %}
             <div class="row mb-2">
                 <div class="col-8">
-                    <div class="p-2 shadow mb-2 {{ post and post.get('id') is same as(comment.getId()) ? 'selected' : 'bg-light' }}" id="comment{{ comment.getId() }}">
+                    <div class="p-2 shadow mb-2 {{ post and post.get('id') is same as(comment.getId()) ? 'selected' }}" id="comment{{ comment.getId() }}">
 
-                        <h6>{{ comment.getUserPseudo() ~ " " ~ comment.getFormatedDate(comment.getCreatedAt()) }} {{ comment.getLastModified() ? '(modifié)' }}</h6>
+                        <h6>{{ link.link(comment.getUserPseudo(),'?route=profile&userId=' ~ comment.getUserId(), { class : 'text-decoration-none' }) }} {{comment.getFormatedDate(comment.getCreatedAt()) }} {{ comment.getLastModified() ? '(modifié)' }}</h6>
 
                         <p>{{ comment.getContent() | nl2br }}</p>
                         <div class="d-flex p-2">
@@ -79,9 +80,9 @@
                             <div class="row mb-2 d-flex justify-content-end">
                                 <div class="col-11">
                                 
-                                    <div class="p-4 shadow mb-2 {{ post and post.get('id') is same as(answer.getId()) ? 'selected' : 'bg-light' }}" id="comment{{ answer.getId() }}">
+                                    <div class="p-4 shadow mb-2 {{ post and post.get('id') is same as(answer.getId()) ? 'selected' }}" id="comment{{ answer.getId() }}">
                                         
-                                        <h6>{{ answer.getUserPseudo() ~ " " ~ answer.getFormatedDate(answer.getCreatedAt()) }} {{ answer.getLastModified() ? '(modifié)' }}</h6>
+                                        <h6>{{ link.link(answer.getUserPseudo(),'?route=profile&userId=' ~ answer.getUserId(), { class : 'text-decoration-none' }) }} {{ answer.getFormatedDate(answer.getCreatedAt()) }} {{ answer.getLastModified() ? '(modifié)' }}</h6>
                                         
                                         <p>{{ answer.getContent() | nl2br }}</p>
                                         
@@ -116,7 +117,7 @@
                     {% if answerTo and answerTo | number_format is same as(comment.getId()) %}
                         <div class="row mb-2 d-flex justify-content-end">
                             <div class="col-10">
-                                <div class="py-2 px-5 shadow bg-light">
+                                <div class="py-2 px-5 shadow">
                                     <form method="post" action="{{ '?route=addComment&articleId=' ~ article.getId() ~ '#comment' ~ comment.getId() }}" id="answerForm">
                                         <div class="row d-flex justify-content-center">
                                             <div class="row d-flex justify-content-center">
@@ -145,7 +146,7 @@
             {% if session.get('pseudo') %}
                 <div class="col-8 d-flex justify-content-center">
                     <div class="col-10">
-                        <div class="py-2 px-5 shadow bg-light ">
+                        <div class="py-2 px-5 shadow">
                             <h4 class="text-center text-md-start">{{ post ? 'Modifier le commentaire' : 'Ajouter un commentaire' }}</h4>
                             <form method="post" action="?route={{ post and not post.get('submit') ? 'editComment&commentId=' ~ post.get('id') ~ '#commentForm' : 'addComment&articleId=' ~ article.getId() ~ '#commentForm'}}" id="commentForm">
 

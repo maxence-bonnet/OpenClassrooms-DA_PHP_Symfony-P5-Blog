@@ -6,17 +6,19 @@
 
 {% block content %}
 
-<h1 class="d-flex">
+<section class="container">
+    <h1 class="d-flex">
 
-    {{ title }}
+        {{ title }}
 
-    {{ link.buttonLink('<i class=\'bx bx-redo\'></i> Les commentaires','?route=adminComments', { position : 'ms-auto my-auto'}) }}
+        {{ link.buttonLink('<i class=\'bx bx-redo\'></i> Les commentaires','?route=adminComments', { position : 'ms-auto my-auto'}) }}
 
-    {{ link.buttonLink('<i class=\'bx bx-redo\'></i> Les utilisateurs','?route=adminUsers', { position : 'mx-2 my-auto'}) }}
+        {{ link.buttonLink('<i class=\'bx bx-redo\'></i> Les utilisateurs','?route=adminUsers', { position : 'mx-2 my-auto'}) }}
 
-</h1>
+    </h1>
+</section>
 
-<section class="container bg-light">
+<section class="container">
     <h3><i class='bx bx-search-alt-2'></i>  Filtrer les résultats :</h3>
     <div class="row p-3 p-sm-0">
         <div class="col-md-12">
@@ -139,7 +141,7 @@
     <div class="row">
         <div class="col">
         <h5>{{ pageArticlesCount }} / {{ totalArticlesCount }} Résultat(s) - Page {{ page }} / {{ pages }}</h5>
-            <table class="table table-striped table-hover table-dark text-center">
+            <table class="adminTable table table-striped table-hover table-dark text-center">
                 <thead>
                     <tr>                    
                         <th> Titre </th>

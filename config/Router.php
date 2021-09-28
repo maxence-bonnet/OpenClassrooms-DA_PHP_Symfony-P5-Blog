@@ -43,6 +43,8 @@ class Router
                     $this->frontController->login($this->request->getPost());
                 } elseif($route === 'logout'){
                     $this->frontController->logout();
+                } elseif($route === 'profile'){
+                    $this->frontController->profile($this->request->getGet());
                 } elseif($route === 'addArticle'){
                     $this->backController->addArticle($this->request->getPost());
                 } elseif($route === 'editArticle'){
