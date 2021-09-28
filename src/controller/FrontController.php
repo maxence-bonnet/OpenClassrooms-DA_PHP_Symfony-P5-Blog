@@ -315,5 +315,41 @@ class FrontController extends Controller
 
         HTTP::redirect('?');
     }
+
+    public function profile(Parameter $get)
+    {
+        $this->checkLoggedIn();
+
+        $user = $this->userDAO->getUser($get->get('userId'));
+        if(!$user){
+            $this->session->addMessage('danger', 'Utilisateur inexistant');
+            HTTP::redirect('?');
+        }
+       
+        $themesList = [];
+        $exclude = ['.','..'];
+        $themes = scandir('../public/bootstrap_themes/');
+        foreach ($themes as $theme) {
+            if (!in_array($theme,$exclude) && preg_match("#^bootstrap-[a-z]+\.min\.css$#",$theme)){                   
+                    $themesList[] = preg_replace("#^bootstrap-([a-z]+)\.min\.css$#","$1",$theme);
+                }
+        }
+
+        if($get->get('theme')){
+            if(in_array($get->get('theme'),$themesList) || $get->get('theme') === "default"){
+                if($get->get('theme') === "default" && $this->session->get('theme')){
+                    $this->session->remove('theme');
+                } else {
+                    $this->session->set('theme', $get->get('theme'));
+                }               
+            }
+            $this->session->addMessage('success','Le thème a été mis à jour : ' . $get->get('theme'));
+        }
+
+        $data['title'] = 'Profil';
+        $data['user'] = $user;
+        $data['themesList'] = $themesList;
+        return $this->view->renderTwig('profile', $data);
+    }
 }
 

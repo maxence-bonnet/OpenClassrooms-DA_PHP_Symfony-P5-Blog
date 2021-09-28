@@ -7,7 +7,7 @@
 <section class="container ps-5">
     <h3>{{ title }}</h3>
     <div class="row mb-2">
-        <div class="col-6 bg-light shadow">
+        <div class="col-6 shadow">
             <h6>{{ comment.getUserPseudo() }} le {{ comment.getFormatedDate(comment.getCreatedAt()) }} {{ comment.getCreatedAt() < comment.getLastModified() ? '(modifié le ' ~ comment.getFormatedDate(comment.getLastModified()) ~ ')' }}</h6>
             <p>{{ comment.getContent() | nl2br }}</p>
         </div>

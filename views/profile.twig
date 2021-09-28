@@ -1,0 +1,31 @@
+{% extends 'base.twig' %}
+
+{% import 'twigMacro/formMacro.twig' as form %}
+
+{% import 'twigMacro/linkMacro.twig' as link %}
+
+{% block content %}
+
+<section class="container mb-3">
+    <div class="row justify-content-md-center">
+        <div class="col-6 shadow">
+            <h4 class="text-center text-md-start">Profil {{ session.get('pseudo') }}</h4>
+        </div>
+    </div>
+</section>
+
+<section class="container mb-3">
+    <div class="row justify-content-md-center">
+        <div class="col-6 shadow-lg">
+            <h4 class="text-center text-md-start">Choisir un thème :</h4>
+            <ul class="list-group p-3">
+                {% for theme in themesList %}
+                    <li class="list-group-item">{{ link.link(theme | capitalize,'?route=profile&userId=' ~ session.get('id') ~ '&theme=' ~ theme, { class : 'text-decoration-none' }) }}</li>
+                {% endfor %}
+                <li class="list-group-item">{{ link.link('Par défaut' | capitalize,'?route=profile&userId=' ~ session.get('id') ~ '&theme=default', { class : 'text-decoration-none' }) }}</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

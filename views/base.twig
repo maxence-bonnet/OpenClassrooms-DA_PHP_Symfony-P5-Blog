@@ -5,13 +5,17 @@
         <meta charset="UTF-8" />
         <base href="http://localhost/P5_blog/public/">
         <link href='css/boxicons.min.css' rel='stylesheet'>
-        <link href="css/bootstrap.min.css" rel="stylesheet" >
+        {% if session.get('theme') and session.get('theme') is not same as('default') %}
+            <link href="bootstrap_themes/bootstrap-{{ session.get('theme') }}.min.css" rel="stylesheet">
+        {% else %}
+            <link href="css/bootstrap.min.css" rel="stylesheet">
+        {% endif %}
         <link href="css/style.css" rel="stylesheet">
         <title>{{ title ?? 'Blog'}}</title>
         {% block head %}{% endblock %}
     </head>
     <body class="d-flex flex-column h-100">
-        <header>
+        <header class="shadow-lg">
             <nav class="navbar navbar-expand-md navbar-dark bg-dark">
                 <div class="container-fluid">
                 <a class="navbar-brand" href="?"><i class='bx bx-cube-alt fs-1' ></i></a>
@@ -29,7 +33,7 @@
                             
                             {% if session.get('pseudo') %}
 
-                                {{ link.navLink('Profil', '?route=profile', {page : title, icon : "bx bx-user"})}}
+                                {{ link.navLink('Profil', '?route=profile&userId=' ~ session.get('id'), {page : title, icon : "bx bx-user"})}}
 
                                 {% if session.get('role') is same as("admin") %}
 
@@ -65,9 +69,8 @@
             {% endblock %}
 
         </div>
-        <footer class="bg-light py-4 footer mt-auto">
-            <div class="container d-flex">
-            
+        <footer class="py-4 footer mt-auto shadow-lg">
+            <div class="container d-flex">          
                 <a href="https://github.com/maxence-bonnet/OpenClassrooms-DA_PHP_Symfony-P5-Blog" class="p-2"><i class='bx bxl-github fs-3'></i></a>
                 <a href="https://www.linkedin.com/in/maxence-bonnet-b28a32203/" class="p-2"><i class='bx bxl-linkedin-square fs-3' ></i></a>
                 <a href="https://twitter.com/" class="p-2"><i class='bx bxl-twitter fs-3' ></i></a>

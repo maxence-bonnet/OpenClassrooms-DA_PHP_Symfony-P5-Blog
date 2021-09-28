@@ -4,57 +4,14 @@
 
 {% block head %}
     <script src="../vendor/tinymce/tinymce/tinymce.min.js"></script>
-    <script type="text/javascript">
-        tinymce.init({
-            selector: '#articleContent',
-            plugins: 'lists',
-            toolbar: 'undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | outdent indent | numlist bullist' ,
-            setup: function content (text) {
-                let contentContentHelp = document.getElementById("contentContentHelp");
-                let contentTextarea = document.getElementById("articleContent");
-                text.on('keyup', function (e) { 
-                    let contentCount = CountCharacters("articleContent");
-                    contentContentHelp.innerHTML = contentCount + "/2000 caractères";
-                    if(contentCount > 2000){
-                        contentContentHelp.classList.add("invalid-feedback");
-                        contentTextarea.classList.add("is-invalid");
-                    } else if(contentCount <= 2000 && ledeContentHelp.classList.contains("invalid-feedback")){
-                        contentContentHelp.classList.remove("invalid-feedback");
-                    }
-                });
-            }
-        });
-        tinymce.init({
-            selector: '#articleLede',         
-            setup: function lede (text) {
-                let ledeContentHelp = document.getElementById("ledeContentHelp");
-                let textarea = document.getElementById("articleLede");
-                text.on('keyup', function (e) { 
-                    let ledeCount = CountCharacters("articleLede");
-                    ledeContentHelp.innerHTML = ledeCount + "/500 caractères";
-                    if(ledeCount > 500){
-                        ledeContentHelp.classList.add("invalid-feedback");
-                        textarea.classList.add("is-invalid");
-                    } else if(ledeCount <= 500 && ledeContentHelp.classList.contains("invalid-feedback")){
-                        ledeContentHelp.classList.remove("invalid-feedback");
-                    }
-                });
-            }
-        });
-    function CountCharacters(elementId) {
-        var body = tinymce.get(elementId).getBody();
-        var content = tinymce.trim(body.innerText || body.textContent);
-        var spaces = content.match(/([\s]+)/g).length; // les espaces comptent pour 2 caractères ???
-        return content.length + spaces;
-    };
-    </script>
+ 
 {% endblock %}
 
 {% block content %}
 
 <section class="container mb-3">
     <div class="row justify-content-md-center">
-        <div class="col-10 bg-light shadow">
+        <div class="col-10 shadow">
             <h1 class="">{{ title }}</h1>
             <form method="post" action="?route={{ post.get('id') ? 'editArticle&articleId=' ~ post.get('id') : 'addArticle'}}">
                 <div class="row">
@@ -121,5 +78,48 @@
         </div>      
     </div>
 </section>
-
+   <script type="text/javascript">
+        tinymce.init({
+            selector: '#articleContent',
+            plugins: 'lists wordcount',
+            toolbar: 'undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | outdent indent | numlist bullist | wordcount' ,
+            setup: function content (text) {
+                let contentContentHelp = document.getElementById("contentContentHelp");
+                let contentTextarea = document.getElementById("articleContent");
+                text.on('keyup', function (e) { 
+                    let contentCount = CountCharacters("articleContent");
+                    contentContentHelp.innerHTML = contentCount + "/2000 caractères";
+                    if(contentCount > 2000){
+                        contentContentHelp.classList.add("invalid-feedback");
+                        contentTextarea.classList.add("is-invalid");
+                    } else if(contentCount <= 2000 && ledeContentHelp.classList.contains("invalid-feedback")){
+                        contentContentHelp.classList.remove("invalid-feedback");
+                    }
+                });
+            }
+        });
+        tinymce.init({
+            selector: '#articleLede',         
+            setup: function lede (text) {
+                let ledeContentHelp = document.getElementById("ledeContentHelp");
+                let textarea = document.getElementById("articleLede");
+                text.on('keyup', function (e) { 
+                    let ledeCount = CountCharacters("articleLede");
+                    ledeContentHelp.innerHTML = ledeCount + "/500 caractères";
+                    if(ledeCount > 500){
+                        ledeContentHelp.classList.add("invalid-feedback");
+                        textarea.classList.add("is-invalid");
+                    } else if(ledeCount <= 500 && ledeContentHelp.classList.contains("invalid-feedback")){
+                        ledeContentHelp.classList.remove("invalid-feedback");
+                    }
+                });
+            }
+        });
+    var wordcount = tinymce.activeEditor.plugins.wordcount;
+    function CountCharacters(elementId) {
+        var body = tinymce.get(elementId).getBody();
+        var content = tinymce.trim(body.innerText || body.textContent);
+        return content.length;
+    };
+    </script>
 {% endblock %}
