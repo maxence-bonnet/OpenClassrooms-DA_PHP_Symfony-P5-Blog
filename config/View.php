@@ -12,11 +12,8 @@ use Twig\RuntimeLoader\RuntimeLoaderInterface;
 
 class View
 {
-    private $file;
-    private $title;
     private $request;
     private $session;
-
     private $loader;
     private $twig;
 

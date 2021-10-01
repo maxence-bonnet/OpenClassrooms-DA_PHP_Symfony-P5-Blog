@@ -61,12 +61,12 @@ class ArticleDAO extends DAO
                 INNER JOIN user ON article.author_id = user.id';
 
         if(isset($q)){
-            $sql .= ' ' . $where . ' article.content LIKE "%' . $q . '%" OR article.lede LIKE "%' . $q . '%"';
+            $sql .= ' ' . $where . ' article.content LIKE "%' . $q . '%" OR article.lede LIKE "%' . $q . '%" OR article.title LIKE "%' . $q . '%"';
             $where = "AND";
         }
 
-        if(isset($author)){
-            $sql .= ' ' . $where . ' user.pseudo LIKE "%' . $author . '%"';
+        if(isset($authorId)){
+            $sql .= ' ' . $where . ' article.author_id = ' . $authorId ;
             $where = "AND";
         }
 
@@ -127,15 +127,14 @@ class ArticleDAO extends DAO
                 INNER JOIN article_status ON article.status_id = article_status.id';
 
         if(isset($q)){
-            $sql .= ' ' . $where . ' article.content LIKE "%' . $q . '%" OR article.lede LIKE "%' . $q . '%"';
+            $sql .= ' ' . $where . ' article.content LIKE "%' . $q . '%" OR article.lede LIKE "%' . $q . '%" OR article.title LIKE "%' . $q . '%"';
             $where = "AND";
         }
 
-        if(isset($author)){
-            $sql .= ' ' . $where . ' user.pseudo LIKE "%' . $author . '%"';
+        if(isset($authorId)){
+            $sql .= ' ' . $where . ' article.author_id = ' . $authorId ;
             $where = "AND";
         }
-
         if(isset($beforeDatetime)){
             $sql .= ' ' . $where . ' article.created_at < "' . $beforeDatetime . '"' ;
             $where = "AND";

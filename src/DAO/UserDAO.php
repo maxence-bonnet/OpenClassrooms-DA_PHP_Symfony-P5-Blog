@@ -37,7 +37,7 @@ class UserDAO extends DAO
         INNER JOIN user_status ON user.status_id = user_status.id
         WHERE user.id = :user_id';
 
-        $result = $this->createQuery($sql, [':user_id' => $userId]);
+        $result = $this->createQuery($sql, ['user_id' => $userId]);
         $user = $result->fetch();
         $result->closeCursor();
         if($user){
@@ -112,188 +112,41 @@ class UserDAO extends DAO
 
     public function logout(int $userId) : void
     {
-        $sql ='UPDATE user
-               SET status_id = 1
-               WHERE id = :id
-               AND status_id != 3' ;
-        $this->createQuery($sql, ['id' => $userId]);
+        $this->query = (new QueryBuilder()) ->statement('update')
+                                            ->table('user')
+                                            ->set('status_id = 1')
+                                            ->where('id = :id')
+                                            ->where('status_id != 3');
+        $this->createQuery((string)$this->query, ['id' => $userId]);
     }
 
     public function countUsers(array $parameters = []) : int
     {
-        $where = "WHERE";
-
-        extract($parameters);
-
-        $sql = 'SELECT COUNT(user.id) FROM user 
-                INNER JOIN user_role ON user.role_id = user_role.id
-                INNER JOIN user_status ON user.status_id = user_status.id';
+        $this->query = (new QueryBuilder()) ->statement('select')
+                                            ->count(1)
+                                            ->table('user', 'u')
+                                            ->innerJoin(['r' => 'user_role'],'u.role_id = r.id')
+                                            ->innerJoin(['s' => 'user_status'],'u.status_id = s.id');
         
-        if(isset($q)){
-            $sql .= ' ' . $where . ' user.pseudo LIKE "%' . $q . '%"';
-            $where = "AND";
-        }
+        $parameters = $this->addParameters($parameters);
 
-        if(isset($scoreHigherThan)){
-            $sql .= ' ' . $where . ' user.score > "' . $scoreHigherThan . '"' ;
-            $where = "AND";
-        }
-
-        if(isset($scoreLowerThan)){
-            $sql .= ' ' . $where . ' user.score < "' . $scoreLowerThan . '"';
-        }
-
-        if(!isset($allUserStatus)){
-            if(isset($online) || isset($offline) || isset($banned)){
-                $or = "";
-                $sql .= ' ' . $where . ' (' ;
-                if(isset($online)){
-                    $sql .= ' user_status.name = "online"';
-                    $or = " OR ";
-                }
-                if(isset($offline)){
-                    $sql .= $or . ' user_status.name = "offline"';
-                    $or = " OR ";
-                }
-                if(isset($banned)){
-                    $sql .= $or . ' user_status.name = "banned"';
-                }
-                $sql .= ')';
-                $where = "AND";
-            }
-        }
-
-        if(!isset($allUserRoles)){
-            if(isset($admin) || isset($moderator) || isset($editor) || isset($user)){
-                $or = "";
-                $sql .= ' ' . $where . ' (' ;
-                if(isset($admin)){
-                    $sql .= ' user_role.name = "admin"';
-                    $or = " OR ";
-                }
-                if(isset($moderator)){
-                    $sql .= $or . ' user_role.name = "moderator"';
-                    $or = " OR ";
-                }
-                if(isset($editor)){
-                    $sql .= $or . ' user_role.name = "editor"';
-                    $or = " OR ";
-                }
-                if(isset($user)){
-                    $sql .= $or . ' user_role.name = "user"';
-                }
-                $sql .= ')';
-                $where = "AND";
-            }
-        }
-
-        if(isset($beforeDatetime)){
-            $sql .= ' ' . $where . ' user.created_at < "' . $beforeDatetime . '"' ;
-            $where = "AND";
-        }
-
-        if(isset($afterDatetime)){
-            $sql .= ' ' . $where . ' user.created_at > "' . $afterDatetime . '"';
-        }
-
-        $result = $this->createQuery($sql);
+        $result = $this->createQuery((string)$this->query,$parameters);
         return $result->fetch(\PDO::FETCH_NUM)[0];
     }
 
     public function getUsers(array $parameters = []) : array
     {
-        $where = "WHERE";
+        $this->query = (new QueryBuilder()) ->statement('select')
+                                            ->select('u.id','u.created_at', 'u.firstname', 'u.lastname', 'u.pseudo', 'u.email', 'u.phone', 'u.score', 'u.status_id', 'u.role_id',
+                                            's.name as status_name',
+                                            'r.name as role_name')
+                                            ->table('user', 'u')
+                                            ->innerJoin(['r' => 'user_role'],'u.role_id = r.id')
+                                            ->innerJoin(['s' => 'user_status'],'u.status_id = s.id');
 
-        extract($parameters);
+        $parameters = $this->addParameters($parameters);
 
-        $sql = 'SELECT user.id, user.created_at, user.firstname, user.lastname, user.pseudo, user.email, user.phone, user.score, user.status_id, user.role_id,
-                user_status.name as status_name,
-                user_role.name as role_name
-                FROM user
-                INNER JOIN user_role ON user.role_id = user_role.id
-                INNER JOIN user_status ON user.status_id = user_status.id';
-
-        if(isset($q)){
-            $sql .= ' ' . $where . ' user.pseudo LIKE "%' . $q . '%"';
-            $where = "AND";
-        }
-
-        if(isset($scoreHigherThan)){
-            $sql .= ' ' . $where . ' user.score > "' . $scoreHigherThan . '"' ;
-            $where = "AND";
-        }
-
-        if(isset($scoreLowerThan)){
-            $sql .= ' ' . $where . ' user.score < "' . $scoreLowerThan . '"';
-        }
-
-        if(!isset($allUserStatus)){
-            if(isset($online) || isset($offline) || isset($banned)){
-                $or = "";
-                $sql .= ' ' . $where . ' (' ;
-                if(isset($online)){
-                    $sql .= ' user_status.name = "online"';
-                    $or = " OR ";
-                }
-                if(isset($offline)){
-                    $sql .= $or . ' user_status.name = "offline"';
-                    $or = " OR ";
-                }
-                if(isset($banned)){
-                    $sql .= $or . ' user_status.name = "banned"';
-                }
-                $sql .= ')';
-                $where = "AND";
-            }
-        }
-
-        if(!isset($allUserRoles)){
-            if(isset($admin) || isset($moderator) || isset($editor) || isset($user)){
-                $or = "";
-                $sql .= ' ' . $where . ' (' ;
-                if(isset($admin)){
-                    $sql .= ' user_role.name = "admin"';
-                    $or = " OR ";
-                }                
-                if(isset($moderator)){
-                    $sql .= $or . ' user_role.name = "moderator"';
-                    $or = " OR ";
-                }
-                if(isset($editor)){
-                    $sql .= $or . ' user_role.name = "editor"';
-                    $or = " OR ";
-                }
-                if(isset($user)){
-                    $sql .= $or . ' user_role.name = "user"';
-                }
-                $sql .= ')';
-                $where = "AND";
-            }
-        }
-        
-        if(isset($beforeDatetime)){
-            $sql .= ' ' . $where . ' user.created_at < "' . $beforeDatetime . '"' ;
-            $where = "AND";
-        }
-
-        if(isset($afterDatetime)){
-            $sql .= ' ' . $where . ' user.created_at > "' . $afterDatetime . '"';
-        }
-        
-        if(isset($orderby)){
-            $sql .= ' ORDER BY created_at ' . $orderby;
-        } else {
-            $sql .= ' ORDER BY created_at DESC';
-        }
-
-        if(isset($limit)){
-            $sql .= " LIMIT $limit";
-            if(isset($offset)){
-                $sql .= " OFFSET $offset";
-            }
-        }
-
-        $result = $this->createQuery($sql);
+        $result = $this->createQuery((string)$this->query,$parameters);
         $users = [];
         foreach ($result as $row){
             $userId = $row['id'];
@@ -301,5 +154,85 @@ class UserDAO extends DAO
         }
         $result->closeCursor();
         return $users;
+    }
+
+    private function addParameters(array $parameters = []) : array
+    {
+        if(isset($parameters['q'])){
+            $this->query->where('u.pseudo LIKE "%' . htmlentities($parameters['q']) . '%"');
+            unset($parameters['q']);
+        }
+        
+        if(isset($parameters['scoreHigherThan'])){
+            $this->query->where('u.score > :scoreHigherThan');
+        }
+        
+        if(isset($parameters['scoreLowerThan'])){
+            $this->query->where('u.score < :scoreLowerThan');
+        }
+        
+        if(isset($parameters['online']) || isset($parameters['offline']) || isset($parameters['banned'])){
+            $conditions = [];
+            if(isset($parameters['online'])){
+                $conditions[] = 's.name = :online';
+                $parameters['online'] = 'online';
+            }
+            if(isset($parameters['offline'])){
+                $conditions[] = 's.name = :offline';
+                $parameters['offline'] = 'offline';
+            }
+            if(isset($parameters['banned'])){
+                $conditions[] = 's.name = :banned';
+            }
+            $this->query->subWhere(join(' OR ', $conditions));
+        }
+        
+        if(isset($parameters['admin']) || isset($parameters['moderator']) || isset($parameters['editor']) || isset($parameters['user'])){
+            $conditions = [];
+            if(isset($parameters['admin'])){
+                $conditions[] = 'r.name = :admin';
+                $parameters['admin'] = 'admin';
+            }
+            if(isset($parameters['moderator'])){
+                $conditions[] = 'r.name = :moderator';
+                $parameters['moderator'] = 'moderator';
+            }
+            if(isset($parameters['editor'])){
+                $conditions[] = 'r.name = :editor';
+                $parameters['editor'] = 'editor';
+            }
+            if(isset($parameters['user'])){
+                $conditions[] = 'r.name = :user';
+                $parameters['user'] = 'user';
+            }
+            $this->query->subWhere(join(' OR ', $conditions));
+        }
+        
+        
+        if(isset($parameters['beforeDatetime'])){
+           $this->query->where('u.created_at < :beforeDatetime');
+        }
+        
+        if(isset($parameters['afterDatetime'])){
+            $this->query->where('u.created_at > :afterDatetime');
+        }
+
+        if(isset($parameters['orderBy'])){
+            $this->query->order($parameters['orderBy']);
+            unset($parameters['orderBy']);
+        } else {
+            $this->query->order('created_at','DESC');
+        }
+
+        if(isset($parameters['limit'])){
+            $this->query->limit($parameters['limit']);
+            unset($parameters['limit']);
+            if(isset($parameters['offset'])){
+                $this->query->offset($parameters['offset']);
+                unset($parameters['offset']);
+            }
+        }
+
+        return $parameters;
     }
 }

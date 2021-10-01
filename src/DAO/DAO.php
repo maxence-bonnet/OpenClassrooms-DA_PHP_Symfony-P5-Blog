@@ -8,7 +8,9 @@ use Exception;
 abstract class DAO
 {
     private $connection;
-
+    
+    protected $query;
+    
     private function checkConnection()
     {
         if($this->connection === null) {
@@ -25,7 +27,7 @@ abstract class DAO
             return $this->connection;
         }
         catch(Exception $connectionError) {
-            die('Erreur lors de la connexion à la base de données : ' . $connectionError->getMessage());
+            throw new Exception ('Erreur lors de la connexion à la base de données : ' . $connectionError->getMessage());
         }
     }
     

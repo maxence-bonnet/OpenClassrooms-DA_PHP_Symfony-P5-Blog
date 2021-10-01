@@ -41,7 +41,7 @@ class UserValidation extends Validation
             $error = $this->checkPhone($name, $value);
             $this->addError($name, $error);
         }
-        if(!is_null($this->getPassword1()) && !is_null($this->getPassword2())){
+        if($this->getPassword1() !== null && $this->getPassword2() !== null){
             $name = 'password2';
             $error = $this->checkSamePasswords($this->getPassword1(), $this->getPassword2());
             $this->addError($name, $error);

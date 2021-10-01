@@ -23,8 +23,7 @@ class CommentDAO extends DAO
         return $comment;
     }
 
-    // ok
-    public function getComment(int $commentId)
+    public function getComment(int $commentId) : mixed
     {
         $sql = 'SELECT comment.id, comment.user_id, comment.article_id, comment.created_at, comment.last_modified, comment.content, comment.validated, comment.answer_to,
                        user.pseudo as user_pseudo,
@@ -91,7 +90,6 @@ class CommentDAO extends DAO
         ]);
     }
 
-    // 
     public function countComments(array $parameters = []) : int
     {
         $where = "WHERE";
@@ -140,7 +138,6 @@ class CommentDAO extends DAO
         return $result->fetch(\PDO::FETCH_NUM)[0];
     }
 
-    // 
     public function getComments(array $parameters = []) : array
     {
         $where = "WHERE";

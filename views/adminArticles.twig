@@ -39,7 +39,7 @@
                             SelectAuthor : {
                                 type : 'select',
                                 label : 'De l\'auteur',
-                                name : 'userId',
+                                name : 'authorId',
                                 dataList : users,
                                 options : {
                                     genericOption : {
@@ -47,7 +47,7 @@
                                         name : ''
                                         },
                                     labelPosition : 'ms-2',
-                                    selected : get.get('userId'),
+                                    selected : get.get('authorId'),
                                     }
                                 } 
                             })
@@ -140,7 +140,9 @@
     </div>
     <div class="row">
         <div class="col">
+        {% if comments is not empty %}   
         <h5>{{ pageArticlesCount }} / {{ totalArticlesCount }} Résultat(s) - Page {{ page }} / {{ pages }}</h5>
+        {% endif %}
             <table class="adminTable table table-striped table-hover table-dark text-center">
                 <thead>
                     <tr>                    

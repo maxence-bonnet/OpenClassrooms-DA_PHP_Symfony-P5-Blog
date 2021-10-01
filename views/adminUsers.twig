@@ -189,7 +189,9 @@
     </div>
     <div class="row">
         <div class="col">
+        {% if users is not empty %}   
         <h5>{{ pageUsersCount }} / {{ totalUsersCount }} Résultat(s) - Page {{ page }} / {{ pages }}</h5>
+        {% endif %}
             <table class="adminTable table table-striped table-hover table-dark text-center">
                 <thead>
                     <tr>                    
