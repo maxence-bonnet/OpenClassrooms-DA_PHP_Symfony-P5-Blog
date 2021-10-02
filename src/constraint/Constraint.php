@@ -4,62 +4,67 @@ namespace App\src\constraint;
 
 class Constraint
 {
-    const EXISTING_PSEUDO = 'AAAAA';
-
     public function notBlank($name, $value)
     {
         $value = preg_replace("#([\t\n\r\s])#","$2",$value);
         if(empty($value)) {
-            return '<div class="invalid-feedback">Le champ '.$name.' saisi est vide.</div>';
+            return 'Le champ '.$name.' saisi est vide.';
         }
     }
 
     public function minLength($name, $value, $minSize)
     {
         if(strlen($value) < $minSize) {
-            return '<div class="invalid-feedback">Le champ '.$name.' doit contenir au moins '.$minSize.' caractères.</div>';
+            return 'Le champ '.$name.' doit contenir au moins '.$minSize.' caractères.';
         }
     }
 
     public function maxLength($name, $value, $maxSize)
     {
         if(strlen($value) > $maxSize) {
-            return '<div class="invalid-feedback">Le champ '.$name.' doit contenir au maximum '.$maxSize.' caractères.</div>';
+            return 'Le champ '.$name.' doit contenir au maximum '.$maxSize.' caractères.';
         }
     }
-
-    public function pseudoExists($value)
-    {
-        if($value === self::EXISTING_PSEUDO){
-            return '<div class="invalid-feedback">Ce pseudonyme est déjà utilisé, veuillez en choisir un autre.</div>';
-        }
-    }
-
+    
     public function PassRequirements($name, $value)
     {
         if(!preg_match("#(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*\d)(?=.*[^A-Za-z\d])#",$value)){
-            return '<div class="invalid-feedback">Le champ '.$name.' ne respecte pas le format demandé.</div>';
+            return 'Le champ '.$name.' ne respecte pas le format demandé.';
         }
     }
 
     public function checkSamePasswords($password1,$password2)
     {
         if($password1 !== $password2) {
-            return '<div class="invalid-feedback">Les mots de passe ne correspondent pas.</div>';
+            return 'Les mots de passe ne correspondent pas.';
         }
     }
 
     public function isEmail($name, $value)
     {
         if(!filter_var($value,FILTER_VALIDATE_EMAIL)){
-            return '<div class="invalid-feedback">Le champ '.$name.' est invalide.</div>';
+            return 'Le champ '.$name.' est invalide.';
         }
     }
 
     public function inArray($name, $value, $array)
     {
         if(!in_array($value, $array)){
-            return '<div class="invalid-feedback">Le champ '.$name.' n\'est pas correctement saisi.</div>';
+            return 'Le champ '.$name.' n\'est pas correctement saisi.';
         }
+    }
+
+    public function existingUser($name, $value)
+    {
+        if(0){
+            return 'L\'utilisateur saisi n\'existe pas.';
+        }
+    }
+
+    public function existingCategory($name, $value)
+    {
+        if(0){
+            return 'La catégorie saisie n\'existe pas.';
+        }       
     }
 }

@@ -13,7 +13,7 @@ class QueryBuilder
     private $table;
     private $join;
     private $where;
-    private $order;
+    private $orderBy;
     private $limit;
     private $offset;
 
@@ -33,7 +33,7 @@ class QueryBuilder
                 $this->statement = 'DELETE';    
                 break;
             default :
-                throw new Exception ('Syntax error in ->statement : ' . $connectionError->getMessage());
+                throw new Exception ('Syntax error in statement declaration');
         }
         return $this;
     }
@@ -73,7 +73,8 @@ class QueryBuilder
 
     public function set(string ...$setValues) : self
     {
-        $this->set = $setValues;
+        $values = join(', ', $setValues);
+        $this->set[] = $values;
         return $this;
     }
 
@@ -94,6 +95,19 @@ class QueryBuilder
         }
         $this->join[] = "INNER JOIN $join ON $condition";
         return $this;
+    }
+
+    public function leftJoin(array $table, string $condition) : self
+    {
+        foreach($table as $key => $value){
+            if(is_string($key)){
+                $join = "$value as $key";
+            } else {
+                $join = "$value";
+            }
+        }
+        $this->join[] = "LEFT OUTER JOIN $join ON $condition";
+        return $this;        
     }
 
     public function count(string $field) : self
@@ -126,20 +140,23 @@ class QueryBuilder
         return $this;
     }
 
-    public function order(string $column, string $order = 'ASC') : self
+    public function orderBy(array $orderBy) : self
     {
-        if($order === 'ASC' || $order === 'DESC'){
-            $this->order = "ORDER BY $column $order";
-        }    
-        return $this;
+        if(isset($orderBy['column']) && isset($orderBy['order'])){
+            if($orderBy['order'] === 'ASC' || $orderBy['order'] === 'DESC'){
+                $this->orderBy = "ORDER BY " . $orderBy['column'] . " " . $orderBy['order'];
+            }    
+            return $this;            
+        }
+
     }
+
     public function __toString() : string
     {
         $parts[] = $this->statement;
         if($this->select){
             $parts[] = join(', ',$this->select);
         }
-        // FROM
         if($this->statement === 'SELECT' || $this->statement === 'DELETE'){
             $parts[] = 'FROM';
         }
@@ -169,8 +186,8 @@ class QueryBuilder
             }          
         }
         // ORDER BY
-        if($this->order){
-            $parts[] = $this->order;
+        if($this->orderBy){
+            $parts[] = $this->orderBy;
         }
         // LIMIT & OFFSET
         if($this->limit){

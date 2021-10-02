@@ -5,11 +5,13 @@ namespace App\src\DAO;
 use App\config\Parameter;
 use App\config\Session;
 use App\src\model\User;
+use PDO;
 
 
 class UserDAO extends DAO
 {
-    private function buildObject($row)
+    // ok QBuilder
+    private function buildObject(array $row) : User
     {
         $user = new User(); 
         $user->setId($row['id']);
@@ -27,89 +29,96 @@ class UserDAO extends DAO
         return $user;
     }
 
-    public function getUser(int $userId)
+    // ok QBuilder
+    public function getUser(int $userId) : mixed
     {
-        $sql = 'SELECT user.id, user.created_at, user.firstname, user.lastname, user.pseudo, user.email, user.phone, user.score, user.status_id, user.role_id,
-        user_status.name as status_name,
-        user_role.name as role_name
-        FROM user
-        INNER JOIN user_role ON user.role_id = user_role.id
-        INNER JOIN user_status ON user.status_id = user_status.id
-        WHERE user.id = :user_id';
-
-        $result = $this->createQuery($sql, ['user_id' => $userId]);
-        $user = $result->fetch();
-        $result->closeCursor();
-        if($user){
+        $this->query = $this->selectUsers()->where('u.id = :userId');   
+        $result = $this->createQuery((string)$this->query, ['userId' => $userId]);
+        if($user = $result->fetch()){
             $user = $this->buildObject($user);
         }
+        $result->closeCursor();
         return $user;
     }
 
+    // ok QBuilder
     public function updateUserRole(int $userId, int $roleId) : void
     {
-        $sql = 'UPDATE user SET role_id = :role_id WHERE id = :user_id';
-        $this->createQuery($sql,[
-            'user_id' => $userId,
-            'role_id' => $roleId
+        $this->query = (new QueryBuilder()) ->statement('update')
+                                            ->table('user')
+                                            ->set('role_id = :roleId')
+                                            ->where('id = :userId');
+        $this->createQuery((string)$this->query,[
+            'userId' => $userId,
+            'roleId' => $roleId
         ]);
     }
 
+    // ok QBuilder
     public function updateUserStatus(int $userId, int $statusId) : void
     {
-        $sql = 'UPDATE user SET status_id = :status_id WHERE id = :user_id';
-        $this->createQuery($sql,[
-            'user_id' => $userId,
-            'status_id' => $statusId
+        $this->query = (new QueryBuilder()) ->statement('update')
+                                            ->table('user')
+                                            ->set('status_id = :statusId')
+                                            ->where('id = :userId');
+        $this->createQuery((string)$this->query,[
+            'userId' => $userId,
+            'statusId' => $statusId
         ]);
     }
 
+    // ok QBuilder
     public function pseudoExists(string $pseudo) : ?int
     {
-        $sql = 'SELECT COUNT(pseudo) FROM user WHERE pseudo = :pseudo';
-        $result = $this->createQuery($sql, [':pseudo' => htmlspecialchars($pseudo)]);
-        return $result->fetchColumn();;
+        $this->query = (new QueryBuilder()) ->statement('select')
+                                            ->table('user')
+                                            ->count(1)
+                                            ->where('pseudo = :pseudo');
+        $result = $this->createQuery((string)$this->query, [':pseudo' => $pseudo]);
+        return $result->fetchColumn();
     }
 
+    // ok QBuilder
     public function register(Parameter $post) : void
     {
-        $sql = 'INSERT INTO user (created_at, firstname, lastname, pseudo, password, email, phone, role_id, status_id, score)
-                VALUES(NOW(), :firstname, :lastname, :pseudo, :password, :email, :phone, :role_id, :status_id, :score)';
-        $this->createQuery($sql, [
-            'firstname' => $post->get('firstname'),
-            'lastname' => $post->get('lastname'),
-            'pseudo' => $post->get('pseudo'),
-            'password' => password_hash($post->get('password'),PASSWORD_BCRYPT),
-            'email' => $post->get('email'),
-            'phone' => $post->get('phone'),
-            'role_id' => 2,
-            'status_id' => 1,
-            'score' => 0
-        ]);
+        $this->query = (new QueryBuilder()) ->statement('insert') 
+                                            ->table('user')
+                                            ->insertValues(['created_at' => ':createdAt',
+                                                            'firstname' => ':firstname',
+                                                            'lastname' => ':lastname',
+                                                            'pseudo' => ':pseudo',
+                                                            'password' => ':password',
+                                                            'email' => ':email',
+                                                            'phone' => ':phone',
+                                                            'role_id' => 2,
+                                                            'status_id' => 1,
+                                                            'score' => 0]);
+        $pdo = $this->prepareQuery((string)$this->query);
+        $pdo->bindValue(':createdAt', $post->get('createdAt'));
+        $pdo->bindValue(':firstname', $post->get('firstname'));
+        $pdo->bindValue(':lastname', $post->get('lastname'));
+        $pdo->bindValue(':pseudo', $post->get('pseudo'));
+        $pdo->bindValue(':password', $post->get('password'));
+        $pdo->bindValue(':email', $post->get('email'));
+        $pdo->bindValue(':phone', $post->get('phone'));
+        $pdo->execute();
     }
 
+    // ok QBuilder
     public function login(Parameter $post) : array
     {
-        $sql = 'SELECT user.id, user.pseudo, user.password, user_status.name as status_name, user_role.name as role_name
-                FROM user
-                INNER JOIN user_role ON user.role_id = user_role.id
-                INNER JOIN user_status ON user.status_id = user_status.id
-                WHERE user.pseudo = :pseudo';
-        $data = $this->createQuery($sql, ['pseudo' => $post->get('pseudo')]);
-        $result = $data->fetch();
-        $passwordValid = password_verify($post->get('password'), $result['password']);
-        if($passwordValid && $result['status_name'] !== "banned"){
-            $sql = 'UPDATE user 
-                    SET status_id = 2 
-                    WHERE pseudo = :pseudo';
-            $this->createQuery($sql, ['pseudo' => $post->get('pseudo')]);
-        }
-        return [
-            'result' => $result,
-            'passwordValid' => $passwordValid
-        ];
+        $this->query = (new QueryBuilder()) ->statement('select')
+                                            ->select('u.id','pseudo','password',
+                                            's.name as status_name',
+                                            'r.name as role_name')
+                                            ->table('user', 'u')
+                                            ->innerJoin(['r' => 'user_role'],'u.role_id = r.id')
+                                            ->innerJoin(['s' => 'user_status'],'u.status_id = s.id')
+                                            ->where('u.pseudo = :pseudo');
+        return $this->createQuery($this->query, ['pseudo' => $post->get('pseudo')])->fetch(PDO::FETCH_ASSOC);
     }
 
+    // ok QBuilder
     public function logout(int $userId) : void
     {
         $this->query = (new QueryBuilder()) ->statement('update')
@@ -120,6 +129,7 @@ class UserDAO extends DAO
         $this->createQuery((string)$this->query, ['id' => $userId]);
     }
 
+    // ok QBuilder
     public function countUsers(array $parameters = []) : int
     {
         $this->query = (new QueryBuilder()) ->statement('select')
@@ -134,15 +144,10 @@ class UserDAO extends DAO
         return $result->fetch(\PDO::FETCH_NUM)[0];
     }
 
+    // ok QBuilder
     public function getUsers(array $parameters = []) : array
     {
-        $this->query = (new QueryBuilder()) ->statement('select')
-                                            ->select('u.id','u.created_at', 'u.firstname', 'u.lastname', 'u.pseudo', 'u.email', 'u.phone', 'u.score', 'u.status_id', 'u.role_id',
-                                            's.name as status_name',
-                                            'r.name as role_name')
-                                            ->table('user', 'u')
-                                            ->innerJoin(['r' => 'user_role'],'u.role_id = r.id')
-                                            ->innerJoin(['s' => 'user_status'],'u.status_id = s.id');
+        $this->query = $this->selectUsers();
 
         $parameters = $this->addParameters($parameters);
 
@@ -156,6 +161,7 @@ class UserDAO extends DAO
         return $users;
     }
 
+    // ok QBuilder
     private function addParameters(array $parameters = []) : array
     {
         if(isset($parameters['q'])){
@@ -183,6 +189,7 @@ class UserDAO extends DAO
             }
             if(isset($parameters['banned'])){
                 $conditions[] = 's.name = :banned';
+                $parameters['banned'] = 'banned';
             }
             $this->query->subWhere(join(' OR ', $conditions));
         }
@@ -208,7 +215,8 @@ class UserDAO extends DAO
             $this->query->subWhere(join(' OR ', $conditions));
         }
         
-        
+        // Common
+
         if(isset($parameters['beforeDatetime'])){
            $this->query->where('u.created_at < :beforeDatetime');
         }
@@ -218,10 +226,11 @@ class UserDAO extends DAO
         }
 
         if(isset($parameters['orderBy'])){
-            $this->query->order($parameters['orderBy']);
+            $this->query->orderBy($parameters['orderBy']);
             unset($parameters['orderBy']);
         } else {
-            $this->query->order('created_at','DESC');
+            $this->query->orderBy(['column'=>'u.created_at','order'=>'DESC']);
+            unset($parameters['orderBy']);
         }
 
         if(isset($parameters['limit'])){
@@ -234,5 +243,17 @@ class UserDAO extends DAO
         }
 
         return $parameters;
+    }
+
+    // ok QBuilder
+    private function selectUsers() : QueryBuilder
+    {
+        return (new QueryBuilder()) ->statement('select')
+                                    ->select('u.id','u.created_at', 'u.firstname', 'u.lastname', 'u.pseudo', 'u.email', 'u.phone', 'u.score', 'u.status_id', 'u.role_id',
+                                    's.name as status_name',
+                                    'r.name as role_name')
+                                    ->table('user', 'u')
+                                    ->innerJoin(['r' => 'user_role'],'u.role_id = r.id')
+                                    ->innerJoin(['s' => 'user_status'],'u.status_id = s.id');
     }
 }

@@ -6,6 +6,12 @@ use App\config\Parameter;
 
 class ContactFormValidation extends Validation
 {
+    public function __construct()
+    {
+        parent::__construct();
+        $this->requiredFields = [];
+    }
+    
     public function checkField($name, $value)
     {
         if($name === 'firstname') {

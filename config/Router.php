@@ -46,7 +46,7 @@ class Router
     public function run()
     {
         $route = $this->request->getGet()->get('route');
-        try{
+        // try{
             if(isset($route)){
                 if($route === 'home'){
                     $this->frontController->home($this->request->getPost());
@@ -100,10 +100,10 @@ class Router
             } else {
                 $this->frontController->home($this->request->getPost());
             }
-        }
-        catch (Exception $e)
-        {
-            $this->errorController->errorServer($e);
-        }
+        // }
+        // catch (Exception $e)
+        // {
+        //     $this->errorController->errorServer($e);
+        // }
     }
 }

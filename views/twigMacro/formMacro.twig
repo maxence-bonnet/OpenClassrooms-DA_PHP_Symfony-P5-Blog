@@ -4,7 +4,7 @@
 {% macro input(type, label, name, options = [] ) %}
     <div class="form-group mb-3 {{ options.col | default('col-md')}}">
         <label class="form-label {{ options.labelposition }}" for="{{ name }}">{{ label | raw }} :</label>
-        <input type="{{ type }}" class="form-control {{ options.errors ? 'is-invalid' : '' }}" id="{{ name }}" name="{{ name }}" {% if options.help %} aria-describedby="{{ name ~ 'ContentHelp' }}" {% endif %} placeholder="{{ options.placeholder }}" value="{{ options.value }}" >
+        <input type="{{ type }}" class="form-control {{ options.errors ? 'is-invalid' : '' }}" id="{{ name }}" name="{{ name }}" {% if options.help %} aria-describedby="{{ name ~ 'ContentHelp' }}" {% endif %} placeholder="{{ options.placeholder }}" value="{{ options.value }}" {{ options.required ? 'required' }}>
         {% if options.help %}
             <div id="{{ name ~ 'ContentHelp' }}" class="form-text">{{ options.help | raw }}</div>
         {% endif %}

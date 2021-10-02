@@ -7,6 +7,7 @@ use App\config\Parameter;
 class Validation
 {
     protected $constraint;
+    protected $requiredFields;
     protected $errors = [];
 
     public function __construct()
@@ -43,10 +44,10 @@ class Validation
         return $this->errors;
     }
 
-    protected function addError($name, $error) {
+    public function addError($name, $error) {
         if($error) {
             $this->errors += [
-                $name => $error
+                $name => '<div class="invalid-feedback">' . $error . '</div>'
             ];
         }
     }

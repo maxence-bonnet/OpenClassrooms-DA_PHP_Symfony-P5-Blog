@@ -7,66 +7,55 @@ use App\src\utils\URL;
 
 class FrontArticleController extends FrontController
 {
+    private $defaultLimit = 9;
+    private $parameters;
+    private $data;
+
+    // ok QBuilder
     public function articles(Parameter $get)
     {
-        $page = 1;
-        $offset = 0;
-        $limit = 9;
-        $parameters['page'] = &$page;
-        $parameters['limit'] = &$limit;
-        $parameters['offset'] = &$offset;
-        $parameters['published'] = 1;
-        $parameters['private'] = null;
-        $parameters['oderby'] = 'DESC';
-        $data = &$parameters;
+        $this->parameters = $this->getCleanParameters($get->all(),'article');
 
-        if(!empty($get->get('q'))){
-            $parameters['q'] = htmlentities($get->get('q'));
-        }
+        $this->data['page'] = isset($this->parameters['page']) && $this->parameters['page'] > 1 ? $this->parameters['page'] : 1;
+        unset($this->parameters['page']);
+        $this->data['title'] = 'Les articles';
+        $this->data['get'] = $get;
 
+        $this->parameters['limit'] = $this->defaultLimit ;
+
+        // For all users -> published articles
+        $this->parameters['published'] = 1;
+        // For connected users -> add private articles
         if($this->session->get('role')){
-            $parameters['private'] = 1;
+            $this->parameters['private'] = 1;
         }
 
-        if((int)$get->get('page') > 1){
-            $page = $get->get('page');
-        }
+        $this->data['totalArticlesCount'] = (int) $this->articleDAO->countArticles($this->parameters);
 
-        $data['totalArticlesCount'] = (int) $this->articleDAO->countArticles($parameters);
+        $this->data['pages'] = ceil($this->data['totalArticlesCount']/$this->parameters['limit']);
 
-        $pages = ceil($data['totalArticlesCount']/$limit);
-
-        if($page <= $pages && $page > 1){
-            $offset = $limit*($page - 1);         
+        if($this->data['page'] <= $this->data['pages'] && $this->data['page'] > 1){
+            $this->parameters['offset'] = $this->parameters['limit']*($this->data['page'] - 1);     
         } else {
-            $page = 1;      
+            $this->data['page'] = 1;
+            $this->parameters['offset'] = 0;
         }
 
-        $data['articles'] = $this->articleDAO->getArticles($parameters);
+        $this->data['articles'] = $this->articleDAO->getArticles($this->parameters);
 
-        $data['pageArticlesCount'] = count($data['articles']);
+        $this->data['pageArticlesCount'] = count($this->data['articles']);
 
-        $data['previousPageURL'] = null;
-        $data['nextPageURL'] = null;
-        
-        if($page > 1){
-            $data['previousPageURL'] = URL::mergeOn($this->get->all(), ['page' => $page - 1]);
-        }
+        $this->data['previousPageURL'] = $this->data['page'] > 1 ? URL::mergeOn($this->get->all(),['page' => $this->data['page'] - 1]) . "#resultsTable" : null;
+        $this->data['nextPageURL'] = $this->data['page'] < $this->data['pages'] && $this->data['pages'] !== 1 ? URL::mergeOn($this->get->all(),['page' => $this->data['page'] + 1]) . "#resultsTable" : null;
 
-        if($page < $pages && $pages !== 1){
-            $data['nextPageURL'] = URL::mergeOn($this->get->all(), ['page' => $page + 1]);
-        }
-
-        $data['pages'] = $pages;
-        $data['title'] = 'Les Articles';
-        $data['get'] = $get;
-
-        return $this->view->renderTwig('articles', $data);
+        return $this->view->renderTwig('articles', $this->data);
     }
 
+    // ok QBuilder
     public function article(Parameter $get)
     {
         $article = $this->articleDAO->getArticle((int)$get->get('articleId'));
+
         if($article){
             $this->setPreviousURI();
 
@@ -91,11 +80,11 @@ class FrontArticleController extends FrontController
                     'validated' => "validated"
                 ]);
             }
-            $data['title'] = $article->getTitle();
-            $data['article'] = $article;
-            $data['comments'] = $comments;
-            $data['answerTo'] = $get->get('answerTo');
-            return $this->view->renderTwig('article', $data);
+            $this->data['title'] = $article->getTitle();
+            $this->data['article'] = $article;
+            $this->data['comments'] = $comments;
+            $this->data['answerTo'] = $get->get('answerTo');
+            return $this->view->renderTwig('article', $this->data);
         }
         $this->session->addMessage('danger', 'L\'article recherché n\'existe pas');
         $this->http->redirect('?route=articles');

@@ -11,13 +11,13 @@
             <form method="post">
                 <div class="row">
 
-                    {{ form.input('text','Pseudo','pseudo', { value : post.get('pseudo') }) }}
+                    {{ form.input('text','Pseudo','pseudo', { value : post.get('pseudo'), required : true }) }}
                 
                     {{ form.input('password','Mot de passe*','password') }}
 
                 </div>
 
-                {{ form.submit('Se connecter', { position : 'mx-auto'}) }}
+                {{ form.submit('Se connecter', { position : 'mx-auto', required : true }) }}
 
             </form>
         </div>

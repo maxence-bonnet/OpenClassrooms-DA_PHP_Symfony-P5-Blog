@@ -55,7 +55,7 @@ abstract class Controller
 
             $this->setPreviousURI();
 
-            // $this->http->redirect('?route=login');
+            $this->http->redirect('?route=login');
         }
     }
 
@@ -80,12 +80,12 @@ abstract class Controller
     {
         $toStringArray = ['q','afterDatetime','beforeDatetime'];
         $toStringArticle = ['published','private','standby','all'];
-        $toStringComment = ['validated'];
+        $toStringComment = ['validated','all'];
         $toStringUser = ['online','offline','banned','allUserStatus','admin','moderator','editor','user','allUserRoles'];
         $toString = array_merge($toStringArray,${'toString' . ucfirst($from)});
 
         $toIntegerArray = ['page','limit'];
-        $toIntegerArticle = ['userId'];
+        $toIntegerArticle = ['userId','authorId','categoryId'];
         $toIntegerComment = ['userId','articleId'];
         $toIntegerUser = ['scoreHigherThan','scoreLowerThan'];
         $toInteger = array_merge($toIntegerArray,${'toInteger' . ucfirst($from)});

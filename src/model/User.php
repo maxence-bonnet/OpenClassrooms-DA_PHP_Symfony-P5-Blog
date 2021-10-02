@@ -57,7 +57,7 @@ class User extends Model
     /**
      * @var string
      */
-    private $StatusName;
+    private $statusName;
 
     /**
      * @var int

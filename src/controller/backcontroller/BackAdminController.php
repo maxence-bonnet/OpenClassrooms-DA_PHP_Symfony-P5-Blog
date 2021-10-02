@@ -8,262 +8,145 @@ use App\src\utils\URL;
 
 class BackAdminController extends BackController
 {
-    private $limitArray = [10,20,30,40,50,75,100];
+    protected $limitArray = [10,20,30,40,50,75,100];
     private $defaultLimit = 20;
-    private $parameters;
-    private $data;
 
+    // ok QBuilder
     public function administration()
     {
         $this->checkAdmin();
         $this->setPreviousURI();
-        $data['comments'] = $this->commentDAO->getComments([
+
+        $this->data['comments'] = $this->commentDAO->getComments([
             'limit' => 10,
             'validated' => "pending",
-            'orderby' => 'DESC'
+            'orderBy' => ['column' => 'c.created_at',
+                            'order' => 'DESC']
         ]);
-        $data['articles'] = $this->articleDAO->getArticles([
+        $this->data['articles'] = $this->articleDAO->getArticles([
             'limit' => 10,
-            'orderby' => 'DESC'
+            'orderBy' => ['column' => 'a.created_at',
+                            'order' => 'DESC']
         ]);
-        $data['users'] = $this->userDAO->getUsers([
+        $this->data['users'] = $this->userDAO->getUsers([
             'limit' => 10,
-            'orderby' => 'DESC'
+            'orderBy' => ['column' => 'u.created_at',
+                            'order' => 'DESC']
         ]);
 
-        $data['title'] = 'Administration';
-        return $this->view->renderTwig('administration', $data);
+        $this->data['title'] = 'Administration';
+        return $this->view->renderTwig('administration', $this->data);
     }
 
+    // ok QBuilder
     public function adminComments(Parameter $get)
     {
         $this->checkAdmin();
         $this->setPreviousURI();
-        $limitArray = [10,20,30,40,50,75,100];
-        $page = 1;
-        $parameters['page'] = &$page;
-        $limit = 20;
-        $parameters = [];
-        // En attendant mieux
-        $parameters['orderby'] = 'DESC';
-        $author = null;
-        $articleId = null;
-        $afterDatetime = null;
-        $beforeDatetime = null;
-        $validated = null;
-        $previousPageURL = null;
-        $nextPageURL = null;
 
-        if(!empty($get->get('q'))){
-            $parameters['q'] = htmlentities($get->get('q'));
-        }
+        $this->parameters = $this->getCleanParameters($get->all(),'comment');
+    
+        $this->data['page'] = isset($this->parameters['page']) && $this->parameters['page'] > 1 ? $this->parameters['page'] : 1;
+        unset($this->parameters['page']);
+        $this->data['title'] = 'Administration des commentaires';
+        $this->data['get'] = $get;
 
-        if(!empty($get->get('userId'))){
-            $parameters['userId'] = htmlentities($get->get('userId'));
-        }
-
-        if(!empty($get->get('articleId'))){
-            $parameters['articleId'] = (int)$get->get('articleId');
-        }
-
-        if(!empty($get->get('afterDatetime'))){
-            $parameters['afterDatetime'] =  htmlentities($get->get('afterDatetime'));
-        }
-
-        if(!empty($get->get('beforeDatetime'))){
-            $parameters['beforeDatetime'] =  htmlentities($get->get('beforeDatetime'));
-        }
-
-        if(!empty($get->get('validated'))){
-            if($get->get('validated') === "validated" || $get->get('validated') === "pending"){
-                $parameters['validated'] = $get->get('validated');                
-            }
-        }
-
-        if((int)$get->get('page') > 1){
-            $page = $get->get('page');
-        }
-
-        if(in_array((int)$get->get('limit'),$limitArray)){
-            $limit = $get->get('limit');
-        }
-        $parameters['limit'] = $limit;
-
-        $commentsCount = $this->commentDAO->countComments($parameters);
-
-        $pages = ceil($commentsCount/$limit);
-        if($page <= $pages && $page > 1){
-            $parameters['offset'] = $limit*($page - 1);         
+        if(in_array((int)$get->get('limit'),$this->limitArray)){
+            $this->parameters['limit'] = $get->get('limit');
         } else {
-            $page = 1;
-            $parameters['offset'] = 0;
+            $this->parameters['limit'] = $this->defaultLimit ;
         }
 
-        $comments = $this->commentDAO->getComments($parameters);
-
-        $pageCommentsCount = count($comments);
-
-        if($page > 1){
-            $previousPageURL = URL::mergeOn($this->get->all(),['page' => $page - 1]) . "#resultsTable";
+        if(isset($this->parameters['validated']) && $this->parameters['validated'] === 'all'){
+            unset($this->parameters['validated']);
         }
 
-        if($page < $pages && $pages !== 1){
-            $nextPageURL = URL::mergeOn($this->get->all(),['page' => $page + 1]) . "#resultsTable";
+        $this->data['totalCommentsCount'] = (int) $this->commentDAO->countComments($this->parameters);
+
+        $this->data['pages'] = ceil($this->data['totalCommentsCount']/$this->parameters['limit']);
+
+        if($this->data['page'] <= $this->data['pages'] && $this->data['page'] > 1){
+            $this->parameters['offset'] = $this->parameters['limit']*($this->data['page'] - 1);     
+        } else {
+            $this->data['page'] = 1;
+            $this->parameters['offset'] = 0;
         }
 
-        // Articles list for <select>
-        $articlesList = $this->articleDAO->getArticles();
-        $i = 0;
-        foreach($articlesList as $article){  
-            $data['articles'][$i]['value'] = $article->getId();
-            $data['articles'][$i]['name'] = $article->getTitle();
-            $i ++;
-        }
+        $this->data['comments'] = $this->commentDAO->getComments($this->parameters);
 
-        // Users list for <select>
-        $users = $this->userDAO->getUsers();
-        $i = 0;
-        foreach($users as $user){  
-            $data['users'][$i]['value'] = $user->getId();
-            $data['users'][$i]['name'] = $user->getPseudo();
-            $i ++;
-        }
+        $this->data['pageCommentsCount'] = count($this->data['comments']);
 
-        // Limits list for <select>
-        $i = 0;
-        foreach($limitArray as $key => $limit){  
-            $data['limit'][$i]['value'] = (string)$limit;
-            $data['limit'][$i]['name'] = (string)$limit;
-            $i ++;
-        }
+        $this->data['previousPageURL'] = $this->data['page'] > 1 ? URL::mergeOn($this->get->all(),['page' => $this->data['page'] - 1]) . "#resultsTable" : null;
+        $this->data['nextPageURL'] = $this->data['page'] < $this->data['pages'] && $this->data['pages'] !== 1 ? URL::mergeOn($this->get->all(),['page' => $this->data['page'] + 1]) . "#resultsTable" : null;
+       
+        $this->data['articles'] = $this->buildArticlesList();
 
-        return $this->view->renderTwig('adminComments', [
-            'title' => 'Administration des commentaires',
-            'get' => $get,
-            'comments' => $comments,
-            'articles' => $data['articles'],
-            'limits' => $data['limit'],
-            'users' => $data['users'],
-            'page' => $page,
-            'pages' => $pages,
-            'totalCommentsCount' => $commentsCount,
-            'pageCommentsCount' => $pageCommentsCount,
-            'previousPageURL' => $previousPageURL,
-            'nextPageURL' => $nextPageURL
-        ]);             
+        $this->data['users'] = $this->buildUsersList();
+
+        $this->data['limits'] = $this->buildLimitsList();
+
+        return $this->view->renderTwig('adminComments', $this->data);             
     }
 
+    // ok QBuilder
     public function adminArticles(Parameter $get)
     {
         $this->checkAdmin();
         $this->setPreviousURI();
-        $limitArray = [10,20,30,40,50];
-        $page = 1;
-        $parameters['page'] = &$page;
-        $limit = 20;
-        $parameters = [];
 
-        if(!empty($get->get('q'))){
-            $parameters['q'] = htmlentities($get->get('q'));
-        }
+        $this->parameters = $this->getCleanParameters($get->all(),'article');
+    
+        $this->data['page'] = isset($this->parameters['page']) && $this->parameters['page'] > 1 ? $this->parameters['page'] : 1;
+        unset($this->parameters['page']);
+        $this->data['title'] = 'Administration des articles';
+        $this->data['get'] = $get;
 
-        if(!empty($get->get('authorId'))){
-            $parameters['authorId'] = htmlentities($get->get('authorId'));
-        }
-
-        if(!empty($get->get('all'))){
-            $parameters['all'] = 1;
+        if(in_array((int)$get->get('limit'),$this->limitArray)){
+            $this->parameters['limit'] = $get->get('limit');
         } else {
-            if(!empty($get->get('published'))){
-                $parameters['published'] = 1;
-            }
-            if(!empty($get->get('private'))){
-                $parameters['private'] = 1;
-            }
-            if(!empty($get->get('standby'))){
-                $parameters['standby'] = 1;
-            }
+            $this->parameters['limit'] = $this->defaultLimit ;
         }
 
-        if(!empty($get->get('afterDatetime'))){
-            $parameters['afterDatetime'] =  htmlentities($get->get('afterDatetime'));
+        if(isset($this->parameters['all'])){
+            unset($this->parameters['published']);
+            unset($this->parameters['private']);
+            unset($this->parameters['standby']);
+            unset($this->parameters['all']);
         }
 
-        if(!empty($get->get('beforeDatetime'))){
-            $parameters['beforeDatetime'] =  htmlentities($get->get('beforeDatetime'));
-        }
+        $this->data['totalArticlesCount'] = (int) $this->articleDAO->countArticles($this->parameters);
 
-        if((int)$get->get('page') > 1){
-            $page = $get->get('page');
-        }
+        $this->data['pages'] = ceil($this->data['totalArticlesCount']/$this->parameters['limit']);
 
-        $articlesCount = (int) $this->articleDAO->countArticles($parameters);
-
-        if(in_array((int)$get->get('limit'),$limitArray)){
-            $limit = $get->get('limit');
-        }
-        $parameters['limit'] = $limit; 
-
-        $pages = ceil($articlesCount/$limit);
-        if($page <= $pages && $page > 1){
-            $parameters['offset'] = $limit*($page - 1);     
+        if($this->data['page'] <= $this->data['pages'] && $this->data['page'] > 1){
+            $this->parameters['offset'] = $this->parameters['limit']*($this->data['page'] - 1);     
         } else {
-            $page = 1;
-            $parameters['offset'] = 0;
+            $this->data['page'] = 1;
+            $this->parameters['offset'] = 0;
         }
 
-        $articles = $this->articleDAO->getArticles($parameters);
+        $this->data['articles'] = $this->articleDAO->getArticles($this->parameters);
 
-        $pageArticlesCount = count($articles);
+        $this->data['pageArticlesCount'] = count($this->data['articles']);
 
-        $previousPageURL = null;
-        $nextPageURL = null;
+        $this->data['previousPageURL'] = $this->data['page'] > 1 ? URL::mergeOn($this->get->all(),['page' => $this->data['page'] - 1]) . "#resultsTable" : null;
+        $this->data['nextPageURL'] = $this->data['page'] < $this->data['pages'] && $this->data['pages'] !== 1 ? URL::mergeOn($this->get->all(),['page' => $this->data['page'] + 1]) . "#resultsTable" : null;
 
-        if($page > 1){
-            $previousPageURL = URL::mergeOn($this->get->all(),['page' => $page - 1]);
-        }
+        $this->data['users'] = $this->buildUsersList();
 
-        if($page < $pages && $pages !== 1){
-            $nextPageURL = URL::mergeOn($this->get->all(),['page' => $page + 1]);
-        }
+        $this->data['categories'] = $this->buildCategoriesList();
 
-        // Users list for <select>
-        $users = $this->userDAO->getUsers();
-        $i = 0;
-        foreach($users as $user){  
-            $data['users'][$i]['value'] = $user->getId();
-            $data['users'][$i]['name'] = $user->getPseudo();
-            $i ++;
-        }
+        $this->data['limits'] = $this->buildLimitsList();
 
-        // Limits list for <select>
-        $i = 0;
-        foreach($limitArray as $key => $limit){  
-            $data['limit'][$i]['value'] = (string)$limit;
-            $data['limit'][$i]['name'] = (string)$limit;
-            $i ++;
-        }
-
-        return $this->view->renderTwig('adminArticles', [
-            'title' => 'Administration des articles',
-            'get' => $get,
-            'articles' => $articles,
-            'users' => $data['users'],
-            'limits' => $data['limit'],
-            'page' => $page,
-            'pages' => $pages,
-            'totalArticlesCount' => $articlesCount,
-            'pageArticlesCount' => $pageArticlesCount,
-            'previousPageURL' => $previousPageURL,
-            'nextPageURL' => $nextPageURL
-        ]);
+        return $this->view->renderTwig('adminArticles', $this->data);
     }
 
+    // ok QBuilder
     public function adminUsers(Parameter $get)
     {
         $this->checkAdmin();
         $this->setPreviousURI();
-        
+
         $this->parameters = $this->getCleanParameters($get->all(),'user');
     
         $this->data['page'] = isset($this->parameters['page']) && $this->parameters['page'] > 1 ? $this->parameters['page'] : 1;
@@ -296,7 +179,6 @@ class BackAdminController extends BackController
 
         $this->data['pages'] = ceil($this->data['totalUsersCount']/$this->parameters['limit']);
 
-        // checks if given parameters['page'] is compatible with offset
         if($this->data['page'] <= $this->data['pages'] && $this->data['page'] > 1){
             $this->parameters['offset'] = $this->parameters['limit']*($this->data['page'] - 1);     
         } else {
@@ -311,12 +193,7 @@ class BackAdminController extends BackController
         $this->data['previousPageURL'] = $this->data['page'] > 1 ? URL::mergeOn($this->get->all(),['page' => $this->data['page'] - 1]) . "#resultsTable" : null;
         $this->data['nextPageURL'] = $this->data['page'] < $this->data['pages'] && $this->data['pages'] !== 1 ? URL::mergeOn($this->get->all(),['page' => $this->data['page'] + 1]) . "#resultsTable" : null;
 
-        $i = 0;
-        foreach($this->limitArray as $key => $limit){  
-            $this->data['limits'][$i]['value'] = (string)$limit;
-            $this->data['limits'][$i]['name'] = (string)$limit;
-            $i ++;
-        }
+        $this->data['limits'] = $this->buildLimitsList();
         
         return $this->view->renderTwig('adminUsers', $this->data);
     }

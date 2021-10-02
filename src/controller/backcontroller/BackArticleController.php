@@ -8,71 +8,76 @@ use App\src\utils\Text;
 
 class BackArticleController extends BackController
 {
+    // ok QBuilder
     public function addArticle(Parameter $post)
     {
         $this->checkAdmin();
 
         if($post->get('submit')){
+
+            $post->set('title', htmlspecialchars($post->get('title')));
+            $post->set('lede', Text::HtmlToMarkdown($post->get('lede')));
+            $post->set('content',Text::HtmlToMarkdown($post->get('content')));
+
             $errors = $this->validation->validate($post, 'Article');
             if(!$errors){
-                $post->set('lede', Text::HtmlToMarkdown($post->get('lede')));
-                $post->set('content',Text::HtmlToMarkdown($post->get('content')));
+                // can be removed after better validation
+                if(!$post->get('categoryId')){
+                    $post->set('categoryId', 1);
+                }
+                //
+                $post->set('createdAt', null);
+                if((int)$post->get('statusId') !== 3){
+                    $post->set('createdAt', date('Y-m-d H:i:s'));
+                }   
+
                 $this->articleDAO->addArticle($post);
                 $this->session->addMessage('success', 'Le nouvel article a bien été ajouté');
                 $this->http->redirect('?route=articles');
             }
-            $data['post'] = $post;
-            $data['errors'] = $errors;
+            $this->data['post'] = $post;
+            $this->data['errors'] = $errors;
         }
 
-        $users = $this->userDAO->getUsers();
-        $i = 0;
-        foreach($users as $user){  
-            $data['users'][$i]['value'] = $user->getId();
-            $data['users'][$i]['name'] = $user->getPseudo();
-            $i ++;
-        }
+        $this->data['users'] = $this->buildUsersList();
         
-        $categories = $this->categoryDAO->getCategories();
-        $i = 0;
-        foreach($categories as $category){
-            $data['categories'][$i]['value'] = $category->getId();
-            $data['categories'][$i]['name'] = $category->getName();
-            $i ++;
-        }
+        $this->data['categories'] = $this->buildCategoriesList();
 
-        $data['title'] = 'Nouvel article';
+        $this->data['title'] = 'Nouvel article';
 
-        return $this->view->renderTwig('editArticle', $data);
+        return $this->view->renderTwig('editArticle', $this->data);
     }
 
-    public function editArticle(Parameter $post, $articleId)
+    // ok QBuilder
+    public function editArticle(Parameter $post, int $articleId)
     {
         $this->checkAdmin();
 
-        // Users list for <select>
-        $users = $this->userDAO->getUsers();
-        $i = 0;
-        foreach($users as $user){  
-            $data['users'][$i]['value'] = $user->getId();
-            $data['users'][$i]['name'] = $user->getPseudo();
-            $i ++;
-        }
+        $this->data['users'] = $this->buildUsersList();
         
-        // Categories list for <select>
-        $categories = $this->categoryDAO->getCategories();
-        $i = 0;
-        foreach($categories as $category){
-            $data['categories'][$i]['value'] = $category->getId();
-            $data['categories'][$i]['name'] = $category->getName();
-            $i ++;
+        $this->data['categories'] = $this->buildCategoriesList();
+
+        $article = $this->articleDAO->getArticle($articleId);
+        if(!$article){
+            $this->session->addMessage('danger', 'L\'article recherché n\'existe pas / plus');  
+            $this->http->dynamicRedirect('?route=adminArticles',$this->session);              
         }
 
+        $post->set('id', $articleId);
+
         if($post->get('submit')){
+
+            $post->set('title', htmlspecialchars($post->get('title')));
+            $post->set('lede', Text::HtmlToMarkdown($post->get('lede')));
+            $post->set('content',Text::HtmlToMarkdown($post->get('content')));
+
             $errors = $this->validation->validate($post, 'Article');
             if(!$errors){
-                $post->set('lede', Text::HtmlToMarkdown($post->get('lede')));
-                $post->set('content',Text::HtmlToMarkdown($post->get('content')));
+                if($article->getCreatedat() === null && $post->get('statusId') !== 3){
+                    $post->set('createdAt', date('Y-m-d H:i:s')); 
+                }
+                $post->set('lastModified', date('Y-m-d H:i:s'));    
+
                 if(!$post->get('categoryId')){
                     $post->set('categoryId',"1");
                 }
@@ -80,15 +85,13 @@ class BackArticleController extends BackController
                 $this->session->addMessage('success', 'L\'article a bien été modifié');   
                 $this->http->redirect('?route=article&articleId=' . $articleId);
             }
-            $data['title'] = 'Modification : ' . $post->get('Title');
-            $data['post'] = $post;
-            $data['errors'] = $errors;
-            return $this->view->renderTwig('editArticle', $data);
+            $this->data['title'] = 'Modification : ' . $post->get('title');
+            $this->data['post'] = $post;
+            $this->data['errors'] = $errors;
+
+            return $this->view->renderTwig('editArticle', $this->data);
         }
 
-        $article = $this->articleDAO->getArticle($articleId);
-
-        $post->set('id', $article->getId());
         $post->set('title', $article->getTitle());
         $post->set('categoryId', $article->getCategoryId());
         $post->set('categoryName', $article->getCategoryName());
@@ -99,29 +102,34 @@ class BackArticleController extends BackController
         $post->set('allowComment', $article->getAllowComment());
         $post->set('statusId', $article->getStatusId());
 
-        $data['title'] = 'Modification : ' . $article->getTitle();
-        $data['post'] = $post;
+        $this->data['title'] = 'Modification : ' . $article->getTitle();
+        $this->data['article'] = $article;
+        $this->data['post'] = $post;
 
-        return $this->view->renderTwig('editArticle', $data);
+        return $this->view->renderTwig('editArticle', $this->data);
     }
 
-    public function updateArticleStatus(int $articleId,int $statusId)
+    // ok QBuilder
+    public function updateArticleStatus(int $articleId,int $statusId) : void
     {
         $this->checkAdmin();
 
-        $date = null;
+        $this->parameters['articleId'] = $articleId;
+        $this->parameters['statusId'] = $statusId;
+
         if($statusId === 1 || $statusId === 2){
             $article = $this->articleDAO->getArticle($articleId);
             if((int)$article->getStatusId() === 3 && $article->getCreatedAt() === null){
-                $date = date('Y-m-d H:i:s');
+                $this->parameters['createdAt'] = date('Y-m-d H:i:s');
             }
         }
-        $this->articleDAO->updateArticleStatus($articleId, $statusId, $date);
+        $this->articleDAO->updateArticleStatus($this->parameters);
         $this->session->addMessage('success', 'Le statut de l\'article a bien été mis à jour');
         $this->http->dynamicRedirect('?route=adminArticles',$this->session);
     } 
     
-    public function deleteArticle($articleId)
+    // ok QBuilder
+    public function deleteArticle(int $articleId) : void
     {
         $this->checkAdmin();
 

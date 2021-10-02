@@ -7,6 +7,7 @@ use App\config\Parameter;
 
 class FrontController extends Controller
 {
+    // ok QBuilder
     public function home(Parameter $post)
     {
         if($post->get('submit')){

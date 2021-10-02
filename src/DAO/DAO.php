@@ -3,6 +3,7 @@
 namespace App\src\DAO;
 
 use PDO;
+use PDOStatement;
 use Exception;
 
 abstract class DAO
@@ -40,5 +41,10 @@ abstract class DAO
         }
         $result = $this->checkConnection()->query($sql);
         return $result;
+    }
+
+    protected function prepareQuery(string $sql) : PDOStatement
+    {
+        return $this->checkConnection()->prepare($sql);
     }
 }

@@ -7,7 +7,8 @@ use App\src\model\Article;
 
 class ArticleDAO extends DAO
 {
-    private function buildObject($row)
+    // ok QBuilder
+    private function buildObject(array $row) : Article
     {
         $article = new Article();
         $article->setId($row['id']);
@@ -29,18 +30,11 @@ class ArticleDAO extends DAO
     /**
      * Returns one article from its id
      */
-    public function getArticle(int $articleId)
+    // ok QBuilder
+    public function getArticle(int $articleId) : mixed
     {
-        $sql = 'SELECT article.id, article.created_at, article.last_modified, article.title, article.lede, article.content, article.author_id, article.category_id, article.status_id, article.allow_comment,
-                       user.pseudo as author_pseudo,
-                       category.name as category_name,
-                       article_status.name as status_name
-                FROM article 
-                INNER JOIN user ON article.author_id = user.id
-                LEFT OUTER JOIN category ON article.category_id = category.id
-                INNER JOIN article_status ON article.status_id = article_status.id
-                WHERE article.id = :article_id';
-        $result = $this->createQuery($sql, [':article_id' => $articleId]);
+        $this->query = $this->selectArticles()->where('a.id = :articleId');
+        $result = $this->createQuery((string)$this->query, ['articleId' => $articleId]);
         $article = $result->fetch();
         $result->closeCursor();
         if($article){
@@ -49,140 +43,34 @@ class ArticleDAO extends DAO
         return $article;
     }
     
-    // ok
+    // ok QBuilder
     public function countArticles(array $parameters = []) : int
     {
-        $where = "WHERE";
+        $this->query = (new QueryBuilder()) ->statement('select')
+                                            ->count(1)
+                                            ->table('article', 'a')
+                                            ->innerJoin(['u' => 'user'], 'a.author_id = u.id')
+                                            ->leftJoin(['c' => 'category'], 'a.category_id = c.id')
+                                            ->innerJoin(['s' => 'article_status'], 'a.status_id = s.id');
 
-        extract($parameters);
 
+        $parameters = $this->addParameters($parameters);
 
-        $sql = 'SELECT COUNT(article.id) FROM article 
-                INNER JOIN user ON article.author_id = user.id';
-
-        if(isset($q)){
-            $sql .= ' ' . $where . ' article.content LIKE "%' . $q . '%" OR article.lede LIKE "%' . $q . '%" OR article.title LIKE "%' . $q . '%"';
-            $where = "AND";
-        }
-
-        if(isset($authorId)){
-            $sql .= ' ' . $where . ' article.author_id = ' . $authorId ;
-            $where = "AND";
-        }
-
-        if(isset($beforeDatetime)){
-            $sql .= ' ' . $where . ' article.created_at < "' . $beforeDatetime . '"' ;
-            $where = "AND";
-        }
-
-        if(isset($afterDatetime)){
-            $sql .= ' ' . $where . ' article.created_at > "' . $afterDatetime . '"';
-            $where = "AND";
-        }
-
-        if(!isset($all)){
-            if(isset($published) || isset($private) || isset($standby)){
-                $or = "";
-                $sql .= ' ' . $where . ' (' ;
-                if(isset($published)){
-                    $sql .= ' article.status_id = 1';
-                    $or = " OR ";
-                }
-                if(isset($private)){
-                    $sql .= $or . ' article.status_id = 2';
-                    $or = " OR ";
-                }
-                if(isset($standby)){
-                    $sql .= $or . ' article.status_id = 3';
-                }
-                $sql .= ')';
-                $where = "AND";
-            }
-        }
-
-        if(isset($categoryId)){
-            $sql .= ' ' . $where . ' article.category_id = :category_id';     
-        }
-
-        $result = $this->createQuery($sql);
+        $result = $this->createQuery((string)$this->query,$parameters);
         return $result->fetch(\PDO::FETCH_NUM)[0];
     }    
 
     /**
      *  Returns list of articles, selection options
      */
+    // ok QBuilder
     public function getArticles(array $parameters = []) : array
     {
-        $where = "WHERE";
+        $this->query = $this->selectArticles();
 
-        extract($parameters);
+        $parameters = $this->addParameters($parameters);
 
-        $sql = 'SELECT article.id, article.created_at, article.last_modified, article.title, article.lede, article.content, article.author_id, article.category_id, article.status_id, article.allow_comment,
-                       user.pseudo as author_pseudo,
-                       category.name as category_name,
-                       article_status.name as status_name
-                FROM article 
-                INNER JOIN user ON article.author_id = user.id
-                LEFT OUTER JOIN category ON article.category_id = category.id
-                INNER JOIN article_status ON article.status_id = article_status.id';
-
-        if(isset($q)){
-            $sql .= ' ' . $where . ' article.content LIKE "%' . $q . '%" OR article.lede LIKE "%' . $q . '%" OR article.title LIKE "%' . $q . '%"';
-            $where = "AND";
-        }
-
-        if(isset($authorId)){
-            $sql .= ' ' . $where . ' article.author_id = ' . $authorId ;
-            $where = "AND";
-        }
-        if(isset($beforeDatetime)){
-            $sql .= ' ' . $where . ' article.created_at < "' . $beforeDatetime . '"' ;
-            $where = "AND";
-        }
-
-        if(isset($afterDatetime)){
-            $sql .= ' ' . $where . ' article.created_at > "' . $afterDatetime . '"';
-            $where = "AND";
-        }
-
-        if(!isset($all)){
-            if(isset($published) || isset($private) || isset($standby)){
-                $or = "";
-                $sql .= ' ' . $where . ' (' ;
-                if(isset($published)){
-                    $sql .= ' article.status_id = 1';
-                    $or = " OR ";
-                }
-                if(isset($private)){
-                    $sql .= $or . ' article.status_id = 2';
-                    $or = " OR ";
-                }
-                if(isset($standby)){
-                    $sql .= $or . ' article.status_id = 3';
-                }
-                $sql .= ')';
-                $where = "AND";
-            }
-        }
-
-        if(isset($categoryId)){
-            $sql .= ' ' . $where . ' article.category_id = :category_id';      
-        }
-
-        if(isset($orderby)){
-            $sql .= ' ORDER BY created_at ' . $orderby;
-        } else {
-            $sql .= ' ORDER BY created_at DESC';
-        }
-
-        if(isset($limit)){
-            $sql .= " LIMIT $limit";
-            if(isset($offset)){
-                $sql .= " OFFSET $offset";
-            }
-        }
-
-        $result = $this->createQuery($sql);
+        $result = $this->createQuery((string)$this->query,$parameters);
         $articles = [];
         foreach ($result as $row){
             $articleId = $row['id'];
@@ -195,77 +83,177 @@ class ArticleDAO extends DAO
     /**
      * Insert one new article
      */
-    public function addArticle(Parameter $post)
+    // ok QBuilder
+    public function addArticle(Parameter $post) : void
     {
-        if((int)$post->get('statusId') === 3){
-            $date = null;
-        } else {
-            $date = date('Y-m-d H:i:s');
-        }
-
-        $sql = 'INSERT INTO article (created_at, last_modified, title, lede, content, author_id, category_id, status_id, allow_comment) 
-                VALUES (:created_at, null, :title, :lede, :content, :author_id, :category_id, :status_id, :allow_comment)';
-        $this->createQuery($sql, ['created_at' => $date,
-                                  'title' => $post->get('title'),
-                                  'lede' => $post->get('lede'),
-                                  'content' => $post->get('content'),                                 
-                                  'author_id' => (int)$post->get('authorId'),
-                                  'category_id' => (int)$post->get('categoryId'),
-                                  'status_id' => (int)$post->get('statusId'),
-                                  'allow_comment' => (int)$post->get('allowComment')]);
+        $this->query = (new QueryBuilder()) ->statement('insert')
+                                            ->table('article')
+                                            ->insertValues(['created_at' => ':createdAt',
+                                                            'last_modified' => ':lastModified',
+                                                            'title' => ':title',
+                                                            'lede' => ':lede',
+                                                            'content' => ':content',
+                                                            'author_id' => ':authorId',
+                                                            'category_id' => ':categoryId',
+                                                            'status_id' => ':statusId',
+                                                            'allow_comment' => ':allowComment']);
+        $pdo = $this->prepareQuery((string)$this->query);
+        $pdo->bindValue(':createdAt', $post->get('createdAt'));
+        $pdo->bindValue(':lastModified', null);
+        $pdo->bindValue(':title', $post->get('title'));
+        $pdo->bindValue(':lede', $post->get('lede'));
+        $pdo->bindValue(':content', $post->get('content'));
+        $pdo->bindValue(':authorId', (int)$post->get('authorId'));
+        $pdo->bindValue(':categoryId', (int)$post->get('categoryId'));
+        $pdo->bindValue(':statusId', (int)$post->get('statusId'));
+        $pdo->bindValue(':allowComment', (int)$post->get('allowComment'));
+        $pdo->execute();                      
     }
 
     /**
      * Update one article
      */
-    public function editArticle(Parameter $post, $articleId)
+    // ok QBuilder
+    public function editArticle(Parameter $post,int $articleId) : void
     {
-        // if((int)$post->get('statusId') === 3){
-        //     $createdAt = null;
-        // } else {
-        //     $createdAt = date('Y-m-d H:i:s');
-        // }
+        $this->query = (new QueryBuilder()) ->statement('update')
+                                            ->table('article')
+                                            ->set('last_modified = :lastModified',
+                                                    'title = :title',
+                                                    'lede=:lede',
+                                                    'content = :content',
+                                                    'author_id = :authorId',
+                                                    'category_id = :categoryId',
+                                                    'status_id = :statusId',
+                                                    'allow_comment = :allowComment');
+        if($post->get('createdAt')){
+            $this->query->set('created_at = :createdAt');
+        }
+        $this->query->where('id = :articleId');
 
-        $lastModified = date('Y-m-d H:i:s');
-        $sql = 'UPDATE article
-        SET last_modified=:last_modified, title=:title, lede=:lede, content=:content, author_id=:author_id, category_id=:category_id, status_id=:status_id, allow_comment=:allow_comment
-        WHERE id=:article_id';
-        $this->createQuery($sql,[
-            'last_modified' => $lastModified,
-            'title' => $post->get('title'),
-            'lede' => $post->get('lede'),
-            'content' => $post->get('content'),
-            'author_id' => (int)$post->get('authorId'),
-            'category_id'  => (int)$post->get('categoryId'),
-            'status_id' => (int)$post->get('statusId'),
-            'allow_comment' => (int)$post->get('allowComment'),
-            'article_id' => (int)$articleId
-        ]);
+        $pdo = $this->prepareQuery((string)$this->query);
+
+        if($post->get('createdAt')){
+            $pdo->bindValue(':createdAt', $post->get('createdAt'));
+        }        
+        $pdo->bindValue(':lastModified', $post->get('lastModified'));
+        $pdo->bindValue(':title', $post->get('title'));
+        $pdo->bindValue(':lede', $post->get('lede'));
+        $pdo->bindValue(':content', $post->get('content'));
+        $pdo->bindValue(':authorId', (int)$post->get('authorId'));
+        $pdo->bindValue(':categoryId', (int)$post->get('categoryId'));
+        $pdo->bindValue(':statusId', (int)$post->get('statusId'));
+        $pdo->bindValue(':allowComment', (int)$post->get('allowComment'));
+        $pdo->bindValue(':articleId', $articleId);
+        $pdo->execute();
     }
 
-    public function updateArticleStatus(int $articleId,int $statusId, $date = null)
+    // ok QBuilder
+    public function updateArticleStatus(array $parameters) : void
     {
-        $parameters = [
-            'article_id' => $articleId,
-            'status_id' => $statusId
-        ];
-        $sql = 'UPDATE article SET status_id=:status_id';
-        if(isset($date)){
-            $sql .= ' , created_at=:created_at';
-            $parameters['created_at'] = $date ;
+        $this->query = (new QueryBuilder()) ->statement('update')
+                                            ->table('article')
+                                            ->set('status_id = :statusId')
+                                            ->where('id = :articleId');                                        
+        if(isset($parameters['createdAt'])){
+            $this->query->set('created_at = :createdAt');
         }
-        $sql .= ' WHERE id=:article_id';
-        $this->createQuery($sql,$parameters);
+        $this->createQuery((string)$this->query,$parameters);
     }
 
     /**
      * Delete one article and its related comments
      */
-    public function deleteArticle($articleId)
+    // ok QBuilder
+    public function deleteArticle(int $articleId) : void
     {
-        $sql = 'DELETE FROM comment WHERE article_id = :article_id';
-        $this->createQuery($sql, ['article_id' => $articleId]);
-        $sql = 'DELETE FROM article WHERE id = :article_id';
-        $this->createQuery($sql, ['article_id' => $articleId]);
+        $parameters['articleId'] = $articleId;
+        $this->query = (new QueryBuilder()) ->statement('delete')
+                                            ->table('comment')
+                                            ->where('article_id = :articleId');
+        $this->createQuery((string)$this->query,$parameters);
+        $this->query = (new QueryBuilder()) ->statement('delete')
+                                            ->table('article')
+                                            ->where('id = :articleId');
+        $this->createQuery((string)$this->query,$parameters);
+    }
+
+    // ok QBuilder
+    private function addParameters(array $parameters = []) : array
+    {
+        if(isset($parameters['q'])){
+            $this->query->subWhere('a.content LIKE "%' . htmlentities($parameters['q']) . '%" OR a.lede LIKE "%' . htmlentities($parameters['q']) . '%" OR a.title LIKE "%' . htmlentities($parameters['q']) . '%" OR u.pseudo LIKE "%' . htmlentities($parameters['q']) . '%"');
+            unset($parameters['q']);
+        }
+
+        if(isset($parameters['authorId'])){
+            $this->query->where('a.author_id = :authorId');
+        }
+
+        if(isset($parameters['categoryId'])){
+            $this->query->where('a.category_id = :categoryId');
+        }
+
+        if(isset($parameters['published']) || isset($parameters['private']) || isset($parameters['standby'])){
+            $conditions = [];
+            if(isset($parameters['published'])){
+                $conditions[] = 's.name = :published';
+                $parameters['published'] = 'published';
+            }
+            if(isset($parameters['private'])){
+                $conditions[] = 's.name = :private';
+                $parameters['private'] = 'private';
+            }
+            if(isset($parameters['standby'])){
+                $conditions[] = 's.name = :standby';
+                $parameters['standby'] = 'standby';
+            }
+            $this->query->subWhere(join(' OR ', $conditions));
+        }
+
+
+
+        // Common
+
+        if(isset($parameters['beforeDatetime'])){
+            $this->query->where('a.created_at < :beforeDatetime');
+        }
+        
+        if(isset($parameters['afterDatetime'])){
+            $this->query->where('a.created_at > :afterDatetime');
+        }
+
+        if(isset($parameters['orderBy'])){
+            $this->query->orderBy($parameters['orderBy']);
+            unset($parameters['orderBy']);
+        } else {
+            $this->query->orderBy(['column'=>'a.created_at','order'=>'DESC']);
+            unset($parameters['orderBy']);
+        }
+
+        if(isset($parameters['limit'])){
+            $this->query->limit($parameters['limit']);
+            unset($parameters['limit']);
+            if(isset($parameters['offset'])){
+                $this->query->offset($parameters['offset']);
+                unset($parameters['offset']);
+            }
+        }
+
+        return $parameters;
+    }
+
+    // ok QBuilder
+    private function selectArticles() : QueryBuilder
+    {
+        return (new QueryBuilder()) ->statement('select')
+                                    ->select('a.id', 'a.created_at', 'a.last_modified', 'a.title', 'a.lede', 'a.content', 'a.author_id', 'a.category_id', 'a.status_id', 'a.allow_comment',
+                                    'u.pseudo as author_pseudo',
+                                    'c.name as category_name',
+                                    's.name as status_name')
+                                    ->table('article', 'a')
+                                    ->innerJoin(['u' => 'user'], 'a.author_id = u.id')
+                                    ->leftJoin(['c' => 'category'], 'a.category_id = c.id')
+                                    ->innerJoin(['s' => 'article_status'], 'a.status_id = s.id');
     }
 }

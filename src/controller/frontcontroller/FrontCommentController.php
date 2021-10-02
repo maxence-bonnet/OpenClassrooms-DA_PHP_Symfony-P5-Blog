@@ -6,6 +6,7 @@ use App\config\Parameter;
 
 class FrontCommentController extends FrontController
 {
+    // ok QBuilder
     public function addComment(Parameter $post, int $articleId)
     {
         $this->checkLoggedIn();
@@ -15,20 +16,23 @@ class FrontCommentController extends FrontController
             if($post->get('submit')) {
                 $errors = $this->validation->validate($post, 'Comment');
                 if(!$errors) {
-                    $parameters['userId'] = $this->session->get('id');
+                    $parameters['userId'] = (int)$this->session->get('id');
                     $parameters['articleId'] = $articleId;
                     
                     if($post->get('answerTo')){
                         $parameters['answerTo'] = (int)$post->get('answerTo');
                         $parameters['content'] = htmlspecialchars($post->get('answer'));
                     } else {
+                        $parameters['answerTo'] = null;
                         $parameters['content'] = htmlspecialchars($post->get('comment'));
                     }
 
+                    // can be removed after better validation
                     if(empty($parameters['content'])){
                         $this->session->addMessage('danger', 'Erreur lors de l\'ajout du commentaire');
                         $this->http->redirect('?route=article&articleId=' . $articleId);
                     }
+                    //
 
                     if($this->session->get('role') === "admin" || $this->session->get('role') === "moderator"){
                         $parameters['validated'] = 1;
@@ -37,10 +41,11 @@ class FrontCommentController extends FrontController
                         $parameters['validated'] = 0;
                         $this->session->addMessage('success', 'Le commentaire a bien été envoyé (soumis à validation avant publication)');
                     }
-
+                    $parameters['createdAt'] = date('Y-m-d H:i:s');
                     $this->commentDAO->addComment($parameters);
                     $this->http->redirect('?route=article&articleId=' . $articleId);
                 }
+                $post->set('new', true);
                 $comments = $this->commentDAO->getComments([
                     'articleId' => $articleId,
                     'validated' => "validated"
@@ -61,6 +66,7 @@ class FrontCommentController extends FrontController
         $this->http->redirect('?route=article&articleId=' . $articleId);
     }
 
+    // ok QBuilder
     public function editComment(Parameter $post, int $commentId)
     {
         $this->checkLoggedIn();
@@ -91,7 +97,8 @@ class FrontCommentController extends FrontController
                     $this->session->addMessage('success', 'Le commentaire a bien été modifié (en attente d\'une nouvelle validation avant publication)');
                 }
                 $content = htmlspecialchars($post->get('comment'));
-                $this->commentDAO->editComment($content, $commentId, $validated);
+                $lastModified = date('Y-m-d H:i:s');
+                $this->commentDAO->editComment($content, $commentId, $lastModified, $validated);
                 $this->http->redirect('?route=article&articleId=' . $articleId);
             }
             $data['errors'] = $errors;

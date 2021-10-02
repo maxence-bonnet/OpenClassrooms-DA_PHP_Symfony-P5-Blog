@@ -7,13 +7,14 @@ use App\src\controller\Controller;
 
 class BackUserController extends BackController
 {
-    public function updateUserRole(int $userId, int $roleId)
+    // ok QBuilder
+    public function updateUserRole(int $userId, int $roleId) : void
     {
         $this->checkAdmin();
-        $roleArray = [1,2,3,4];
+        $rolesArray = [1,2,3,4];
         $user = $this->userDAO->getUser($userId);
         if($user){
-            if(((int)$user->getRoleId() !== 1) && ((int)$user->getRoleId() !== $roleId) && in_array($roleId, $roleArray)){
+            if(((int)$user->getRoleId() !== 1) && ((int)$user->getRoleId() !== $roleId) && in_array($roleId, $rolesArray)){
 
                 $this->userDAO->updateUserRole($userId,$roleId);
 
@@ -32,7 +33,8 @@ class BackUserController extends BackController
         $this->http->dynamicRedirect('?route=adminUsers',$this->session);
     }
 
-    public function updateUserStatus(int $userId, int $statusId)
+    // ok QBuilder
+    public function updateUserStatus(int $userId, int $statusId) : void
     {
         $this->checkAdmin();
         $statusArray = [1,3];
