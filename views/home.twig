@@ -27,20 +27,29 @@
             <form method="post">
                 <div class="row">
 
-                    {{ form.input('text','Votre nom','lastname',{ errors : errors.lastname, value : post.get('lastname'), placeholder : 'Dupont'}) }}
+                    {{ form.input('text','Votre nom','lastname', { errors : errors.lastname, value : post.get('lastname'), placeholder : 'Dupont', help : { text : '', limit : '0/60' } }) }}
 
-                    {{ form.input('text','Votre prénom','firstname',{ errors : errors.firstname, value : post.get('firstname'), placeholder : 'Jean'}) }}
+                    {{ form.input('text','Votre prénom','firstname', { errors : errors.firstname, value : post.get('firstname'), placeholder : 'Jean',  help : { text : '', limit : '0/60' } }) }}
 
                 </div>
 
-                {{ form.input('mail','Votre email','email',{ errors : errors.email, value : post.get('email'), placeholder : 'exemple@monmail.com'}) }}
+                {{ form.input('mail','Votre email','email', { errors : errors.email, value : post.get('email'), placeholder : 'exemple@monmail.com'}) }}
                 
-                {{ form.textarea('Votre message','message', 'message',{ errors : errors.message, value : post.get('message'), placeholder : '...', help : '500 caractères maximum : 0/500'}) }}
+                {{ form.textarea('Votre message','message', 'message',{ errors : errors.message, value : post.get('message'), placeholder : '...', help : { text : '20 caractères minimum :', limit : '0/500' } }) }}
 
                 {{ form.submit('Envoyer', { position : 'mx-auto'}) }}    
             </form>
         </div>
     </div>
 </section>
+<script src="js/countChars.js"></script>
+<script>
+    lastnameInput = document.getElementById("lastname");
+    firstnameInput = document.getElementById("firstname");
+    messageTextarea = document.getElementById("message");
 
+    lastnameInput.addEventListener("keyup", () => countChars(lastnameInput,"lastnameContentHelp",60));
+    firstnameInput.addEventListener("keyup", () => countChars(firstnameInput,"firstnameContentHelp",60));
+    messageTextarea.addEventListener("keyup", () => countChars(messageTextarea,"messageContentHelp",500));
+</script>
 {% endblock %}

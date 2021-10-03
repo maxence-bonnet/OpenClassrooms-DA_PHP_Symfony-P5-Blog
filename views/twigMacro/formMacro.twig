@@ -6,7 +6,7 @@
         <label class="form-label {{ options.labelposition }}" for="{{ name }}">{{ label | raw }} :</label>
         <input type="{{ type }}" class="form-control {{ options.errors ? 'is-invalid' : '' }}" id="{{ name }}" name="{{ name }}" {% if options.help %} aria-describedby="{{ name ~ 'ContentHelp' }}" {% endif %} placeholder="{{ options.placeholder }}" value="{{ options.value }}" {{ options.pattern ? 'pattern=' ~ options.pattern }} {{ options.required ? 'required' }}>
         {% if options.help %}
-            <div id="{{ name ~ 'ContentHelp' }}" class="form-text">{{ options.help | raw }}</div>
+            <div id="{{ name ~ 'ContentHelp' }}" class="form-text">{{ options.help.text | raw }} <span class="dynamic">{{ options.help.limit | raw }}</span></div>
         {% endif %}
         {{ options.errors | raw }}
     </div>
@@ -23,7 +23,7 @@
         <label class="form-label" for="{{ name }}">{{ label }} :</label>
         <textarea class="form-control {{ options.errors ? 'is-invalid' : '' }}" id="{{ id }}" name="{{ name }}" {% if options.help %} aria-describedby="{{ name ~ 'ContentHelp' }}" {% endif %} style="height: {{ options.size ?? '120' }}px" placeholder="...">{{ options.value }}</textarea>
         {% if options.help %}
-            <div id="{{ name ~ 'ContentHelp' }}" class="form-text">{{ options.help | raw }}</div>
+            <div id="{{ name ~ 'ContentHelp' }}" class="form-text">{{ options.help.text | raw }} <span class="dynamic">{{ options.help.limit | raw }}</span></div>
         {% endif %}
         {{ options.errors | raw }}
     </div>

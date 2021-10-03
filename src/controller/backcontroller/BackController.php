@@ -22,7 +22,7 @@ abstract class BackController extends Controller
     protected function buildLimitsList() : array
     {
         $i = 0;
-        foreach($this->limitArray as $key => $limit){  
+        foreach($this->limitArray as $limit){  
             $list[$i]['value'] = (string)$limit;
             $list[$i]['name'] = (string)$limit;
             $i ++;

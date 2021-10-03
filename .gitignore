@@ -1,8 +1,7 @@
 /vendor/
 /ignore/
-/public/fonts/
-/public/css/
-/public/js/
+/public/css/bootstrap/
+/public/js/bootstrap/
 /public/uploads/
 .htpasswd
 # Commit your application's lock file https://getcomposer.org/doc/01-basic-usage.md#commit-your-composer-lock-file-to-version-control

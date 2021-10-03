@@ -4,11 +4,11 @@
     <head>
         <meta charset="UTF-8" />
         <base href="http://localhost/P5_blog/public/">
-        <link href='css/boxicons.min.css' rel='stylesheet'>
+        <link href='css/boxicons/boxicons.min.css' rel='stylesheet'>
         {% if session.get('theme') and session.get('theme') is not same as('default') %}
             <link href="bootstrap_themes/bootstrap-{{ session.get('theme') }}.min.css" rel="stylesheet">
         {% else %}
-            <link href="css/bootstrap.min.css" rel="stylesheet">
+            <link href="css/bootstrap/bootstrap.min.css" rel="stylesheet">
         {% endif %}
         <link href="css/style.css" rel="stylesheet">
         <title>{{ title ?? 'Blog'}}</title>
@@ -93,7 +93,7 @@
 
             </div>
         </footer>
-        <script src="js/bootstrap.min.js"></script>
+        <script src="js/bootstrap/bootstrap.min.js"></script>
     </body>
 </html>
 
