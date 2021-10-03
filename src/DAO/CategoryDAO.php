@@ -31,7 +31,7 @@ class CategoryDAO extends DAO
         return $category;                           
     }
 
-    public function getCategories(array $parameters = []) : array
+    public function getCategories() : array
     {
         $this->query = (new QueryBuilder()) ->statement('select')
                                             ->select('c.id', 'c.name', 'c.parent_id')

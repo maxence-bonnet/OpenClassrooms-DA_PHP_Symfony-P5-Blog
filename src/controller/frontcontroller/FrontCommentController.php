@@ -6,7 +6,6 @@ use App\config\Parameter;
 
 class FrontCommentController extends FrontController
 {
-    // ok QBuilder
     public function addComment(Parameter $post, int $articleId)
     {
         $this->checkLoggedIn();
@@ -27,13 +26,6 @@ class FrontCommentController extends FrontController
                         $parameters['content'] = htmlspecialchars($post->get('comment'));
                     }
 
-                    // can be removed after better validation
-                    if(empty($parameters['content'])){
-                        $this->session->addMessage('danger', 'Erreur lors de l\'ajout du commentaire');
-                        $this->http->redirect('?route=article&articleId=' . $articleId);
-                    }
-                    //
-
                     if($this->session->get('role') === "admin" || $this->session->get('role') === "moderator"){
                         $parameters['validated'] = 1;
                         $this->session->addMessage('success', 'Le commentaire a bien été publié');
@@ -41,6 +33,7 @@ class FrontCommentController extends FrontController
                         $parameters['validated'] = 0;
                         $this->session->addMessage('success', 'Le commentaire a bien été envoyé (soumis à validation avant publication)');
                     }
+                    
                     $parameters['createdAt'] = date('Y-m-d H:i:s');
                     $this->commentDAO->addComment($parameters);
                     $this->http->redirect('?route=article&articleId=' . $articleId);
@@ -69,7 +62,6 @@ class FrontCommentController extends FrontController
         $this->http->redirect('?route=article&articleId=' . $articleId);
     }
 
-    // ok QBuilder
     public function editComment(Parameter $post, int $commentId)
     {
         $this->checkLoggedIn();

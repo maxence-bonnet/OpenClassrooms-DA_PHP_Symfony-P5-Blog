@@ -4,7 +4,7 @@ namespace App\src\controller\backcontroller;
 
 use App\src\controller\Controller;
 
-class BackController extends Controller
+abstract class BackController extends Controller
 {
     protected $parameters;
     protected $data;

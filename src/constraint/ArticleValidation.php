@@ -18,10 +18,10 @@ class ArticleValidation extends Validation
             $error = $this->checkTitle($name, $value);
             $this->addError($name, $error);
         } elseif ($name === 'authorId'){
-            $error = $this->checkAuthorId($name, strip_tags($value));
+            $error = $this->checkAuthorId($value);
             $this->addError($name, $error);
         } elseif ($name === 'categoryId'){
-            $error = $this->checkCategoryId($name, strip_tags($value));
+            $error = $this->checkCategoryId($value);
             $this->addError($name, $error);
         } elseif ($name === 'lede'){
             $error = $this->checkLede($name, strip_tags($value));
@@ -82,17 +82,17 @@ class ArticleValidation extends Validation
         }
     }
 
-    private function checkAuthorId($name, $value)
+    private function checkAuthorId($value)
     {
-        if($this->constraint->existingUserId($name, $value)) {
-            return $this->constraint->existingUserId('Auteur', $value);
+        if($this->constraint->existingUserId($value)) {
+            return $this->constraint->existingUserId($value);
         }
     }
 
-    private function checkCategoryId($name, $value)
+    private function checkCategoryId($value)
     {
-        if($this->constraint->existingCategoryId($name, $value)) {
-            return $this->constraint->existingCategoryId('Catégorie', $value);
+        if($this->constraint->existingCategoryId($value)) {
+            return $this->constraint->existingCategoryId($value);
         }        
     }
 }
