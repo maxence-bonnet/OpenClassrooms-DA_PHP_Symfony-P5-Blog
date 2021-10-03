@@ -7,7 +7,6 @@ use App\src\model\Article;
 
 class ArticleDAO extends DAO
 {
-    // ok QBuilder
     private function buildObject(array $row) : Article
     {
         $article = new Article();
@@ -30,7 +29,6 @@ class ArticleDAO extends DAO
     /**
      * Returns one article from its id
      */
-    // ok QBuilder
     public function getArticle(int $articleId) : mixed
     {
         $this->query = $this->selectArticles()->where('a.id = :articleId');
@@ -43,7 +41,6 @@ class ArticleDAO extends DAO
         return $article;
     }
     
-    // ok QBuilder
     public function countArticles(array $parameters = []) : int
     {
         $this->query = (new QueryBuilder()) ->statement('select')
@@ -63,7 +60,6 @@ class ArticleDAO extends DAO
     /**
      *  Returns list of articles, selection options
      */
-    // ok QBuilder
     public function getArticles(array $parameters = []) : array
     {
         $this->query = $this->selectArticles();
@@ -83,7 +79,6 @@ class ArticleDAO extends DAO
     /**
      * Insert one new article
      */
-    // ok QBuilder
     public function addArticle(Parameter $post) : void
     {
         $this->query = (new QueryBuilder()) ->statement('insert')
@@ -113,7 +108,6 @@ class ArticleDAO extends DAO
     /**
      * Update one article
      */
-    // ok QBuilder
     public function editArticle(Parameter $post,int $articleId) : void
     {
         $this->query = (new QueryBuilder()) ->statement('update')
@@ -148,7 +142,6 @@ class ArticleDAO extends DAO
         $pdo->execute();
     }
 
-    // ok QBuilder
     public function updateArticleStatus(array $parameters) : void
     {
         $this->query = (new QueryBuilder()) ->statement('update')
@@ -164,7 +157,6 @@ class ArticleDAO extends DAO
     /**
      * Delete one article and its related comments
      */
-    // ok QBuilder
     public function deleteArticle(int $articleId) : void
     {
         $parameters['articleId'] = $articleId;
@@ -178,7 +170,6 @@ class ArticleDAO extends DAO
         $this->createQuery((string)$this->query,$parameters);
     }
 
-    // ok QBuilder
     private function addParameters(array $parameters = []) : array
     {
         if(isset($parameters['q'])){
@@ -243,7 +234,6 @@ class ArticleDAO extends DAO
         return $parameters;
     }
 
-    // ok QBuilder
     private function selectArticles() : QueryBuilder
     {
         return (new QueryBuilder()) ->statement('select')

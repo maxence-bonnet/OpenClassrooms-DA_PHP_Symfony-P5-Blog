@@ -8,7 +8,6 @@ use App\src\utils\Text;
 
 class BackArticleController extends BackController
 {
-    // ok QBuilder
     public function addArticle(Parameter $post)
     {
         $this->checkAdmin();
@@ -46,7 +45,6 @@ class BackArticleController extends BackController
         return $this->view->renderTwig('editArticle', $this->data);
     }
 
-    // ok QBuilder
     public function editArticle(Parameter $post, int $articleId)
     {
         $this->checkAdmin();
@@ -110,7 +108,6 @@ class BackArticleController extends BackController
         return $this->view->renderTwig('editArticle', $this->data);
     }
 
-    // ok QBuilder
     public function updateArticleStatus(int $articleId,int $statusId) : void
     {
         $this->checkAdmin();
@@ -129,7 +126,6 @@ class BackArticleController extends BackController
         $this->http->dynamicRedirect('?route=adminArticles',$this->session);
     } 
     
-    // ok QBuilder
     public function deleteArticle(int $articleId) : void
     {
         $this->checkAdmin();

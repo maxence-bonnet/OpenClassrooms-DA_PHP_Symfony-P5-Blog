@@ -8,7 +8,6 @@ use Exception;
 
 class FrontUserController extends FrontController
 {
-    // ok QBuilder
     public function register(Parameter $post)
     {
         if($this->session->get('pseudo')){
@@ -40,7 +39,6 @@ class FrontUserController extends FrontController
         return $this->view->renderTwig('register', $data);
     }
 
-    // ok QBuilder
     public function login(Parameter $post)
     {
         if(strlen($post->get('pseudo')) > 61 || strlen($post->get('password')) > 121){
@@ -83,7 +81,6 @@ class FrontUserController extends FrontController
         return $this->view->renderTwig('login', $data);
     }
 
-    // ok QBuilder
     public function logout()
     {
         $this->checkLoggedIn();
@@ -98,7 +95,6 @@ class FrontUserController extends FrontController
         $this->http->redirect('?');
     }
 
-    // ok QBuilder
     public function profile(Parameter $get)
     {
         $this->checkLoggedIn();
@@ -111,15 +107,7 @@ class FrontUserController extends FrontController
 
         $data['title'] = 'Profil de ' . $user->getPseudo() ;
         if($user->getPseudo() === $this->session->get('pseudo')){
-            $themesList = [];
-            $exclude = ['.','..'];
-            $themes = scandir('../public/bootstrap_themes/'); // Codacy doesn't like scandir()
-            foreach ($themes as $theme) {
-                if (!in_array($theme,$exclude) && preg_match("#^bootstrap-[a-z]+\.min\.css$#",$theme)){                   
-                        $themesList[] = preg_replace("#^bootstrap-([a-z]+)\.min\.css$#","$1",$theme);
-                    }
-            }
-            
+            $themesList = $this->getThemesList();
             if($get->get('theme')){
                 if(in_array($get->get('theme'),$themesList) || $get->get('theme') === "default"){
                     if($get->get('theme') === "default" && $this->session->get('theme')){
@@ -136,5 +124,17 @@ class FrontUserController extends FrontController
      
         $data['user'] = $user;
         return $this->view->renderTwig('profile', $data);
+    }
+
+    private function getThemesList() : array 
+    {
+        $exclude = ['.','..'];
+        $themes = scandir('../public/bootstrap_themes/'); // Codacy doesn't like scandir()
+        foreach ($themes as $theme) {
+            if (!in_array($theme,$exclude) && preg_match("#^bootstrap-[a-z]+\.min\.css$#",$theme)){                   
+                    $themesList[] = preg_replace("#^bootstrap-([a-z]+)\.min\.css$#","$1",$theme);
+            }
+        }
+        return isset($themesList) ? $themesList : [];
     }
 }

@@ -93,8 +93,8 @@ class UserValidation extends Validation
         if($this->constraint->maxLength($name, $value, 60)) {
             return $this->constraint->maxLength('Pseudo', $value, 60);
         }
-        if($this->constraint->existingPseudo($name,$value)){
-            return $this->constraint->existingPseudo($name,$value);
+        if($this->constraint->existingPseudo($value)){
+            return $this->constraint->existingPseudo($value);
         }
     }
 

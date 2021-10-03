@@ -9,7 +9,6 @@ class QueryBuilder
     private $select;
     private $set;
     private $insert;
-    private $count;
     private $table;
     private $join;
     private $where;
@@ -164,18 +163,15 @@ class QueryBuilder
         if($this->statement === 'INSERT INTO'){
             $parts[] = $this->insert;
         }
-        // (IF UPDATE => SET)
         if($this->statement === 'UPDATE' && $this->set){
             $parts[] = 'SET';
             $parts[] = join(', ', $this->set);
         }
-        // JOIN
         if($this->join){
             foreach($this->join as $join){
                 $parts[] = $join;
             }
         }
-        // WHERE
         if($this->where){
             $parts[] = "WHERE";
             foreach($this->where as $key => $condition){
@@ -185,11 +181,9 @@ class QueryBuilder
                 }
             }          
         }
-        // ORDER BY
         if($this->orderBy){
             $parts[] = $this->orderBy;
         }
-        // LIMIT & OFFSET
         if($this->limit){
             $parts[] = $this->limit;
             if($this->offset){

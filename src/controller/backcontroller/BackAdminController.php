@@ -11,7 +11,6 @@ class BackAdminController extends BackController
     protected $limitArray = [10,20,30,40,50,75,100];
     private $defaultLimit = 20;
 
-    // ok QBuilder
     public function administration()
     {
         $this->checkAdmin();
@@ -38,7 +37,6 @@ class BackAdminController extends BackController
         return $this->view->renderTwig('administration', $this->data);
     }
 
-    // ok QBuilder
     public function adminComments(Parameter $get)
     {
         $this->checkAdmin();
@@ -51,10 +49,9 @@ class BackAdminController extends BackController
         $this->data['title'] = 'Administration des commentaires';
         $this->data['get'] = $get;
 
+        $this->parameters['limit'] = $this->defaultLimit ;
         if(in_array((int)$get->get('limit'),$this->limitArray)){
             $this->parameters['limit'] = $get->get('limit');
-        } else {
-            $this->parameters['limit'] = $this->defaultLimit ;
         }
 
         if(isset($this->parameters['validated']) && $this->parameters['validated'] === 'all'){
@@ -88,7 +85,6 @@ class BackAdminController extends BackController
         return $this->view->renderTwig('adminComments', $this->data);             
     }
 
-    // ok QBuilder
     public function adminArticles(Parameter $get)
     {
         $this->checkAdmin();
@@ -101,12 +97,11 @@ class BackAdminController extends BackController
         $this->data['title'] = 'Administration des articles';
         $this->data['get'] = $get;
 
+        $this->parameters['limit'] = $this->defaultLimit ;
         if(in_array((int)$get->get('limit'),$this->limitArray)){
             $this->parameters['limit'] = $get->get('limit');
-        } else {
-            $this->parameters['limit'] = $this->defaultLimit ;
         }
-
+        
         if(isset($this->parameters['all'])){
             unset($this->parameters['published']);
             unset($this->parameters['private']);
@@ -141,7 +136,6 @@ class BackAdminController extends BackController
         return $this->view->renderTwig('adminArticles', $this->data);
     }
 
-    // ok QBuilder
     public function adminUsers(Parameter $get)
     {
         $this->checkAdmin();
@@ -154,10 +148,9 @@ class BackAdminController extends BackController
         $this->data['title'] = 'Administration des utilisateurs';
         $this->data['get'] = $get;
 
+        $this->parameters['limit'] = $this->defaultLimit ;
         if(in_array((int)$get->get('limit'),$this->limitArray)){
             $this->parameters['limit'] = $get->get('limit');
-        } else {
-            $this->parameters['limit'] = $this->defaultLimit ;
         }
 
         if(isset($this->parameters['allUserStatus'])){

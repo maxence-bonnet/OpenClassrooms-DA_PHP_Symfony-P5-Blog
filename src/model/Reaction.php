@@ -38,7 +38,7 @@ class Reaction
     /**
      * @return int
      */
-    public function getUserId(){return $this->UserId;}
+    public function getUserId(){return $this->userId;}
 
     /**
      * @return string
@@ -64,7 +64,7 @@ class Reaction
     /**
      * @param int
      */
-    public function setUserId($userId){$this->UserId = $userId;}
+    public function setUserId($userId){$this->userId = $userId;}
 
     /**
      * @param string

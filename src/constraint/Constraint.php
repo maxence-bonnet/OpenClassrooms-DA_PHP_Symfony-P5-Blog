@@ -64,14 +64,14 @@ class Constraint
         }
     }
 
-    public function existingUserId($name, int $value)
+    public function existingUserId(int $value)
     {
         if(!(new UserDAO())->getUser($value)){
             return 'L\'utilisateur saisi n\'existe pas.';
         }
     }
 
-    public function existingCategoryId($name, int $value)
+    public function existingCategoryId(int $value)
     {
         if(!(new CategoryDAO())->getCategory($value)){
             return 'La catégorie saisie n\'existe pas.';
