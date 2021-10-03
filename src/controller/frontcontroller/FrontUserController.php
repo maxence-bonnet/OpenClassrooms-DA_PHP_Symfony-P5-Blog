@@ -21,9 +21,6 @@ class FrontUserController extends FrontController
                 $post->set($key, htmlspecialchars($value));
             }
             $errors = $this->validation->validate($post, 'User');
-            if($this->userDAO->pseudoExists($post->get('pseudo'))){
-                $errors['pseudo'] = '<div class="invalid-feedback">Le pseudo : ' . $post->get('pseudo') . ' est déjà utilisé, veuillez en choisir un autre.</div>';
-            }
             if(!$errors){
                 $post->set('createdAt', date('Y-m-d H:i:s'));
                 $post->set('password', password_hash($post->get('password'),PASSWORD_BCRYPT));
@@ -132,7 +129,6 @@ class FrontUserController extends FrontController
                     } 
                     $this->session->addMessage('success','Le thème a été mis à jour : ' . $get->get('theme'));          
                 }
-                $this->http->redirect('?route=profile&userId=' . $this->session->get('id'));
             }
             $data['themesList'] = $themesList;
             $data['title'] = 'Profil';

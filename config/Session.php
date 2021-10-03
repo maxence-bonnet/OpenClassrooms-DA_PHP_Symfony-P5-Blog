@@ -6,7 +6,7 @@ use App\src\utils\AlertMessage;
 
 class Session
 {
-    private $session;
+    public $session;
 
     public function __construct($session)
     {
@@ -16,7 +16,7 @@ class Session
     public function set($name, $value) : void
     {
         $_SESSION[$name] = $value;
-        $this->session[$name] = $value;
+        $this->session[$name] = $value;     
     }
 
     public function remove($name) : void
@@ -35,14 +35,13 @@ class Session
      * @param $key
      * @return mixed
      */
-    public function use($key) : mixed
+    public function use($key)
     {
         if($this->get($key)){
             $value = $this->get($key);
             $this->remove($key);
             return $value;
         }
-        return null;
     }
 
     /**
@@ -51,9 +50,10 @@ class Session
      * @param $type, $message
      * @return void
      */
-    public function addMessage(string $type, string $message) : void
+    public function addMessage(string $type, string $message)// : void
     {
         $this->set('messages', array(new AlertMessage($type,$message)));
+        return $this->session;
     }
 
     public function start() : void

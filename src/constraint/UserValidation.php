@@ -9,7 +9,7 @@ class UserValidation extends Validation
     public function __construct()
     {
         parent::__construct();
-        $this->requiredFields = [];
+        $this->requiredFields = ['firstname','lastname','pseudo','password1','password2','email'];
     }
 
     private $password1 = null;
@@ -54,8 +54,6 @@ class UserValidation extends Validation
             $this->setPassword1(null);
             $this->setPassword2(null);
         }
-
-        // Add required fields
     }
 
     public function checkLastname($name, $value)
@@ -94,6 +92,9 @@ class UserValidation extends Validation
         }
         if($this->constraint->maxLength($name, $value, 60)) {
             return $this->constraint->maxLength('Pseudo', $value, 60);
+        }
+        if($this->constraint->existingPseudo($name,$value)){
+            return $this->constraint->existingPseudo($name,$value);
         }
     }
 

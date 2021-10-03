@@ -21,11 +21,6 @@ class BackArticleController extends BackController
 
             $errors = $this->validation->validate($post, 'Article');
             if(!$errors){
-                // can be removed after better validation
-                if(!$post->get('categoryId')){
-                    $post->set('categoryId', 1);
-                }
-                //
                 $post->set('createdAt', null);
                 if((int)$post->get('statusId') !== 3){
                     $post->set('createdAt', date('Y-m-d H:i:s'));
@@ -34,6 +29,9 @@ class BackArticleController extends BackController
                 $this->articleDAO->addArticle($post);
                 $this->session->addMessage('success', 'Le nouvel article a bien été ajouté');
                 $this->http->redirect('?route=articles');
+            }
+            if(isset($errors['missingField'])){
+                $this->session->addMessage('danger','Un ou plusieurs champs manquant.');
             }
             $this->data['post'] = $post;
             $this->data['errors'] = $errors;
@@ -84,6 +82,9 @@ class BackArticleController extends BackController
                 $this->articleDAO->editArticle($post, $articleId);
                 $this->session->addMessage('success', 'L\'article a bien été modifié');   
                 $this->http->redirect('?route=article&articleId=' . $articleId);
+            }
+            if(isset($errors['missingField'])){
+                $this->session->addMessage('danger','Un ou plusieurs champs manquant.');
             }
             $this->data['title'] = 'Modification : ' . $post->get('title');
             $this->data['post'] = $post;

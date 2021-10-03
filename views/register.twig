@@ -11,30 +11,30 @@
             <form method="post">
                 <div class="row">
 
-                    {{ form.input('text','Votre nom*','lastname',{ errors : errors.lastname, value : post.get('lastname'), placeholder : 'Dupont', help : '60 caractères maximum : 0/60' }) }}
+                    {{ form.input('text','Votre nom*','lastname',{ errors : errors.lastname, value : post.get('lastname'), placeholder : 'Dupont', help : '60 caractères maximum : 0/60', required : true }) }}
 
-                    {{ form.input('text','Votre prénom*','firstname',{ errors : errors.firstname, value : post.get('firstname'), placeholder : 'Jean', help : '60 caractères maximum : 0/60'}) }}
+                    {{ form.input('text','Votre prénom*','firstname',{ errors : errors.firstname, value : post.get('firstname'), placeholder : 'Jean', help : '60 caractères maximum : 0/60', required : true }) }}
                 
                 </div>
                 
                 <div class="row">
 
-                    {{ form.input('text','Votre pseudo*','pseudo',{ errors : errors.pseudo, value : post.get('pseudo'), placeholder : 'JeanJean', help : 'Identifiant / pseudo unique<br>60 caractères maximum : 0/60'}) }}
+                    {{ form.input('text','Votre pseudo*','pseudo',{ errors : errors.pseudo, value : post.get('pseudo'), placeholder : 'JeanJean', help : 'Identifiant / pseudo unique<br>60 caractères maximum : 0/60', required : true }) }}
                 
-                    {{ form.input('email','Votre email','email',{ errors : errors.email, value : post.get('email'), placeholder : 'exemple@monmail.com'}) }}
+                    {{ form.input('email','Votre email','email',{ errors : errors.email, value : post.get('email'), placeholder : 'exemple@monmail.com', required : true }) }}
 
                 </div>
 
                 <div class="row">
 
-                    {{ form.input('password','Votre mot de passe*','password',{ errors : errors.password, help : '1 chiffre, 1 majuscule, 1 caratère spécial et 8 caractères minimum'}) }}
+                    {{ form.input('password','Votre mot de passe*','password',{ errors : errors.password, help : '1 chiffre, 1 majuscule, 1 caratère spécial et 8 caractères minimum', pattern : '(?=.*[^A-Za-z\\d])(?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{8,}', required : true }) }}
 
-                    {{ form.input('password','Confirmer le mot de passe*','password2',{ errors : errors.password2}) }}
+                    {{ form.input('password','Confirmer le mot de passe*','password2',{ errors : errors.password2, pattern : '(?=.*[^A-Za-z\\d])(?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{8,}', required : true }) }}
 
                 </div>
 
                 
-                {{ form.input('phone','Votre numéro de téléphone','phone',{ col : 'col-md-5', errors : errors.phone, value : post.get('phone'), placeholder : '0612345678', help : 'format 06.12.34.56.78'}) }}
+                {{ form.input('phone','Votre numéro de téléphone','phone',{ col : 'col-md-5', errors : errors.phone, value : post.get('phone'), placeholder : '0612345678', pattern : '[0-9]' }) }}
 
                 {{ form.submit('Valider', { position : 'mx-auto'}) }} 
 

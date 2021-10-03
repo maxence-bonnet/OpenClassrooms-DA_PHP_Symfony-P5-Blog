@@ -2,6 +2,9 @@
 
 namespace App\src\constraint;
 
+use App\src\DAO\UserDAO;
+use App\src\DAO\CategoryDAO;
+
 class Constraint
 {
     public function notBlank($name, $value)
@@ -54,16 +57,23 @@ class Constraint
         }
     }
 
-    public function existingUser($name, $value)
+    public function existingPseudo($name, $value)
     {
-        if(0){
+        if((new UserDAO())->pseudoExists($value)){
+            return 'Le pseudo : ' . $value . ' est déjà utilisé, veuillez en choisir un autre..';
+        }
+    }
+
+    public function existingUserId($name, int $value)
+    {
+        if(!(new UserDAO())->getUser($value)){
             return 'L\'utilisateur saisi n\'existe pas.';
         }
     }
 
-    public function existingCategory($name, $value)
+    public function existingCategoryId($name, int $value)
     {
-        if(0){
+        if(!(new CategoryDAO())->getCategory($value)){
             return 'La catégorie saisie n\'existe pas.';
         }       
     }

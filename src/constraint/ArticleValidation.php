@@ -33,8 +33,6 @@ class ArticleValidation extends Validation
             $error = $this->checkStatusId($name, $value);
             $this->addError($name, $error);
         }
-
-        // Add required fields
     }
 
     private function checkTitle($name, $value)
@@ -86,11 +84,15 @@ class ArticleValidation extends Validation
 
     private function checkAuthorId($name, $value)
     {
-
+        if($this->constraint->existingUserId($name, $value)) {
+            return $this->constraint->existingUserId('Auteur', $value);
+        }
     }
 
     private function checkCategoryId($name, $value)
     {
-        
+        if($this->constraint->existingCategoryId($name, $value)) {
+            return $this->constraint->existingCategoryId('Catégorie', $value);
+        }        
     }
 }

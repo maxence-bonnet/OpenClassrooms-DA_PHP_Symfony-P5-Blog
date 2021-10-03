@@ -40,11 +40,23 @@ class Validation
     {
         foreach ($post->all() as $key => $value) {
             $this->checkField($key, $value);
+            $this->updateRequiredFields($key);
+        }
+        // check if all required fields has been found & cleared from array
+        if(!empty($this->requiredFields)){
+            $this->addError('missingField',1);
         }
         return $this->errors;
     }
 
-    public function addError($name, $error) {
+    protected function updateRequiredFields($key) : void
+    {
+        if(in_array($key,$this->requiredFields)){
+            unset($this->requiredFields[array_search($key,$this->requiredFields)]);
+        }
+    }
+
+    protected function addError($name, $error) {
         if($error) {
             $this->errors += [
                 $name => '<div class="invalid-feedback">' . $error . '</div>'

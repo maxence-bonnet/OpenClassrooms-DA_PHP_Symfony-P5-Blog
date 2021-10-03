@@ -18,7 +18,10 @@ class FrontController extends Controller
                     $this->session->addMessage('success','Votre message a bien été envoyé');
                     $this->http->redirect('?');
                 }
-                $this->session->addMessage('danger','Échec lors de l\'envoi du message<');  
+                $this->session->addMessage('danger','Échec lors de l\'envoi du message');  
+            }
+            if(isset($errors['missingField'])){
+                $this->session->addMessage('danger','Un ou plusieurs champs manquant.');
             }
             $data['post'] = $post;
             $data['errors'] = $errors;            

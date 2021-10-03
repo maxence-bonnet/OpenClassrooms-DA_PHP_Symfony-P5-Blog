@@ -43,6 +43,9 @@ class BackCommentController extends BackController
                 $this->session->addMessage('success', 'Le commentaire a bien été modifié et publié');  
                 $this->http->dynamicRedirect('?route=adminComments',$this->session);                
             }
+            if(isset($errors['missingField'])){
+                $this->session->addMessage('danger','Un ou plusieurs champs manquant.');
+            }
             $this->data['errors'] = $errors ;
         } else {
             $post->set('comment', $comment->getContent());

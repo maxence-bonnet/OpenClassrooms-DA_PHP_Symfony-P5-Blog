@@ -20,9 +20,9 @@
 
                             {{ form.input('text','Titre de l\'article','title', { errors : errors.title, value : post.get('title'), help : '63 caractères maximum : 0/63'}) }}
         
-                            {{ form.select('Auteur','authorId', users, { errors : errors.author, selected : post.get('authorId') ?: session.get('id') }) }}
+                            {{ form.select('Auteur','authorId', users, { errors : errors.authorId, selected : post.get('authorId') ?: session.get('id') }) }}
                             
-                            {{ form.select('Catégorie','categoryId', categories, { errors : errors.category, selected : post.get('categoryId')}) }}
+                            {{ form.select('Catégorie','categoryId', categories, { errors : errors.categoryId, selected : post.get('categoryId') }) }}
 
                         </div>
 

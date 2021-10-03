@@ -45,6 +45,9 @@ class FrontCommentController extends FrontController
                     $this->commentDAO->addComment($parameters);
                     $this->http->redirect('?route=article&articleId=' . $articleId);
                 }
+                if(isset($errors['missingField'])){
+                    $this->session->addMessage('danger','Un ou plusieurs champs manquant.');
+                }
                 $post->set('new', true);
                 $comments = $this->commentDAO->getComments([
                     'articleId' => $articleId,
@@ -100,6 +103,9 @@ class FrontCommentController extends FrontController
                 $lastModified = date('Y-m-d H:i:s');
                 $this->commentDAO->editComment($content, $commentId, $lastModified, $validated);
                 $this->http->redirect('?route=article&articleId=' . $articleId);
+            }
+            if(isset($errors['missingField'])){
+                $this->session->addMessage('danger','Un ou plusieurs champs manquant.');
             }
             $data['errors'] = $errors;
         }

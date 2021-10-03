@@ -36,7 +36,6 @@ abstract class Controller
         $this->commentDAO = new CommentDAO();
         $this->reactionDAO = new ReactionDAO();
         $this->userDAO = new UserDAO();
-        $this->view = new View();
         $this->http = new HTTP();
         $this->validation = new Validation();
         $this->request = new Request();
@@ -45,6 +44,7 @@ abstract class Controller
         $this->post = $this->request->getPost();
         $this->server = $this->request->getServer();
         $this->session = $this->request->getSession();
+        $this->view = new View($this->session);
     }
 
     protected function checkLoggedIn()

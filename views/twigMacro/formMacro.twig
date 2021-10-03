@@ -4,7 +4,7 @@
 {% macro input(type, label, name, options = [] ) %}
     <div class="form-group mb-3 {{ options.col | default('col-md')}}">
         <label class="form-label {{ options.labelposition }}" for="{{ name }}">{{ label | raw }} :</label>
-        <input type="{{ type }}" class="form-control {{ options.errors ? 'is-invalid' : '' }}" id="{{ name }}" name="{{ name }}" {% if options.help %} aria-describedby="{{ name ~ 'ContentHelp' }}" {% endif %} placeholder="{{ options.placeholder }}" value="{{ options.value }}" {{ options.required ? 'required' }}>
+        <input type="{{ type }}" class="form-control {{ options.errors ? 'is-invalid' : '' }}" id="{{ name }}" name="{{ name }}" {% if options.help %} aria-describedby="{{ name ~ 'ContentHelp' }}" {% endif %} placeholder="{{ options.placeholder }}" value="{{ options.value }}" {{ options.pattern ? 'pattern=' ~ options.pattern }} {{ options.required ? 'required' }}>
         {% if options.help %}
             <div id="{{ name ~ 'ContentHelp' }}" class="form-text">{{ options.help | raw }}</div>
         {% endif %}
@@ -33,8 +33,10 @@
 {% macro select(label, name, data, options = [] ) %}
     <div class="form-group mb-3 col">
         <label class="form-label" for="{{ name }}">{{ label }} :</label>
-        <select class="form-select form-select" name="{{ name }}" id="{{ name }}">
+        <select class="form-select form-select {{ options.errors ? 'is-invalid' : '' }}"  name="{{ name }}" id="{{ name }}">
+            {% if options.emptyFirst %}
             <option value="0" disabled selected></option>
+            {% endif %}
             {% for sample in data %}
                 <option value="{{ sample.value }}" {{ sample.value is same as(options.selected) ? 'selected' }}>{{ sample.name }}</option>
             {% endfor %}
