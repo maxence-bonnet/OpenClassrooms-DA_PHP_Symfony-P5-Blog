@@ -123,7 +123,7 @@
 
                                             {{ form.hiddenInput('answerTo',{ value : answerTo}) }}
 
-                                            {{ form.textarea('Votre réponse','answer', 'answerContent', { errors : errors.answer, value : post.get('answer'), placeholder : '...', help : 'Ce commentaire sera soumis à relecture avant publication <br> 500 caractères maximum : 0/500'}) }}
+                                            {{ form.textarea('Votre réponse','answer', 'answerContent', { errors : errors.answer, value : post.get('answer'), placeholder : '...', help : { text : 'Ce commentaire sera soumis à relecture avant publication <br> 500 caractères maximum : ', limit : '0/500' } }) }}
 
                                             {{ form.submit('Répondre', { position : 'ms-auto'}) }}
 
@@ -149,7 +149,7 @@
                             <h4 class="text-center text-md-start">{{ post and not post.get('new') ? 'Modifier le commentaire' : 'Ajouter un commentaire' }}</h4>
                             <form method="post" action="?route={{ post and not post.get('new') ? 'editComment&commentId=' ~ post.get('id') ~ '#commentForm' : 'addComment&articleId=' ~ article.getId() ~ '#commentForm'}}" id="commentForm">
 
-                                {{ form.textarea(session.get('pseudo'), 'comment', 'commentContent', { errors : errors.comment, value : post.get('comment'), placeholder : 'C\'est énorme j\'adore !', help : 'Ce commentaire sera soumis à relecture avant publication <br> 500 caractères maximum : 0/500'}) }}
+                                {{ form.textarea(session.get('pseudo'), 'comment', 'commentContent', { errors : errors.comment, value : post.get('comment'), placeholder : 'C\'est énorme j\'adore !', help : { text : 'Ce commentaire sera soumis à relecture avant publication <br> 500 caractères maximum : ', limit : '0/500' } }) }}
                                 
                                 {{ form.submit('Valider', { position : 'mx-auto'}) }}
 
@@ -169,5 +169,17 @@
         <h3 class="text-center text-md-start">Les commentaires sont désactivés pour cet article</h3>
     {% endif %}
 </section>
+
+<script src="js/countChars.js"></script>
+<script>
+    answerTexarea = document.getElementById("answerContent");
+    commentTextarea = document.getElementById("commentContent");
+    if(answerTexarea){
+        answerTexarea.addEventListener("keyup", () => countChars(answerTexarea,"answerContentHelp",500));
+    }
+    if(commentTextarea){
+        commentTextarea.addEventListener("keyup", () => countChars(commentTextarea,"commentContentHelp",500));
+    }
+</script>
 
 {% endblock %}

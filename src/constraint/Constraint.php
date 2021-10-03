@@ -57,7 +57,7 @@ class Constraint
         }
     }
 
-    public function existingPseudo($name, $value)
+    public function existingPseudo($value)
     {
         if((new UserDAO())->pseudoExists($value)){
             return 'Le pseudo : ' . $value . ' est déjà utilisé, veuillez en choisir un autre..';
