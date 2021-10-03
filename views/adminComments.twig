@@ -155,7 +155,9 @@
 
     <div class="row">
         <div class="col">
+            {% if comments is not empty %}          
             <h5>{{ pageCommentsCount }} / {{ totalCommentsCount }} Résultat(s) - Page {{ page }} / {{ pages }}</h5>
+            {% endif %}
             <table class="adminTable table table-striped table-hover table-dark text-center" id="resultsTable">
                 <thead>
                     <tr>

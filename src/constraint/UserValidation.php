@@ -6,14 +6,20 @@ use App\config\Parameter;
 
 class UserValidation extends Validation
 {
+    public function __construct()
+    {
+        parent::__construct();
+        $this->requiredFields = ['firstname','lastname','pseudo','password1','password2','email'];
+    }
+
     private $password1 = null;
     private $password2 = null;
 
-    public function getPassword1(){return $this->password1;}
-    public function getPassword2(){return $this->password2;}
+    private function getPassword1(){return $this->password1;}
+    private function getPassword2(){return $this->password2;}
 
-    public function setPassword1($password1){$this->password1 = $password1;}
-    public function setPassword2($password2){$this->password2 = $password2;}
+    private function setPassword1($password1){$this->password1 = $password1;}
+    private function setPassword2($password2){$this->password2 = $password2;}
     
     public function checkField($name, $value)
     {
@@ -41,15 +47,13 @@ class UserValidation extends Validation
             $error = $this->checkPhone($name, $value);
             $this->addError($name, $error);
         }
-        if(!is_null($this->getPassword1()) && !is_null($this->getPassword2())){
+        if($this->getPassword1() !== null && $this->getPassword2() !== null){
             $name = 'password2';
             $error = $this->checkSamePasswords($this->getPassword1(), $this->getPassword2());
             $this->addError($name, $error);
             $this->setPassword1(null);
             $this->setPassword2(null);
         }
-
-        // Add required fields
     }
 
     public function checkLastname($name, $value)
@@ -89,8 +93,8 @@ class UserValidation extends Validation
         if($this->constraint->maxLength($name, $value, 60)) {
             return $this->constraint->maxLength('Pseudo', $value, 60);
         }
-        if($this->constraint->pseudoExists($value)) {
-            return $this->constraint->pseudoExists($value);
+        if($this->constraint->existingPseudo($name,$value)){
+            return $this->constraint->existingPseudo($name,$value);
         }
     }
 

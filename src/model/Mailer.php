@@ -39,13 +39,13 @@ class Mailer
      */
     public function sendContactForm(Parameter $data) : bool
     {
-        $firstname = htmlspecialchars($data->get('firstname'));
-        $lastname = htmlspecialchars($data->get('lastname'));
+        $firstname = $data->get('firstname');
+        $lastname = $data->get('lastname');
 
         $this->setTo(self::CONTACT_MAIL);
         $this->setSubject('Blog Contact Form : ' . $firstname . ' ' . $lastname);
         $this->setHeaders(self::HEADERS_CONTENT_TYPE);
-        $this->setuserEmail(htmlspecialchars($data->get('email')));
+        $this->setuserEmail($data->get('email'));
         $this->setMessage(Text::formatMailMessage($data->get('message')));
         
         ob_start();
@@ -57,7 +57,7 @@ class Mailer
 
     private function sendMail(string $to,string $subject,string $message,string $headers = "") : bool
     {
-        return mail($to,$subject,$message,$headers);
+        return mail($to,$subject,$message,$headers); // Codacy doesn't like mail()
     }
 
     /**

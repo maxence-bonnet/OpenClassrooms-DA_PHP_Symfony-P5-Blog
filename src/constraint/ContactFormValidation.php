@@ -6,6 +6,12 @@ use App\config\Parameter;
 
 class ContactFormValidation extends Validation
 {
+    public function __construct()
+    {
+        parent::__construct();
+        $this->requiredFields = ['firstname','lastname','email','message'];
+    }
+    
     public function checkField($name, $value)
     {
         if($name === 'firstname') {
@@ -21,8 +27,6 @@ class ContactFormValidation extends Validation
             $error = $this->checkMessage($name, $value);
             $this->addError($name, $error);
         }
-
-        // Add required fields
     }
 
     public function checkLastname($name, $value)

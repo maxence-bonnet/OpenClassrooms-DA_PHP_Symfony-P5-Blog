@@ -7,10 +7,9 @@
 {% block content %}
 
 <section class="container mb-3">
-    <div class="row">
-        <div class="col-12 col-lg-8 p-2 shadow-sm">
+    <div class="row d-flex justify-content-center">
+        <div class="col-lg-8 p-2 shadow-sm">
             <h2 class="text-center text-md-start">{{ title }}</h2>
-
     
             <h5 class="text-center text-md-start">
 
@@ -28,7 +27,7 @@
 
         </div>
 
-        <div class="col-12 col-lg-4 p-2 px-md-5 shadow-sm">
+        <div class="col-8 col-lg-4 p-2 px-md-5 shadow-sm d-none d-md-block">
             <h3 class="text-center text-md-start">A propos de l'auteur(e):</h3>
             <div class="w-50 text-center m-auto">
                 <i class='bx bx-user-circle bx-lg'></i>
@@ -147,8 +146,8 @@
                 <div class="col-8 d-flex justify-content-center">
                     <div class="col-10">
                         <div class="py-2 px-5 shadow">
-                            <h4 class="text-center text-md-start">{{ post ? 'Modifier le commentaire' : 'Ajouter un commentaire' }}</h4>
-                            <form method="post" action="?route={{ post and not post.get('submit') ? 'editComment&commentId=' ~ post.get('id') ~ '#commentForm' : 'addComment&articleId=' ~ article.getId() ~ '#commentForm'}}" id="commentForm">
+                            <h4 class="text-center text-md-start">{{ post and not post.get('new') ? 'Modifier le commentaire' : 'Ajouter un commentaire' }}</h4>
+                            <form method="post" action="?route={{ post and not post.get('new') ? 'editComment&commentId=' ~ post.get('id') ~ '#commentForm' : 'addComment&articleId=' ~ article.getId() ~ '#commentForm'}}" id="commentForm">
 
                                 {{ form.textarea(session.get('pseudo'), 'comment', 'commentContent', { errors : errors.comment, value : post.get('comment'), placeholder : 'C\'est énorme j\'adore !', help : 'Ce commentaire sera soumis à relecture avant publication <br> 500 caractères maximum : 0/500'}) }}
                                 

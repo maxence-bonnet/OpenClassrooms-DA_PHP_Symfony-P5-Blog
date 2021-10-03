@@ -37,20 +37,20 @@ class Text
 
     public static function HtmlToMarkdown(string $html) : string
     {
-        $htmlToMarkdownConverter = new HtmlConverter([
+        $htmlToMarkdown = new HtmlConverter([
             'strip_tags'=> true,
             'hard_break'=> true
         ]);
-        return $htmlToMarkdownConverter->convert($html);
+        return $htmlToMarkdown->convert($html);
     }
 
     public static function markdownToHtml(string $markdown) : string
     {
-        $markdownToHtmlConverter = new CommonMarkConverter([
+        $markdownToHtml = new CommonMarkConverter([
             'html_input' => 'strip',
             'allow_unsafe_links' => false,
         ]);
-        return $markdownToHtmlConverter->convertToHtml($markdown);
+        return $markdownToHtml->convertToHtml($markdown);
     }
 
     public static function removeMarkdown(string $markdown) : string

@@ -6,10 +6,22 @@ use App\config\Parameter;
 
 class ArticleValidation extends Validation
 {   
+    public function __construct()
+    {
+        parent::__construct();
+        $this->requiredFields = ['title','categoryId','authorId','lede','content','statusId'];
+    }
+
     public function checkField($name, $value)
     {
         if($name === 'title'){
             $error = $this->checkTitle($name, $value);
+            $this->addError($name, $error);
+        } elseif ($name === 'authorId'){
+            $error = $this->checkAuthorId($name, strip_tags($value));
+            $this->addError($name, $error);
+        } elseif ($name === 'categoryId'){
+            $error = $this->checkCategoryId($name, strip_tags($value));
             $this->addError($name, $error);
         } elseif ($name === 'lede'){
             $error = $this->checkLede($name, strip_tags($value));
@@ -21,37 +33,35 @@ class ArticleValidation extends Validation
             $error = $this->checkStatusId($name, $value);
             $this->addError($name, $error);
         }
-
-        // Add required fields
     }
 
-    public function checkTitle($name, $value)
+    private function checkTitle($name, $value)
     {
         if($this->constraint->notBlank($name, $value)) {
             return $this->constraint->notBlank('Titre', $value);
         }
-        if($this->constraint->minLength($name, $value, 2)) {
-            return $this->constraint->minLength('titre', $value, 2);
+        if($this->constraint->minLength($name, $value, 3)) {
+            return $this->constraint->minLength('titre', $value, 3);
         }
         if($this->constraint->maxLength($name, $value, 63)) {
             return $this->constraint->maxLength('titre', $value, 63);
         }
     }
 
-    public function checkLede($name, $value)
+    private function checkLede($name, $value)
     {
         if($this->constraint->notBlank($name, $value)) {
             return $this->constraint->notBlank('chapô', $value);
         }
-        if($this->constraint->minLength($name, $value, 2)) {
-            return $this->constraint->minLength('chapô', $value, 2);
+        if($this->constraint->minLength($name, $value, 50)) {
+            return $this->constraint->minLength('chapô', $value, 50);
         }
         if($this->constraint->maxLength($name, $value, 500)) {
             return $this->constraint->maxLength('chapô', $value, 500);
         }
     }
 
-    public function checkContent($name, $value)
+    private function checkContent($name, $value)
     {
         if($this->constraint->notBlank($name, $value)) {
             return $this->constraint->notBlank('contenu', $value);
@@ -64,11 +74,25 @@ class ArticleValidation extends Validation
         }
     }
 
-    public function checkStatusId($name, $value)
+    private function checkStatusId($name, $value)
     {
         $valuesArray = [1,2,3];
         if($this->constraint->inArray($name, (int)$value, $valuesArray)) {
             return $this->constraint->inArray('Statut de publication', (int)$value, $valuesArray);
         }
+    }
+
+    private function checkAuthorId($name, $value)
+    {
+        if($this->constraint->existingUserId($name, $value)) {
+            return $this->constraint->existingUserId('Auteur', $value);
+        }
+    }
+
+    private function checkCategoryId($name, $value)
+    {
+        if($this->constraint->existingCategoryId($name, $value)) {
+            return $this->constraint->existingCategoryId('Catégorie', $value);
+        }        
     }
 }

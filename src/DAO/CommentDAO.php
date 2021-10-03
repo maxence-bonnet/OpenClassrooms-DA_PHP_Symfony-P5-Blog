@@ -7,7 +7,8 @@ use App\src\model\Comment;
 
 class CommentDAO extends DAO
 {
-    private function buildObject($row)
+    // ok QBuilder
+    private function buildObject($row) : Comment
     {
         $comment = new Comment();
         $comment->setId($row['id']);
@@ -23,188 +24,105 @@ class CommentDAO extends DAO
         return $comment;
     }
 
-    // ok
-    public function getComment(int $commentId)
+    // ok QBuilder
+    public function getComment(int $commentId) : mixed
     {
-        $sql = 'SELECT comment.id, comment.user_id, comment.article_id, comment.created_at, comment.last_modified, comment.content, comment.validated, comment.answer_to,
-                       user.pseudo as user_pseudo,
-                       article.title as article_title
-                FROM comment
-                INNER JOIN article ON comment.article_id = article.id
-                INNER JOIN user ON comment.user_id = user.id
-                WHERE comment.id = :comment_id';
-        $result = $this->createQuery($sql,[
-            'comment_id' => $commentId
-        ]);
-        $comment = $result->fetch();
-        if($comment){
+        $this->query = $this->selectComments()->where('c.id = :commentId');
+        $result = $this->createQuery((string)$this->query,['commentId' => $commentId]);
+        if($comment = $result->fetch()){
             $comment = $this->buildObject($comment);
         }
         $result->closeCursor();
         return $comment;
     }
 
-    // ok
+    // ok QBuilder
     public function addComment (array $parameters) : void
     {
-        extract($parameters);
-
-        if(!isset($answerTo)){
-            $answerTo = null;
-        }
-        
-        $sql ='INSERT INTO comment (user_id, article_id, created_at, last_modified, content, validated, answer_to)
-               VALUES (:user_id, :article_id, NOW(), null, :content, :validated, :answer_to)';
-        $this->createQuery($sql, [ 'user_id' => $userId,
-                                   'article_id' => $articleId,
-                                   'content' => $content,
-                                   'validated' => $validated,
-                                   'answer_to' => $answerTo]);
+        $this->query = (new QueryBuilder()) ->statement('insert')
+                                            ->table('comment')
+                                            ->insertValues(['user_id' => ':userId',
+                                                            'article_id' => ':articleId',
+                                                            'created_at' => ':createdAt',
+                                                            'last_modified' => ':lastModified',
+                                                            'content' => ':content',
+                                                            'validated' => ':validated',
+                                                            'answer_to' => ':answerTo']);
+        $pdo = $this->prepareQuery((string)$this->query);
+        $pdo->bindValue(':userId', $parameters['userId']);
+        $pdo->bindValue(':articleId', $parameters['articleId']);
+        $pdo->bindValue(':createdAt', $parameters['createdAt']);
+        $pdo->bindValue(':lastModified', null);
+        $pdo->bindValue(':content', $parameters['content']);    
+        $pdo->bindValue(':validated', $parameters['validated']);
+        $pdo->bindValue(':answerTo', $parameters['answerTo']);
+        $pdo->execute();  
                                    
     }
 
-    // ok
-    public function editComment (string $content, int $commentId,int $validated = 0) : void
+    // ok QBuilder
+    public function editComment (string $content, int $commentId, string $lastModified,int $validated = 0) : void
     {
-        $sql = 'UPDATE comment SET content = :content, last_modified = NOW(), validated = :validated WHERE id = :comment_id';
-        $this->createQuery($sql,['content' => $content,
-                                 'comment_id' => $commentId,
-                                 'validated' => $validated
-                                ]);
-    }
-
-    // ok
-    public function deleteComment(int $commentId)
-    {
-        $sql = 'DELETE FROM comment WHERE answer_to = :comment_id;
-                DELETE FROM comment WHERE id = :comment_id';
-        $this->createQuery($sql, ['comment_id' => $commentId]);
-    }
-
-    // ok
-    public function updateCommentValidation(int $commentId, int $validated) : void
-    {       
-        $sql = 'UPDATE comment SET validated = :validated WHERE id = :comment_id';
-        $this->createQuery($sql,[
+        $this->query = (new QueryBuilder()) ->statement('update')
+                                            ->table('comment')
+                                            ->set('content = :content, last_modified = :lastModified, validated = :validated')
+                                            ->where('id = :commentId'); 
+        $this->createQuery((string)$this->query,[
+            'content' => $content,
             'validated' => $validated,
-            'comment_id' => $commentId
+            'lastModified' => $lastModified,
+            'commentId' => $commentId
         ]);
     }
 
-    // 
+    // ok QBuilder
+    public function deleteComment(int $commentId) : void
+    {
+        $this->query = (new QueryBuilder()) ->statement('delete')
+                                            ->table('comment')
+                                            ->where('answer_to = :commentId');
+        $this->createQuery((string)$this->query, ['commentId' => $commentId]);
+        $this->query = (new QueryBuilder()) ->statement('delete')
+                                            ->table('comment')
+                                            ->where('id = :commentId');
+        $this->createQuery((string)$this->query, ['commentId' => $commentId]);
+    }
+
+    // ok QBuilder
+    public function updateCommentValidation(int $commentId, int $validated) : void
+    {   
+        $this->query = (new QueryBuilder()) ->statement('update')
+                                            ->table('comment')
+                                            ->set('validated = :validated')
+                                            ->where('id = :commentId'); 
+        $this->createQuery((string)$this->query,[
+            'validated' => $validated,
+            'commentId' => $commentId
+        ]);
+    }
+
+    // ok QBuilder
     public function countComments(array $parameters = []) : int
     {
-        $where = "WHERE";
+        $this->query = (new QueryBuilder()) ->statement('select')
+                                            ->count(1)
+                                            ->table('comment','c')
+                                            ->innerJoin(['u'=>'user'], 'c.user_id = u.id');
 
-        extract($parameters);
+        $parameters = $this->addParameters($parameters);
 
-        $sql = 'SELECT COUNT(comment.id) FROM comment 
-                INNER JOIN user ON comment.user_id = user.id';
-        
-        if(isset($q)){
-            $sql .= ' ' . $where . ' comment.content LIKE "%' . $q . '%"';
-            $where = "AND";
-        }
-
-        if(isset($userId)){
-            $sql .= ' ' . $where . ' user.id =' . $userId ;
-            $where = "AND";
-        }
-
-        if(isset($articleId)){
-            $sql .= ' ' . $where . ' comment.article_id = ' . $articleId;
-            $where = "AND";
-        }
-
-        if(isset($validated)){
-            if($validated === "validated"){
-                $validated = 1;
-            } elseif($validated === "pending"){
-                $validated = 0;
-            }
-            $sql .= ' ' . $where . ' comment.validated = ' . $validated ;
-            $where = "AND";
-        }
-
-        if(isset($beforeDatetime)){
-            $sql .= ' ' . $where . ' comment.created_at < "' . $beforeDatetime . '"' ;
-            $where = "AND";
-        }
-
-        if(isset($afterDatetime)){
-            $sql .= ' ' . $where . ' comment.created_at > "' . $afterDatetime . '"';
-            $where = "AND";
-        }
-
-        $result = $this->createQuery($sql);
+        $result = $this->createQuery((string)$this->query, $parameters);
         return $result->fetch(\PDO::FETCH_NUM)[0];
     }
 
-    // 
+    // ok QBuilder
     public function getComments(array $parameters = []) : array
     {
-        $where = "WHERE";
+        $this->query = $this->selectComments();
 
-        extract($parameters);
+        $parameters = $this->addParameters($parameters);
 
-        $sql = 'SELECT comment.id, comment.user_id, comment.article_id, comment.created_at, comment.last_modified, comment.content, comment.validated, comment.answer_to,
-        user.pseudo as user_pseudo,
-        article.title as article_title
-        FROM comment
-        INNER JOIN article ON comment.article_id = article.id
-        INNER JOIN user ON comment.user_id = user.id';
-        
-        if(isset($q)){
-            $sql .= ' ' . $where . ' comment.content LIKE "%' . $q . '%"';
-            $where = "AND";
-        }
-
-        if(isset($userId)){
-            $sql .= ' ' . $where . ' user.id =' . $userId ;
-            $where = "AND";
-        }
-
-        if(isset($articleId)){
-            $sql .= ' ' . $where . ' comment.article_id = ' . $articleId;
-            $where = "AND";
-        }
-
-        if(isset($validated)){
-            if($validated === "validated"){
-                $validated = 1;
-            } elseif($validated === "pending"){
-                $validated = 0;
-            }
-            $sql .= ' ' . $where . ' comment.validated = ' . $validated ;
-            $where = "AND";
-        }
-
-        if(isset($beforeDatetime)){
-            $sql .= ' ' . $where . ' comment.created_at < "' . $beforeDatetime . '"' ;
-            $where = "AND";
-        }
-
-        if(isset($afterDatetime)){
-            $sql .= ' ' . $where . ' comment.created_at > "' . $afterDatetime . '"';
-            $where = "AND";
-        }
-
-        if(isset($orderby)){
-            $sql .= ' ORDER BY created_at ' . $orderby;
-        } else {
-            $sql .= ' ORDER BY created_at ASC';
-        }
-        
-        if(isset($limit)){
-            $sql .= ' LIMIT ' . $limit;
-            if(isset($offset)){
-                $sql .= " OFFSET $offset";
-            }
-        }
-
-
-        
-        $result = $this->createQuery($sql);
+        $result = $this->createQuery((string)$this->query, $parameters);
         $comments = [];
         foreach ($result as $row){
             $commentId = $row['id'];
@@ -212,5 +130,72 @@ class CommentDAO extends DAO
         }
         $result->closeCursor();
         return $comments;
+    }
+
+    // ok QBuilder
+    private function addParameters(array $parameters = []) : array
+    {
+        if(isset($parameters['q'])){
+            $this->query->where('c.content LIKE "%' . htmlentities($parameters['q']) . '%"');
+            unset($parameters['q']);
+        }
+
+        if(isset($parameters['userId'])){
+            $this->query->where('u.id = :userId');
+        }
+
+        if(isset($parameters['articleId'])){
+            $this->query->where('c.article_id = :articleId');
+        }
+
+        if(isset($parameters['validated'])){
+            if($parameters['validated'] === "validated"){
+                $parameters['validated'] = 1;
+            } elseif ($parameters['validated'] === "pending") {
+                $parameters['validated'] = 0;
+            }
+            $this->query->where('c.validated = :validated');
+        }
+
+        // Common
+
+        if(isset($parameters['beforeDatetime'])){
+            $this->query->where('c.created_at < :beforeDatetime');
+        }
+        
+        if(isset($parameters['afterDatetime'])){
+            $this->query->where('c.created_at > :afterDatetime');
+        }
+
+        if(isset($parameters['orderBy'])){
+            $this->query->orderBy($parameters['orderBy']);
+            unset($parameters['orderBy']);
+        } else {
+            $this->query->orderBy(['column'=>'c.created_at','order'=>'DESC']);
+            unset($parameters['orderBy']);
+        }
+
+        if(isset($parameters['limit'])){
+            $this->query->limit($parameters['limit']);
+            unset($parameters['limit']);
+            if(isset($parameters['offset'])){
+                $this->query->offset($parameters['offset']);
+                unset($parameters['offset']);
+            }
+        }
+
+        return $parameters;
+    }
+
+    // ok QBuilder
+    private function selectComments() : QueryBuilder
+    {
+        return (new QueryBuilder()) ->statement('select')
+                                    ->select('c.id', 'c.user_id', 'c.article_id', 'c.created_at', 'c.last_modified', 'c.content', 'c.validated', 'c.answer_to',
+                                    'u.pseudo as user_pseudo',
+                                    'a.title as article_title')
+                                    ->table('comment','c')
+                                    ->innerJoin(['a'=>'article'], 'c.article_id = a.id')
+                                    ->innerJoin(['u'=>'user'], 'c.user_id = u.id');
     }
 }

@@ -5,11 +5,13 @@ namespace App\src\DAO;
 use App\config\Parameter;
 use App\config\Session;
 use App\src\model\User;
+use PDO;
 
 
 class UserDAO extends DAO
 {
-    private function buildObject($row)
+    // ok QBuilder
+    private function buildObject(array $row) : User
     {
         $user = new User(); 
         $user->setId($row['id']);
@@ -27,273 +29,129 @@ class UserDAO extends DAO
         return $user;
     }
 
-    public function getUser(int $userId)
+    // ok QBuilder
+    public function getUser(int $userId) : mixed
     {
-        $sql = 'SELECT user.id, user.created_at, user.firstname, user.lastname, user.pseudo, user.email, user.phone, user.score, user.status_id, user.role_id,
-        user_status.name as status_name,
-        user_role.name as role_name
-        FROM user
-        INNER JOIN user_role ON user.role_id = user_role.id
-        INNER JOIN user_status ON user.status_id = user_status.id
-        WHERE user.id = :user_id';
-
-        $result = $this->createQuery($sql, [':user_id' => $userId]);
-        $user = $result->fetch();
-        $result->closeCursor();
-        if($user){
+        $this->query = $this->selectUsers()->where('u.id = :userId');   
+        $result = $this->createQuery((string)$this->query, ['userId' => $userId]);
+        if($user = $result->fetch()){
             $user = $this->buildObject($user);
         }
+        $result->closeCursor();
         return $user;
     }
 
+    // ok QBuilder
     public function updateUserRole(int $userId, int $roleId) : void
     {
-        $sql = 'UPDATE user SET role_id = :role_id WHERE id = :user_id';
-        $this->createQuery($sql,[
-            'user_id' => $userId,
-            'role_id' => $roleId
+        $this->query = (new QueryBuilder()) ->statement('update')
+                                            ->table('user')
+                                            ->set('role_id = :roleId')
+                                            ->where('id = :userId');
+        $this->createQuery((string)$this->query,[
+            'userId' => $userId,
+            'roleId' => $roleId
         ]);
     }
 
+    // ok QBuilder
     public function updateUserStatus(int $userId, int $statusId) : void
     {
-        $sql = 'UPDATE user SET status_id = :status_id WHERE id = :user_id';
-        $this->createQuery($sql,[
-            'user_id' => $userId,
-            'status_id' => $statusId
+        $this->query = (new QueryBuilder()) ->statement('update')
+                                            ->table('user')
+                                            ->set('status_id = :statusId')
+                                            ->where('id = :userId');
+        $this->createQuery((string)$this->query,[
+            'userId' => $userId,
+            'statusId' => $statusId
         ]);
     }
 
+    // ok QBuilder
     public function pseudoExists(string $pseudo) : ?int
     {
-        $sql = 'SELECT COUNT(pseudo) FROM user WHERE pseudo = :pseudo';
-        $result = $this->createQuery($sql, [':pseudo' => htmlspecialchars($pseudo)]);
-        return $result->fetchColumn();;
+        $this->query = (new QueryBuilder()) ->statement('select')
+                                            ->table('user')
+                                            ->count(1)
+                                            ->where('pseudo = :pseudo');
+        $result = $this->createQuery((string)$this->query, [':pseudo' => $pseudo]);
+        return $result->fetchColumn();
     }
 
+    // ok QBuilder
     public function register(Parameter $post) : void
     {
-        $sql = 'INSERT INTO user (created_at, firstname, lastname, pseudo, password, email, phone, role_id, status_id, score)
-                VALUES(NOW(), :firstname, :lastname, :pseudo, :password, :email, :phone, :role_id, :status_id, :score)';
-        $this->createQuery($sql, [
-            'firstname' => $post->get('firstname'),
-            'lastname' => $post->get('lastname'),
-            'pseudo' => $post->get('pseudo'),
-            'password' => password_hash($post->get('password'),PASSWORD_BCRYPT),
-            'email' => $post->get('email'),
-            'phone' => $post->get('phone'),
-            'role_id' => 2,
-            'status_id' => 1,
-            'score' => 0
-        ]);
+        $this->query = (new QueryBuilder()) ->statement('insert') 
+                                            ->table('user')
+                                            ->insertValues(['created_at' => ':createdAt',
+                                                            'firstname' => ':firstname',
+                                                            'lastname' => ':lastname',
+                                                            'pseudo' => ':pseudo',
+                                                            'password' => ':password',
+                                                            'email' => ':email',
+                                                            'phone' => ':phone',
+                                                            'role_id' => 2,
+                                                            'status_id' => 1,
+                                                            'score' => 0]);
+        $pdo = $this->prepareQuery((string)$this->query);
+        $pdo->bindValue(':createdAt', $post->get('createdAt'));
+        $pdo->bindValue(':firstname', $post->get('firstname'));
+        $pdo->bindValue(':lastname', $post->get('lastname'));
+        $pdo->bindValue(':pseudo', $post->get('pseudo'));
+        $pdo->bindValue(':password', $post->get('password'));
+        $pdo->bindValue(':email', $post->get('email'));
+        $pdo->bindValue(':phone', $post->get('phone'));
+        $pdo->execute();
     }
 
+    // ok QBuilder
     public function login(Parameter $post) : array
     {
-        $sql = 'SELECT user.id, user.pseudo, user.password, user_status.name as status_name, user_role.name as role_name
-                FROM user
-                INNER JOIN user_role ON user.role_id = user_role.id
-                INNER JOIN user_status ON user.status_id = user_status.id
-                WHERE user.pseudo = :pseudo';
-        $data = $this->createQuery($sql, ['pseudo' => $post->get('pseudo')]);
-        $result = $data->fetch();
-        $passwordValid = password_verify($post->get('password'), $result['password']);
-        if($passwordValid && $result['status_name'] !== "banned"){
-            $sql = 'UPDATE user 
-                    SET status_id = 2 
-                    WHERE pseudo = :pseudo';
-            $this->createQuery($sql, ['pseudo' => $post->get('pseudo')]);
-        }
-        return [
-            'result' => $result,
-            'passwordValid' => $passwordValid
-        ];
+        $this->query = (new QueryBuilder()) ->statement('select')
+                                            ->select('u.id','pseudo','password',
+                                            's.name as status_name',
+                                            'r.name as role_name')
+                                            ->table('user', 'u')
+                                            ->innerJoin(['r' => 'user_role'],'u.role_id = r.id')
+                                            ->innerJoin(['s' => 'user_status'],'u.status_id = s.id')
+                                            ->where('u.pseudo = :pseudo');
+        return $this->createQuery($this->query, ['pseudo' => $post->get('pseudo')])->fetch(PDO::FETCH_ASSOC);
     }
 
+    // ok QBuilder
     public function logout(int $userId) : void
     {
-        $sql ='UPDATE user
-               SET status_id = 1
-               WHERE id = :id
-               AND status_id != 3' ;
-        $this->createQuery($sql, ['id' => $userId]);
+        $this->query = (new QueryBuilder()) ->statement('update')
+                                            ->table('user')
+                                            ->set('status_id = 1')
+                                            ->where('id = :id')
+                                            ->where('status_id != 3');
+        $this->createQuery((string)$this->query, ['id' => $userId]);
     }
 
+    // ok QBuilder
     public function countUsers(array $parameters = []) : int
     {
-        $where = "WHERE";
-
-        extract($parameters);
-
-        $sql = 'SELECT COUNT(user.id) FROM user 
-                INNER JOIN user_role ON user.role_id = user_role.id
-                INNER JOIN user_status ON user.status_id = user_status.id';
+        $this->query = (new QueryBuilder()) ->statement('select')
+                                            ->count(1)
+                                            ->table('user', 'u')
+                                            ->innerJoin(['r' => 'user_role'],'u.role_id = r.id')
+                                            ->innerJoin(['s' => 'user_status'],'u.status_id = s.id');
         
-        if(isset($q)){
-            $sql .= ' ' . $where . ' user.pseudo LIKE "%' . $q . '%"';
-            $where = "AND";
-        }
+        $parameters = $this->addParameters($parameters);
 
-        if(isset($scoreHigherThan)){
-            $sql .= ' ' . $where . ' user.score > "' . $scoreHigherThan . '"' ;
-            $where = "AND";
-        }
-
-        if(isset($scoreLowerThan)){
-            $sql .= ' ' . $where . ' user.score < "' . $scoreLowerThan . '"';
-        }
-
-        if(!isset($allUserStatus)){
-            if(isset($online) || isset($offline) || isset($banned)){
-                $or = "";
-                $sql .= ' ' . $where . ' (' ;
-                if(isset($online)){
-                    $sql .= ' user_status.name = "online"';
-                    $or = " OR ";
-                }
-                if(isset($offline)){
-                    $sql .= $or . ' user_status.name = "offline"';
-                    $or = " OR ";
-                }
-                if(isset($banned)){
-                    $sql .= $or . ' user_status.name = "banned"';
-                }
-                $sql .= ')';
-                $where = "AND";
-            }
-        }
-
-        if(!isset($allUserRoles)){
-            if(isset($admin) || isset($moderator) || isset($editor) || isset($user)){
-                $or = "";
-                $sql .= ' ' . $where . ' (' ;
-                if(isset($admin)){
-                    $sql .= ' user_role.name = "admin"';
-                    $or = " OR ";
-                }
-                if(isset($moderator)){
-                    $sql .= $or . ' user_role.name = "moderator"';
-                    $or = " OR ";
-                }
-                if(isset($editor)){
-                    $sql .= $or . ' user_role.name = "editor"';
-                    $or = " OR ";
-                }
-                if(isset($user)){
-                    $sql .= $or . ' user_role.name = "user"';
-                }
-                $sql .= ')';
-                $where = "AND";
-            }
-        }
-
-        if(isset($beforeDatetime)){
-            $sql .= ' ' . $where . ' user.created_at < "' . $beforeDatetime . '"' ;
-            $where = "AND";
-        }
-
-        if(isset($afterDatetime)){
-            $sql .= ' ' . $where . ' user.created_at > "' . $afterDatetime . '"';
-        }
-
-        $result = $this->createQuery($sql);
+        $result = $this->createQuery((string)$this->query,$parameters);
         return $result->fetch(\PDO::FETCH_NUM)[0];
     }
 
+    // ok QBuilder
     public function getUsers(array $parameters = []) : array
     {
-        $where = "WHERE";
+        $this->query = $this->selectUsers();
 
-        extract($parameters);
+        $parameters = $this->addParameters($parameters);
 
-        $sql = 'SELECT user.id, user.created_at, user.firstname, user.lastname, user.pseudo, user.email, user.phone, user.score, user.status_id, user.role_id,
-                user_status.name as status_name,
-                user_role.name as role_name
-                FROM user
-                INNER JOIN user_role ON user.role_id = user_role.id
-                INNER JOIN user_status ON user.status_id = user_status.id';
-
-        if(isset($q)){
-            $sql .= ' ' . $where . ' user.pseudo LIKE "%' . $q . '%"';
-            $where = "AND";
-        }
-
-        if(isset($scoreHigherThan)){
-            $sql .= ' ' . $where . ' user.score > "' . $scoreHigherThan . '"' ;
-            $where = "AND";
-        }
-
-        if(isset($scoreLowerThan)){
-            $sql .= ' ' . $where . ' user.score < "' . $scoreLowerThan . '"';
-        }
-
-        if(!isset($allUserStatus)){
-            if(isset($online) || isset($offline) || isset($banned)){
-                $or = "";
-                $sql .= ' ' . $where . ' (' ;
-                if(isset($online)){
-                    $sql .= ' user_status.name = "online"';
-                    $or = " OR ";
-                }
-                if(isset($offline)){
-                    $sql .= $or . ' user_status.name = "offline"';
-                    $or = " OR ";
-                }
-                if(isset($banned)){
-                    $sql .= $or . ' user_status.name = "banned"';
-                }
-                $sql .= ')';
-                $where = "AND";
-            }
-        }
-
-        if(!isset($allUserRoles)){
-            if(isset($admin) || isset($moderator) || isset($editor) || isset($user)){
-                $or = "";
-                $sql .= ' ' . $where . ' (' ;
-                if(isset($admin)){
-                    $sql .= ' user_role.name = "admin"';
-                    $or = " OR ";
-                }                
-                if(isset($moderator)){
-                    $sql .= $or . ' user_role.name = "moderator"';
-                    $or = " OR ";
-                }
-                if(isset($editor)){
-                    $sql .= $or . ' user_role.name = "editor"';
-                    $or = " OR ";
-                }
-                if(isset($user)){
-                    $sql .= $or . ' user_role.name = "user"';
-                }
-                $sql .= ')';
-                $where = "AND";
-            }
-        }
-        
-        if(isset($beforeDatetime)){
-            $sql .= ' ' . $where . ' user.created_at < "' . $beforeDatetime . '"' ;
-            $where = "AND";
-        }
-
-        if(isset($afterDatetime)){
-            $sql .= ' ' . $where . ' user.created_at > "' . $afterDatetime . '"';
-        }
-        
-        if(isset($orderby)){
-            $sql .= ' ORDER BY created_at ' . $orderby;
-        } else {
-            $sql .= ' ORDER BY created_at DESC';
-        }
-
-        if(isset($limit)){
-            $sql .= " LIMIT $limit";
-            if(isset($offset)){
-                $sql .= " OFFSET $offset";
-            }
-        }
-
-        $result = $this->createQuery($sql);
+        $result = $this->createQuery((string)$this->query,$parameters);
         $users = [];
         foreach ($result as $row){
             $userId = $row['id'];
@@ -301,5 +159,101 @@ class UserDAO extends DAO
         }
         $result->closeCursor();
         return $users;
+    }
+
+    // ok QBuilder
+    private function addParameters(array $parameters = []) : array
+    {
+        if(isset($parameters['q'])){
+            $this->query->where('u.pseudo LIKE "%' . htmlentities($parameters['q']) . '%"');
+            unset($parameters['q']);
+        }
+        
+        if(isset($parameters['scoreHigherThan'])){
+            $this->query->where('u.score > :scoreHigherThan');
+        }
+        
+        if(isset($parameters['scoreLowerThan'])){
+            $this->query->where('u.score < :scoreLowerThan');
+        }
+        
+        if(isset($parameters['online']) || isset($parameters['offline']) || isset($parameters['banned'])){
+            $conditions = [];
+            if(isset($parameters['online'])){
+                $conditions[] = 's.name = :online';
+                $parameters['online'] = 'online';
+            }
+            if(isset($parameters['offline'])){
+                $conditions[] = 's.name = :offline';
+                $parameters['offline'] = 'offline';
+            }
+            if(isset($parameters['banned'])){
+                $conditions[] = 's.name = :banned';
+                $parameters['banned'] = 'banned';
+            }
+            $this->query->subWhere(join(' OR ', $conditions));
+        }
+        
+        if(isset($parameters['admin']) || isset($parameters['moderator']) || isset($parameters['editor']) || isset($parameters['user'])){
+            $conditions = [];
+            if(isset($parameters['admin'])){
+                $conditions[] = 'r.name = :admin';
+                $parameters['admin'] = 'admin';
+            }
+            if(isset($parameters['moderator'])){
+                $conditions[] = 'r.name = :moderator';
+                $parameters['moderator'] = 'moderator';
+            }
+            if(isset($parameters['editor'])){
+                $conditions[] = 'r.name = :editor';
+                $parameters['editor'] = 'editor';
+            }
+            if(isset($parameters['user'])){
+                $conditions[] = 'r.name = :user';
+                $parameters['user'] = 'user';
+            }
+            $this->query->subWhere(join(' OR ', $conditions));
+        }
+        
+        // Common
+
+        if(isset($parameters['beforeDatetime'])){
+           $this->query->where('u.created_at < :beforeDatetime');
+        }
+        
+        if(isset($parameters['afterDatetime'])){
+            $this->query->where('u.created_at > :afterDatetime');
+        }
+
+        if(isset($parameters['orderBy'])){
+            $this->query->orderBy($parameters['orderBy']);
+            unset($parameters['orderBy']);
+        } else {
+            $this->query->orderBy(['column'=>'u.created_at','order'=>'DESC']);
+            unset($parameters['orderBy']);
+        }
+
+        if(isset($parameters['limit'])){
+            $this->query->limit($parameters['limit']);
+            unset($parameters['limit']);
+            if(isset($parameters['offset'])){
+                $this->query->offset($parameters['offset']);
+                unset($parameters['offset']);
+            }
+        }
+
+        return $parameters;
+    }
+
+    // ok QBuilder
+    private function selectUsers() : QueryBuilder
+    {
+        return (new QueryBuilder()) ->statement('select')
+                                    ->select('u.id','u.created_at', 'u.firstname', 'u.lastname', 'u.pseudo', 'u.email', 'u.phone', 'u.score', 'u.status_id', 'u.role_id',
+                                    's.name as status_name',
+                                    'r.name as role_name')
+                                    ->table('user', 'u')
+                                    ->innerJoin(['r' => 'user_role'],'u.role_id = r.id')
+                                    ->innerJoin(['s' => 'user_status'],'u.status_id = s.id');
     }
 }

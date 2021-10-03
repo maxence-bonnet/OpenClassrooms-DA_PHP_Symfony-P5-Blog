@@ -62,7 +62,15 @@
 
         <div class="container-fluid mt-3" id="content">
 
-            {{ session.messages() | raw }}
+            <div class="container">
+
+            {% for message in session.use('messages') %}
+
+                {{ message.getAlertMessage() | raw }}          
+                
+            {% endfor %}
+
+            </div>
 
             {% block content %}
 
@@ -79,7 +87,7 @@
 
                     <a href="?route=administration" class="ms-auto p-2 d-flex text-decoration-none"><i class='bx bxs-crown fs-3' ></i> Administration </a>
 
-                    <span class="d-inline-block p-2"> Généré en {{ (1000*("now" | date('U.u') - constant('PAGE_GENERATING_TIME'))) | round }} ms <i class='bx bxl-php'></i></span>
+                    <span class="d-inline-block p-2"> Généré en {{ (1000*("now" | date('U.u') - constant('PAGE_GENERATING_TIME'))) | round }} ms <i class='bx-fw bx bxl-php'></i></span>
 
                 {% endif %}
 

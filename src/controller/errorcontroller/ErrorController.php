@@ -1,6 +1,9 @@
 <?php
 
-namespace App\src\controller;
+namespace App\src\controller\errorcontroller;
+
+use App\src\controller\Controller;
+use Exception;
 
 class ErrorController extends Controller
 {
@@ -14,8 +17,9 @@ class ErrorController extends Controller
         return $this->view->renderTwig('error404');
     }
 
-    public function errorServer()
+    public function errorServer(Exception $e)
     {
-        return $this->view->renderTwig('error500');
+        $data['message'] = $e->getMessage();
+        return $this->view->renderTwig('error500',$data);
     }
 }

@@ -7,6 +7,7 @@ use App\config\Parameter;
 class Validation
 {
     protected $constraint;
+    protected $requiredFields;
     protected $errors = [];
 
     public function __construct()
@@ -39,14 +40,26 @@ class Validation
     {
         foreach ($post->all() as $key => $value) {
             $this->checkField($key, $value);
+            $this->updateRequiredFields($key);
+        }
+        // check if all required fields has been found & cleared from array
+        if(!empty($this->requiredFields)){
+            $this->addError('missingField',1);
         }
         return $this->errors;
+    }
+
+    protected function updateRequiredFields($key) : void
+    {
+        if(in_array($key,$this->requiredFields)){
+            unset($this->requiredFields[array_search($key,$this->requiredFields)]);
+        }
     }
 
     protected function addError($name, $error) {
         if($error) {
             $this->errors += [
-                $name => $error
+                $name => '<div class="invalid-feedback">' . $error . '</div>'
             ];
         }
     }

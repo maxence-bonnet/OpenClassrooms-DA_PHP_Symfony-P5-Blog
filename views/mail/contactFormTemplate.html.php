@@ -59,12 +59,12 @@
       <table role="presentation" border="0" bgcolor="#c1cbd4" cellpadding="0" cellspacing="10px" style="padding: 20px 20px 20px 30px;" width="100%">
         <tr>
           <td>
-            <h2> Nouveau message de : <?= $firstname ?> <?= $lastname ?></h2>
+            <h2> Nouveau message de : <?= htmlspecialchars($firstname) ?> <?= htmlspecialchars($lastname) ?></h2>
             <p>
-              <a class="subtle-link" href="#"><span class="entity">&#9993; </span> <?= $this->getUserEmail() ?> </a>
+              <a class="subtle-link" href="#"><span class="entity">&#9993; </span> <?= htmlspecialchars($this->getUserEmail()) ?> </a>
             </p>
             <p>
-              <?= $this->getMessage() ?> 
+              <?= htmlspecialchars($this->getMessage()) ?> 
             </p>
           </td> 
         </tr>

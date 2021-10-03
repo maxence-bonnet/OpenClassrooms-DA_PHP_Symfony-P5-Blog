@@ -11,19 +11,27 @@ class Parameter
         $this->parameter = $parameter;
     }
 
-    public function get($name)
+    /**
+     * @param $key
+     * @return mixed
+     */
+    public function get($key)
     {
-        if(isset($this->parameter[$name]))
-        {
-            return $this->parameter[$name];
-        }
-    }
-    
-    public function set($name, $value)
-    {
-        $this->parameter[$name] = $value;
+        return isset($this->parameter[$key]) ? $this->parameter[$key] : null;
     }
 
+    /**
+     * @param $key, $value
+     * @return void
+     */    
+    public function set($key, $value)
+    {
+        $this->parameter[$key] = $value;
+    }
+
+    /**
+     * @return Parameter
+     */
     public function all()
     {
         return $this->parameter;

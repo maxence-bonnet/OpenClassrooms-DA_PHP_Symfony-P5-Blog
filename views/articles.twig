@@ -30,7 +30,7 @@
                             <div class="card-body">
                                 <h5 class="card-title">{{ link.link(article.getTitle(), "?route=article&articleId=" ~ article.getId()) }}</h5>
                                 <p class="card-text">{{ article.getLedeExcerpt() }}</p>
-                                {{ link.link(article.getAuthorPseudo(),'?route=profile&userId=' ~ article.getAuthorId(), { class : 'text-decoration-none' }) }}
+                                <span>auteur : {{ link.link(article.getAuthorPseudo(),'?route=profile&userId=' ~ article.getAuthorId(), { class : 'text-decoration-none' }) }}</span>
                             </div>
                             <div class="card-footer">
                                 <small class="text-muted">

@@ -69,7 +69,7 @@ class Article extends Model
     private $statusName;
 
     /**
-     * @var boolean
+     * @var int
      */
     private $allowComment;
 
@@ -145,7 +145,7 @@ class Article extends Model
     public function getStatusName(){return $this->statusName;}
 
     /**
-     * @return boolean
+     * @return int
      */
     public function getAllowComment(){return $this->allowComment;}
 
@@ -211,7 +211,7 @@ class Article extends Model
     public function setStatusName($statusName){$this->statusName = $statusName;}
 
     /**
-     * @param boolean $allowComment
+     * @param int $allowComment
      */
     public function setAllowComment($allowComment){$this->allowComment = $allowComment;}
 }

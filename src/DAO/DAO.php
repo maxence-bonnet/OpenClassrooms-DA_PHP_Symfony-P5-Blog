@@ -3,12 +3,15 @@
 namespace App\src\DAO;
 
 use PDO;
+use PDOStatement;
 use Exception;
 
 abstract class DAO
 {
     private $connection;
-
+    
+    protected $query;
+    
     private function checkConnection()
     {
         if($this->connection === null) {
@@ -25,7 +28,7 @@ abstract class DAO
             return $this->connection;
         }
         catch(Exception $connectionError) {
-            die('Erreur lors de la connexion à la base de données : ' . $connectionError->getMessage());
+            throw new Exception ('Erreur lors de la connexion à la base de données : ' . $connectionError->getMessage());
         }
     }
     
@@ -38,5 +41,10 @@ abstract class DAO
         }
         $result = $this->checkConnection()->query($sql);
         return $result;
+    }
+
+    protected function prepareQuery(string $sql) : PDOStatement
+    {
+        return $this->checkConnection()->prepare($sql);
     }
 }

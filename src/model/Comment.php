@@ -45,7 +45,7 @@ class Comment extends Model
     private $content;
 
     /**
-     * @var boolean
+     * @var int
      */
     private $validated;    
 
@@ -105,7 +105,7 @@ class Comment extends Model
     public function getContent(){return $this->content;}
 
     /**
-     * @return boolean
+     * @return int
      */
     public function getValidated(){return $this->validated;}
 
@@ -156,7 +156,7 @@ class Comment extends Model
     public function setContent($content){$this->content = $content;}
 
     /**
-     * @param boolean $validated
+     * @param int $validated
      */
     public function setValidated($validated){$this->validated = $validated;}
 

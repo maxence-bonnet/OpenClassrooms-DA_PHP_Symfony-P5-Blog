@@ -39,7 +39,7 @@
                             SelectAuthor : {
                                 type : 'select',
                                 label : 'De l\'auteur',
-                                name : 'userId',
+                                name : 'authorId',
                                 dataList : users,
                                 options : {
                                     genericOption : {
@@ -47,7 +47,21 @@
                                         name : ''
                                         },
                                     labelPosition : 'ms-2',
-                                    selected : get.get('userId'),
+                                    selected : get.get('authorId'),
+                                    }
+                                },
+                            SelectCategory: {
+                                type : 'select',
+                                label : 'Catégorie',
+                                name : 'categoryId',
+                                dataList : categories,
+                                options : {
+                                    genericOption : {
+                                        value : '',
+                                        name : ''
+                                        },
+                                    labelPosition : 'ms-2',
+                                    selected : get.get('categoryId'),
                                     }
                                 } 
                             })
@@ -140,12 +154,15 @@
     </div>
     <div class="row">
         <div class="col">
+        {% if articles is not empty %}   
         <h5>{{ pageArticlesCount }} / {{ totalArticlesCount }} Résultat(s) - Page {{ page }} / {{ pages }}</h5>
+        {% endif %}
             <table class="adminTable table table-striped table-hover table-dark text-center">
                 <thead>
                     <tr>                    
                         <th> Titre </th>
                         <th> Auteur </th>
+                        <th> Catégorie </th>
                         <th> Date de création </th>
                         <th> Modifier L'article </th>
                         <th> Statut </th>
@@ -159,6 +176,8 @@
                             <td> {{ link.link(article.getTitle(), '?route=article&articleId=' ~ article.getId()) }} </td>
 
                             <td> {{ link.link(article.getAuthorPseudo(), '?route=profile&userId=' ~ article.getAuthorId()) }} </td>
+
+                            <td> {{ article.getCategoryName() is not same as(null) and article.getCategoryName() is not same as("aucune") ? article.getCategoryName() : "aucune" }} </td>
 
                             <td> {{ article.getFormatedDate(article.getCreatedAt()) }} </td>
 
@@ -186,7 +205,7 @@
                         </tr>
                     {% endfor %}
                     {% if articles is empty %}
-                        <td colspan="7" class="text-center">
+                        <td colspan="8" class="text-center">
                             Aucun article correspondant à la recherche
                         </td>
                     {% endif %}

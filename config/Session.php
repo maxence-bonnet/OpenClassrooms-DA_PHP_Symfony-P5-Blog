@@ -6,66 +6,62 @@ use App\src\utils\AlertMessage;
 
 class Session
 {
-    private $session;
+    public $session;
 
     public function __construct($session)
     {
         $this->session = $session;
     }
 
-    public function set($name, $value)
+    public function set($name, $value) : void
     {
         $_SESSION[$name] = $value;
+        $this->session[$name] = $value;     
     }
 
-    public function get($name)
-    {
-        if(isset($_SESSION[$name])){
-            return $_SESSION[$name];
-        }
-    }
-
-    public function use($name)
-    {
-        if(isset($_SESSION[$name])){
-            $key = $this->get($name);
-            $this->remove($name);
-            return $key;
-        }
-    }
-
-    public function remove($name)
+    public function remove($name) : void
     {
         unset($_SESSION[$name]);
     }
 
-    public function addMessage(string $type, string $message) : void
+    public function get($key) : mixed
     {
-        $_SESSION['messages'][] = new AlertMessage($type,$message);
+        return isset($this->session[$key]) ? $this->session[$key] : null;
     }
 
-    public function messages()
+    /**
+     * Return $value for the given $key then delete $key
+     * 
+     * @param $key
+     * @return mixed
+     */
+    public function use($key)
     {
-        if(isset($_SESSION['messages'])){
-            foreach($_SESSION['messages'] as $key => $alertMessage){
-                echo $alertMessage->getAlertMessage();     
-            }
-            $this->removeMessages();
+        if($this->get($key)){
+            $value = $this->get($key);
+            $this->remove($key);
+            return $value;
         }
     }
 
-    public function removeMessages()
+    /**
+     * Add new message to be displayed later (kind of a notification)
+     * 
+     * @param $type, $message
+     * @return void
+     */
+    public function addMessage(string $type, string $message)// : void
     {
-        unset($_SESSION['messages']);
+        $this->set('messages', array(new AlertMessage($type,$message)));
+        return $this->session;
     }
 
-
-    public function start()
+    public function start() : void
     {
         session_start();
     }
     
-    public function stop()
+    public function stop() : void
     {
         session_destroy();
     }

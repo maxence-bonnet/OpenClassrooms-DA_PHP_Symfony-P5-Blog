@@ -6,14 +6,23 @@ use App\config\Parameter;
 
 class CommentValidation extends Validation
 {
+    public function __construct()
+    {
+        parent::__construct();
+        $this->requiredFields = ['comment','answer'];
+    }
+    
     public function checkField($name, $value)
     {
         if ($name === 'comment' || $name === 'answer') {
             $error = $this->checkComment($name, $value);
             $this->addError($name, $error);
+            // comment can be either 'answer' or 'comment', need to clear both if one is received
+            if($name === 'comment'){
+                unset($this->requiredFields[array_search('answer',$this->requiredFields)]);
+            }
+            unset($this->requiredFields[array_search('comment',$this->requiredFields)]);
         }
-        
-        // Add required fields
     }
 
     public function checkComment($name, $value)
