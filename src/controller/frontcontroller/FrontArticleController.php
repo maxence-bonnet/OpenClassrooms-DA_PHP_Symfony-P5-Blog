@@ -11,7 +11,6 @@ class FrontArticleController extends FrontController
     private $parameters;
     private $data;
 
-    // ok QBuilder
     public function articles(Parameter $get)
     {
         $this->parameters = $this->getCleanParameters($get->all(),'article');
@@ -43,6 +42,8 @@ class FrontArticleController extends FrontController
 
         $this->data['articles'] = $this->articleDAO->getArticles($this->parameters);
 
+        $this->data['withCountCategories'] = $this->articleDAO->countByCategory();
+
         $this->data['pageArticlesCount'] = count($this->data['articles']);
 
         $this->data['previousPageURL'] = $this->data['page'] > 1 ? URL::mergeOn($this->get->all(),['page' => $this->data['page'] - 1]) . "#resultsTable" : null;
@@ -51,7 +52,6 @@ class FrontArticleController extends FrontController
         return $this->view->renderTwig('articles', $this->data);
     }
 
-    // ok QBuilder
     public function article(Parameter $get)
     {
         $article = $this->articleDAO->getArticle((int)$get->get('articleId'));

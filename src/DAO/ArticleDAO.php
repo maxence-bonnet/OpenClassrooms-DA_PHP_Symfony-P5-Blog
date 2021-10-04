@@ -57,6 +57,22 @@ class ArticleDAO extends DAO
         return $result->fetch(\PDO::FETCH_NUM)[0];
     }    
 
+    public function countByCategory() : array
+    {
+        $this->query = (new QueryBuilder()) ->statement('select')
+                                            ->count('1' ,'count')
+                                            ->select('c.name','c.id')
+                                            ->table('article as a')
+                                            ->leftJoin(['c' => 'category'],'a.category_id = c.id')
+                                            ->groupBy('c.id')
+                                            ->orderBy(['column'=>'count','order'=>'DESC']);
+        $result = $this->createQuery((string)$this->query)->fetchAll(\PDO::FETCH_ASSOC);
+        if(!$result){
+            return [];
+        }
+        return $result;                                  
+    }
+
     /**
      *  Returns list of articles, selection options
      */

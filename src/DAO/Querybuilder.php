@@ -12,6 +12,7 @@ class QueryBuilder
     private $table;
     private $join;
     private $where;
+    private $groupBy;
     private $orderBy;
     private $limit;
     private $offset;
@@ -79,7 +80,9 @@ class QueryBuilder
 
     public function select(string ...$fields) : self
     {
-        $this->select = $fields;
+        foreach($fields as $field){
+            $this->select[] = $field;
+        }
         return $this;
     }
 
@@ -109,9 +112,13 @@ class QueryBuilder
         return $this;        
     }
 
-    public function count(string $field) : self
+    public function count(string $field, string $alias = null) : self
     {
-        $this->select = ["COUNT($field)"];
+        if($alias){
+            $this->select[] = "COUNT($field) as $alias";
+        } else {
+            $this->select[] = "COUNT($field)";
+        }
         return $this;
     }
 
@@ -124,6 +131,12 @@ class QueryBuilder
     public function subWhere(string $condition) : self
     {
         $this->where[] = "(" . $condition . ")";
+        return $this;
+    }
+
+    public function groupBy(string ...$rows) : self
+    {
+        $this->groupBy = $rows;
         return $this;
     }
 
@@ -180,6 +193,10 @@ class QueryBuilder
                     $parts[] = "AND";
                 }
             }          
+        }
+        if($this->groupBy){
+            $parts[] = "GROUP BY";
+            $parts[] = join(', ', $this->groupBy);
         }
         if($this->orderBy){
             $parts[] = $this->orderBy;
