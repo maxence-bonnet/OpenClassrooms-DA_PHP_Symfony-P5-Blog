@@ -6,11 +6,32 @@ use App\Src\Utils\AlertMessage;
 
 class Session
 {
+    const REFRESH_INTERVAL = 7200; // 2 hours
+
     public $session;
 
     public function __construct($session)
     {
         $this->session = $session;
+        $this->checkRefresh();
+    }
+
+    private function checkRefresh()
+    {
+        if ($this->get('refreshed') && $this->get('refreshed') + self::REFRESH_INTERVAL < time()) {
+            $this->refreshSessId();
+        }
+    }
+
+    private function refreshSessId()
+    {
+        $previousSessId = session_id();
+        $result = session_regenerate_id();
+        if (!$result) {
+            session_id($previousSessId);
+            return;
+        }
+        $this->set('refreshed', time());
     }
 
     public function set($name, $value) : void
@@ -62,6 +83,7 @@ class Session
     
     public function stop() : void
     {
+        session_unset();
         session_destroy();
     }
 }
