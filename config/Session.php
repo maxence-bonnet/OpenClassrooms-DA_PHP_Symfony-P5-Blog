@@ -1,8 +1,8 @@
 <?php
 
-namespace App\config;
+namespace App\Config;
 
-use App\src\utils\AlertMessage;
+use App\Src\Utils\AlertMessage;
 
 class Session
 {
@@ -37,7 +37,7 @@ class Session
      */
     public function use($key)
     {
-        if($this->get($key)){
+        if ($this->get($key)) {
             $value = $this->get($key);
             $this->remove($key);
             return $value;
@@ -50,10 +50,9 @@ class Session
      * @param $type, $message
      * @return void
      */
-    public function addMessage(string $type, string $message)// : void
+    public function addMessage(string $type, string $message) : void
     {
         $this->set('messages', array(new AlertMessage($type,$message)));
-        return $this->session;
     }
 
     public function start() : void

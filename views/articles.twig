@@ -20,25 +20,35 @@
                     {% else %}
                         <h5>{{ pageArticlesCount }} / {{ totalArticlesCount }} Résultat(s) - Page {{ page }} / {{ pages }}</h5>
                         {% for article in articles %}
-                            <div class="col-sm-4">
+                            <div class="col-12 col-lg-4 col-sm-6">
                                 <div class="card my-2 shadow">
                                     <div class="card-body">
                                         <h5 class="card-title">{{ link.link(article.getTitle(), "?route=article&articleId=" ~ article.getId()) }}</h5>
                                         <p class="card-text">{{ article.getLedeExcerpt() }}</p>
-                                        <span>auteur : {{ link.link(article.getAuthorPseudo(),'?route=profile&userId=' ~ article.getAuthorId(), { class : 'text-decoration-none' }) }}</span>
+                                        <div class="d-flex justify-content-between">
+                                            <div>
+                                                auteur : {{ link.link(article.getAuthorPseudo(),'?route=profile&userId=' ~ article.getAuthorId(), {class: 'text-decoration-none'}) }}
+                                                <br>
+                                                catégorie : {{ link.link(article.getCategoryName() |capitalize, '?route=articles&categoryId=' ~ article.getCategoryId(), {class: 'text-decoration-none'}) }}
+                                            </div>
+                                            <div class="mt-auto">
+                                                {{ link.buttonLink('Voir l\'article', "?route=article&articleId=" ~ article.getId()) }}
+                                            </div>
+                                        </div>
+                
                                     </div>
                                     <div class="card-footer">
                                         <small class="text-muted">
                                         Créé le {{ article.getFormatedDate(article.getCreatedAt()) }}
-                                        {% if article.getCreatedAt() < article.getLastModified() %}
-                                        <small class=" fw-lighter fst-italic"> (modifié) </small>
-                                        {% endif %}
                                         <span> | </span>
                                         Statut :    {% if article.getStatusId() is same as("1") %}
                                                         <i class='bx bx-check-circle'></i> Public
                                                     {% elseif article.getStatusId() is same as("2") %}
                                                         <i class='bx bxs-mask' ></i> Privé
-                                                    {% endif %}  
+                                                    {% endif %} 
+                                        {% if article.getCreatedAt() < article.getLastModified() %}
+                                            <br><small class=" fw-lighter fst-italic"> (dernière modification {{ article.getFormatedDate(article.getLastModified()) }})</small>
+                                        {% endif %} 
                                         </small>
                                     </div>
                                 </div>
@@ -50,7 +60,7 @@
                             {% endif %}
 
                             {% if nextPageURL %}
-                                {{ link.buttonLink('Page suivante ❯', nextPageURL,{ position : 'ms-auto'}) }}
+                                {{ link.buttonLink('Page suivante ❯', nextPageURL, {position: 'ms-auto'}) }}
                             {% endif %}
                         </div>
                     {% endif %}
@@ -59,15 +69,15 @@
         <div id="sideBar" class="col-12 col-lg-3  border-start">
             <div class="form">
                 <form method="get">
-                {{ form.hiddenInput('route', { value : 'articles'}) }}
-                {{ form.input('text','Rechercher <i class="bx-fw bx bx-search-alt-2"></i>','q', { placeholder : '...', value : get.get('q') }) }}
+                {{ form.hiddenInput('route', {value: 'articles'}) }}
+                {{ form.input('text','Rechercher <i class="bx-fw bx bx-search-alt-2"></i>','q', {placeholder: '...', value: get.get('q')}) }}
                 </form>
             </div>  
             <h2>Les catégories</h2>
             <ul class="list-group">
                 {% for category in withCountCategories %}
                 <li class="list-group-item d-flex justify-content-between align-items-center">
-                    {{ link.link(category.name ? category.name | capitalize : 'Aucune' , "?route=articles&categoryId=" ~ category.id ?: "ezrzer") }}
+                    {{ link.link(category.name ? category.name |capitalize : 'Aucune' , "?route=articles&categoryId=" ~ category.id, {class: 'text-decoration-none'}) }}
                     <span class="badge bg-primary rounded-pill">{{ category.count}}</span>
                 </li>
                 {% endfor %}

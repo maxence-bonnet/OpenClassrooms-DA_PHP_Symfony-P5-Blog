@@ -11,9 +11,9 @@
 
         {{ title }}
 
-        {{ link.buttonLink('<i class=\'bx bx-redo\'></i> Les commentaires','?route=adminComments', { position : 'ms-auto my-auto'}) }}
+        {{ link.buttonLink('<i class=\'bx bx-redo\'></i> Les commentaires','?route=adminComments', {position: 'ms-auto my-auto'}) }}
 
-        {{ link.buttonLink('<i class=\'bx bx-redo\'></i> Les utilisateurs','?route=adminUsers', { position : 'mx-2 my-auto'}) }}
+        {{ link.buttonLink('<i class=\'bx bx-redo\'></i> Les utilisateurs','?route=adminUsers', {position: 'mx-2 my-auto'}) }}
 
     </h1>
 </section>
@@ -24,44 +24,44 @@
         <div class="col-md-12">
             <form method="get" class="mb-3">
 
-                {{ form.hiddenInput('route', { value : 'adminArticles'}) }}
+                {{ form.hiddenInput('route', {value: 'adminArticles'}) }}
 
                 <div class="row">                    
                     <div class="col-lg-9">
                         {{ form.inputGroup({
-                            textQ : {
-                                type : 'text',
-                                label : 'Article contenant',
-                                name : 'q',
-                                value : get.get('q'),
-                                placeholder : '...'
+                            textQ: {
+                                type: 'text',
+                                label: 'Article contenant',
+                                name: 'q',
+                                value: get.get('q'),
+                                placeholder: '...'
                                 },
-                            SelectAuthor : {
-                                type : 'select',
-                                label : 'De l\'auteur',
-                                name : 'authorId',
-                                dataList : users,
-                                options : {
-                                    genericOption : {
-                                        value : '',
-                                        name : ''
+                            selectAuthor: {
+                                type: 'select',
+                                label: 'De l\'auteur',
+                                name: 'authorId',
+                                dataList: users,
+                                options: {
+                                    genericOption: {
+                                        value: '',
+                                        name: '- Tous -'
                                         },
-                                    labelPosition : 'ms-2',
-                                    selected : get.get('authorId'),
+                                    labelPosition: 'ms-2',
+                                    selected: get.get('authorId'),
                                     }
                                 },
-                            SelectCategory: {
-                                type : 'select',
-                                label : 'Catégorie',
-                                name : 'categoryId',
-                                dataList : categories,
-                                options : {
-                                    genericOption : {
-                                        value : '',
-                                        name : ''
+                            selectCategory: {
+                                type: 'select',
+                                label: 'Catégorie',
+                                name: 'categoryId',
+                                dataList: categories,
+                                options: {
+                                    genericOption: {
+                                        value: '',
+                                        name: '- Tous les articles -'
                                         },
-                                    labelPosition : 'ms-2',
-                                    selected : get.get('categoryId'),
+                                    labelPosition: 'ms-2',
+                                    selected: get.get('categoryId'),
                                     }
                                 } 
                             })
@@ -72,18 +72,18 @@
                 <div class="row">                    
                     <div class="col-lg-9">
                         {{ form.inputGroup({
-                            datetimeAfterDatetime : {
-                                type : 'datetime-local',
-                                label : 'Après',
-                                name : 'afterDatetime',
-                                value : get.get('afterDatetime'),
+                            datetimeAfterDatetime: {
+                                type: 'datetime-local',
+                                label: 'Après',
+                                name: 'afterDatetime',
+                                value: get.get('afterDatetime'),
                                 },
-                            datetimeBeforeDatetime : {
-                                type : 'datetime-local',
-                                label : 'Avant',
-                                name : 'beforeDatetime',
-                                value : get.get('beforeDatetime'),
-                                options : { labelPosition : 'ms-lg-2' }                        
+                            datetimeBeforeDatetime: {
+                                type: 'datetime-local',
+                                label: 'Avant',
+                                name: 'beforeDatetime',
+                                value: get.get('beforeDatetime'),
+                                options: {labelPosition: 'ms-lg-2'}                        
                                 }
                             })
                         }}
@@ -93,37 +93,37 @@
                 <div class="row">                    
                     <div class="col-lg-9">
                         {{ form.inputGroup({
-                            checkboxStatusPublished : {
-                                type : 'checkbox',
-                                label : 'Publiés',
-                                name : 'published',
-                                id : 'published',
-                                value : 'on',
-                                checked : get.get('published')
+                            checkboxStatusPublished: {
+                                type: 'checkbox',
+                                label: 'Publiés',
+                                name: 'published',
+                                id: 'published',
+                                value: 'on',
+                                checked: get.get('published')
                                 },
-                            checkboxStatusPrivate : {
-                                type : 'checkbox',
-                                label : 'Privés',
-                                name : 'private',
-                                id : 'private',
-                                value : 'on',
-                                checked : get.get('private')                                
+                            checkboxStatusPrivate: {
+                                type: 'checkbox',
+                                label: 'Privés',
+                                name: 'private',
+                                id: 'private',
+                                value: 'on',
+                                checked: get.get('private')                                
                                 },
-                            checkboxStatusStandby : {
-                                type : 'checkbox',
-                                label : 'En attente avant publication',
-                                name : 'standby',
-                                id : 'standby',
-                                value : 'on',
-                                checked : get.get('standby')                                
+                            checkboxStatusStandby: {
+                                type: 'checkbox',
+                                label: 'En attente avant publication',
+                                name: 'standby',
+                                id: 'standby',
+                                value: 'on',
+                                checked: get.get('standby')                                
                                 },
-                            checkboxStatusAll : {
-                                type : 'checkbox',
-                                label : 'Tous',
-                                name : 'all',
-                                id : 'all',
-                                value : 'on',
-                                checked : get.get('all')                                
+                            checkboxStatusAll: {
+                                type: 'checkbox',
+                                label: 'Tous',
+                                name: 'all',
+                                id: 'all',
+                                value: 'on',
+                                checked: get.get('all')                                
                                 }
                             })
                         }}
@@ -133,14 +133,14 @@
                 <div class="row">                    
                     <div class="col-lg-6">
                         {{ form.inputGroup({
-                            SelectLimit : {
-                                type : 'select',
-                                label : 'Résultats par page',
-                                name : 'limit',
-                                dataList : limits,
-                                options : {
-                                    selected : get.get('limit'),
-                                    default : "20"
+                            SelectLimit: {
+                                type: 'select',
+                                label: 'Résultats par page',
+                                name: 'limit',
+                                dataList: limits,
+                                options: {
+                                    selected: get.get('limit'),
+                                    default: "20"
                                     }
                                 } 
                             })
@@ -193,11 +193,11 @@
                                     {% endif %} </td>
                             <td>
                                 {% if article.getStatusId() is same as("1") %}
-                                    {{ link.link('Publier en privé', '?route=updateArticleStatus&articleId=' ~ article.getId() ~ '&statusId=2') }}<span> | </span>{{ link.link('Suspendre la publication', '?route=updateArticleStatus&articleId=' ~ article.getId() ~ '&statusId=3') }}
+                                    {{ link.link('Privé', '?route=updateArticleStatus&articleId=' ~ article.getId() ~ '&statusId=2') }}<span> | </span>{{ link.link('Suspendren', '?route=updateArticleStatus&articleId=' ~ article.getId() ~ '&statusId=3') }}
                                 {% elseif article.getStatusId() is same as("2") %}
-                                    {{ link.link('Publier en public', '?route=updateArticleStatus&articleId=' ~ article.getId() ~ '&statusId=1') }}<span> | </span>{{ link.link('Suspendre la publication', '?route=updateArticleStatus&articleId=' ~ article.getId() ~ '&statusId=3') }}
+                                    {{ link.link('Public', '?route=updateArticleStatus&articleId=' ~ article.getId() ~ '&statusId=1') }}<span> | </span>{{ link.link('Suspendre', '?route=updateArticleStatus&articleId=' ~ article.getId() ~ '&statusId=3') }}
                                 {% elseif article.getStatusId() is same as("3") %}
-                                    {{ link.link('Publier en public', '?route=updateArticleStatus&articleId=' ~ article.getId() ~ '&statusId=1') }}<span> | </span>{{ link.link('Publier en privé', '?route=updateArticleStatus&articleId=' ~ article.getId() ~ '&statusId=2') }}
+                                    {{ link.link('Public', '?route=updateArticleStatus&articleId=' ~ article.getId() ~ '&statusId=1') }}<span> | </span>{{ link.link('Privé', '?route=updateArticleStatus&articleId=' ~ article.getId() ~ '&statusId=2') }}
                                 {% endif %}                           
                             </td>
 
@@ -205,9 +205,11 @@
                         </tr>
                     {% endfor %}
                     {% if articles is empty %}
-                        <td colspan="8" class="text-center">
-                            Aucun article correspondant à la recherche
-                        </td>
+                        <tr>
+                            <td colspan="8" class="text-center">
+                                Aucun article correspondant à la recherche
+                            </td>
+                        </tr>
                     {% endif %}
                 </tbody>
             </table>
@@ -216,10 +218,11 @@
                     {{ link.buttonLink('❮ Page précédente', previousPageURL) }}
                 {% endif %}
                 {% if nextPageURL %}
-                    {{ link.buttonLink('Page suivante ❯', nextPageURL,{ position : 'ms-auto'}) }}
+                    {{ link.buttonLink('Page suivante ❯', nextPageURL,{position : 'ms-auto'}) }}
                 {% endif %}
             </div>
-        </div>    
+        </div>
+    </div>
 </section>
 
 {% endblock %}

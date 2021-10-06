@@ -7,7 +7,7 @@
 {% block content %}
 
 <section class="container shadow-lg p-2 mb-4">
-    <h2 class="d-flex">Commentaires en attente de validation <i class='bx bxs-comment-check mx-3'></i>{{ link.buttonLink('<i class=\'bx bx-redo\'></i> Section Commentaires', '?route=adminComments', { position : 'ms-auto'}) }}</h2>
+    <h2 class="d-flex">Commentaires en attente de validation <i class='bx bxs-comment-check mx-3'></i>{{ link.buttonLink('<i class=\'bx bx-redo\'></i> Section Commentaires', '?route=adminComments', {position: 'ms-auto'}) }}</h2>
     <div class="row">
         <div class="col">
             <table class="adminTable table table-striped table-hover table-dark text-center">
@@ -40,17 +40,20 @@
                     </tr>
                 {% endfor %}
                 {% if comments is empty %}
-                    <td colspan="6" class="text-center">
-                        Aucun nouveau commentaire à valider
-                    </td>
+                    <tr>
+                        <td colspan="6" class="text-center">
+                            Aucun nouveau commentaire à valider
+                        </td>
+                    </tr>
                 {% endif %}
                 </tbody>
             </table>
-        </div>    
+        </div>   
+    </div> 
 </section>
 
 <section class="container shadow-lg p-2 mb-4">
-    <h2 class="d-flex">Les articles <i class='bx bx-book-open mx-3' ></i>{{ link.buttonLink('<i class=\'bx bx-redo\'></i> Section Articles', '?route=adminArticles', { position : 'ms-auto'}) }}</h2>
+    <h2 class="d-flex">Les articles <i class='bx bx-book-open mx-3' ></i>{{ link.buttonLink('<i class=\'bx bx-redo\'></i> Section Articles', '?route=adminArticles', {position: 'ms-auto'}) }}</h2>
     <div class="row">
         <div class="col">
             <table class="adminTable table table-striped table-hover table-dark text-center">
@@ -108,7 +111,7 @@
 </section>
 
 <section class="container shadow-lg p-2 mb-4">
-    <h2 class="d-flex">Les utilisateurs <i class='bx bxs-user-account mx-3'></i>{{ link.buttonLink('<i class=\'bx bx-redo\'></i> Section Utilisateurs', '?route=adminUsers', { position : 'ms-auto'}) }}</h2>
+    <h2 class="d-flex">Les utilisateurs <i class='bx bxs-user-account mx-3'></i>{{ link.buttonLink('<i class=\'bx bx-redo\'></i> Section Utilisateurs', '?route=adminUsers', {position: 'ms-auto'}) }}</h2>
     <div class="row">
         <div class="col">
             <table class="adminTable table table-striped table-hover table-dark text-center">
@@ -171,7 +174,7 @@
                                 <td>
                                     {% if user.getRoleId() is same as("1") %}
 
-                                        {{ link.link('<i class=\'bx bx-crown\' ></i>','#', { class : 'mx-auto'}) }}
+                                        {{ link.link('<i class=\'bx bx-crown\' ></i>','#', {class: 'mx-auto'}) }}
 
                                     {% else %}
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\config;
+namespace App\Config;
 
 class Parameter
 {
@@ -12,7 +12,7 @@ class Parameter
     }
 
     /**
-     * @param $key
+     * @param  $key
      * @return mixed
      */
     public function get($key)
@@ -21,10 +21,10 @@ class Parameter
     }
 
     /**
-     * @param $key, $value
+     * @param  $key, $value
      * @return void
      */    
-    public function set($key, $value)
+    public function set($key, $value) : void
     {
         $this->parameter[$key] = $value;
     }
@@ -32,7 +32,7 @@ class Parameter
     /**
      * @return Parameter
      */
-    public function all()
+    public function all() : array
     {
         return $this->parameter;
     }

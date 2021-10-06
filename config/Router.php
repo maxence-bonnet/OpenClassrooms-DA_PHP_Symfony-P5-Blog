@@ -1,16 +1,20 @@
 <?php
 
-namespace App\config;
+namespace App\Config;
 
-use App\src\controller\frontcontroller\{FrontController,
-                                        FrontArticleController,
-                                        FrontCommentController,
-                                        FrontUserController};
-use App\src\controller\backcontroller\{ BackAdminController,
-                                        BackArticleController,
-                                        BackCommentController,
-                                        BackUserController};
-use App\src\controller\errorcontroller\ErrorController;
+use App\Src\Controller\FrontController\{
+    FrontController,
+    FrontArticleController,
+    FrontCommentController,
+    FrontUserController
+};
+use App\Src\Controller\BackController\{
+    BackAdminController,
+    BackArticleController,
+    BackCommentController,
+    BackUserController
+};
+use App\Src\Controller\ErrorController\ErrorController;
 use Exception;
 
 class Router
@@ -27,7 +31,7 @@ class Router
         $route = $this->request->getGet()->get('route');
         try{
             if(isset($route)){
-                switch($route){
+                switch ($route) {
                     case 'home' :
                         (new FrontController())->home($this->request->getPost());
                         break;
@@ -103,9 +107,7 @@ class Router
             } else {
                 (new FrontController())->home($this->request->getPost());
             }
-        }
-        catch (Exception $error)
-        {
+        } catch (Exception $error) {
             (new ErrorController())->errorServer($error);
         }
     }

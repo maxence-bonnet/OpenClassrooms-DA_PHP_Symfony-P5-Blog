@@ -46,6 +46,13 @@ Order allow,deny
 Allow from all
 </FilesMatch>
 
+
+# Allow access to insersion.php
+<FilesMatch "^insersion.php$">
+Order allow,deny
+Allow from all
+</FilesMatch>
+
 # Allow access to CV.pdf
 <FilesMatch "^CV.pdf$">
 Order allow,deny

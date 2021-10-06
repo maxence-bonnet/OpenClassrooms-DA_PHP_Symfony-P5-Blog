@@ -1,9 +1,9 @@
 <?php
 
-namespace App\src\model;
+namespace App\Src\Service;
 
-use App\config\Parameter;
-use App\src\utils\Text;
+use App\Config\Parameter;
+use App\Src\Utils\Text;
 
 class Mailer
 {

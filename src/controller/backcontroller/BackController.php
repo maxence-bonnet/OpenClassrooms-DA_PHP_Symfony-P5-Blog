@@ -1,8 +1,8 @@
 <?php
 
-namespace App\src\controller\backcontroller;
+namespace App\Src\Controller\BackController;
 
-use App\src\controller\Controller;
+use App\Src\Controller\Controller;
 
 abstract class BackController extends Controller
 {
@@ -13,7 +13,7 @@ abstract class BackController extends Controller
     {
         $this->checkLoggedIn();
 
-        if(!($this->session->get('role') === 'admin')){
+        if (!($this->session->get('role') === 'admin')) {
             $this->session->addMessage('danger', 'Vous n\'avez pas le droit d\'accéder à cette page');
             $this->http->redirect('?');
         }
@@ -22,7 +22,7 @@ abstract class BackController extends Controller
     protected function buildLimitsList() : array
     {
         $i = 0;
-        foreach($this->limitArray as $limit){  
+        foreach ($this->limitArray as $limit) {  
             $list[$i]['value'] = (string)$limit;
             $list[$i]['name'] = (string)$limit;
             $i ++;
@@ -34,7 +34,7 @@ abstract class BackController extends Controller
     {
         $articlesList = $this->articleDAO->getArticles();
         $i = 0;
-        foreach($articlesList as $article){  
+        foreach ($articlesList as $article) {  
             $list[$i]['value'] = $article->getId();
             $list[$i]['name'] = $article->getTitle();
             $i ++;
@@ -46,7 +46,7 @@ abstract class BackController extends Controller
     {
         $users = $this->userDAO->getUsers();
         $i = 0;
-        foreach($users as $user){  
+        foreach ($users as $user) {  
             $list[$i]['value'] = $user->getId();
             $list[$i]['name'] = $user->getPseudo();
             $i ++;
@@ -58,9 +58,9 @@ abstract class BackController extends Controller
     {
         $categories = $this->categoryDAO->getCategories();
         $i = 0;
-        foreach($categories as $category){
+        foreach ($categories as $category) {
             $list[$i]['value'] = $category->getId();
-            $list[$i]['name'] = $category->getName();
+            $list[$i]['name'] = ucfirst($category->getName());
             $i ++;
         }
         return $list ? $list : [];

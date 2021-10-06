@@ -1,6 +1,6 @@
 <?php
 
-namespace App\src\model;
+namespace App\Src\Model;
 
 class Comment extends Model
 {
@@ -57,7 +57,7 @@ class Comment extends Model
 
     public function getExcerptContent()
     {
-        if($this->content === null){
+        if ($this->content === null) {
             return null;
         }
         return $this->getExcerpt($this->content, 20);
