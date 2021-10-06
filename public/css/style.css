@@ -1,16 +1,16 @@
 .adminTable a {
-    color:#fff;
-    text-decoration:none;
-    transition: color 0.3s;
-    padding: 2px;
+    color : #fff;
+    text-decoration : none;
+    transition : color 0.3s;
+    padding : 2px;
 }
 
 .adminTable a:hover {
-    color:rgba(211, 211, 211, 0.808);
+    color : rgba(211, 211, 211, 0.808);
 }
 
 .selected {
-    color: #664d03;
-    background-color: #fff3cd;
-    border-color: #ffecb5;
+    color : #664d03;
+    background-color : #fff3cd;
+    border-color : #ffecb5;
 }

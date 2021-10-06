@@ -4,7 +4,7 @@
 
 {% block content %}
 
-<section class="container mb-3">
+<section class="container-fluid container-md mb-3">
     <div class="row justify-content-md-center">
         <div class="col shadow">
             <h1> Maxence Bonnet</h1>
@@ -20,24 +20,24 @@
     </div>
 </section>
 
-<section class="container mb-3">
+<section class="container-fluid container-md mb-3">
     <div class="row justify-content-md-center">
-        <div class="col-6 shadow-lg">
+        <div class="col-md-6 shadow-lg">
             <h4 class="text-center text-md-start">Formulaire de contact</h4>
             <form method="post">
                 <div class="row">
 
-                    {{ form.input('text','Votre nom','lastname', { errors : errors.lastname, value : post.get('lastname'), placeholder : 'Dupont', help : { text : '', limit : '0/60' } }) }}
+                    {{ form.input('text', 'Votre nom', 'lastname', {errors: errors.lastname, value: post.get('lastname'), placeholder: 'Dupont', help: {text: '', limit: '0/60'}}) }}
 
-                    {{ form.input('text','Votre prénom','firstname', { errors : errors.firstname, value : post.get('firstname'), placeholder : 'Jean',  help : { text : '', limit : '0/60' } }) }}
+                    {{ form.input('text', 'Votre prénom', 'firstname', {errors: errors.firstname, value: post.get('firstname'), placeholder: 'Jean',  help: {text: '', limit: '0/60'} }) }}
 
                 </div>
 
-                {{ form.input('mail','Votre email','email', { errors : errors.email, value : post.get('email'), placeholder : 'exemple@monmail.com'}) }}
+                {{ form.input('email', 'Votre email', 'email', {errors: errors.email, value: post.get('email')}) }}
                 
-                {{ form.textarea('Votre message','message', 'message',{ errors : errors.message, value : post.get('message'), placeholder : '...', help : { text : '20 caractères minimum :', limit : '0/500' } }) }}
+                {{ form.textarea('Votre message', 'message', 'message',{errors: errors.message, value: post.get('message'), placeholder: '...', help: {text: '20 caractères minimum :', limit: '0/500'}}) }}
 
-                {{ form.submit('Envoyer', { position : 'mx-auto'}) }}    
+                {{ form.submit('Envoyer', {position: 'mx-auto'}) }}    
             </form>
         </div>
     </div>
@@ -52,4 +52,5 @@
     firstnameInput.addEventListener("keyup", () => countChars(firstnameInput,"firstnameContentHelp",60));
     messageTextarea.addEventListener("keyup", () => countChars(messageTextarea,"messageContentHelp",500));
 </script>
+
 {% endblock %}

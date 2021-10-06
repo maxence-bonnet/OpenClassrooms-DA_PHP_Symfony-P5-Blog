@@ -4,39 +4,39 @@
 
 {% block content %}
 
-<section class="container mb-3">
+<section class="container-fluid container-md mb-3">
     <div class="row justify-content-md-center">
-        <div class="col-8 shadow-lg">
+        <div class="col-md-8 shadow-lg">
             <h4 class="text-center text-md-start">Formulaire d'inscription</h4>
             <form method="post">
                 <div class="row">
 
-                    {{ form.input('text','Votre nom*','lastname',{ errors : errors.lastname, value : post.get('lastname'), placeholder : 'Dupont', help : { text : '60 caractères maximum :', limit : '0/60' }, required : true }) }}
+                    {{ form.input('text', 'Votre nom*', 'lastname', {errors: errors.lastname, value: post.get('lastname'), placeholder: 'Dupont', help: {text: '60 caractères maximum :', limit: '0/60'}, required: true}) }}
 
-                    {{ form.input('text','Votre prénom*','firstname',{ errors : errors.firstname, value : post.get('firstname'), placeholder : 'Jean', help : { text : '60 caractères maximum :', limit : '0/60' }, required : true }) }}
+                    {{ form.input('text', 'Votre prénom*', 'firstname', { errors: errors.firstname, value: post.get('firstname'), placeholder: 'Jean', help: {text: '60 caractères maximum :', limit: '0/60'}, required: true}) }}
                 
                 </div>
                 
                 <div class="row">
 
-                    {{ form.input('text','Votre pseudo*','pseudo',{ errors : errors.pseudo, value : post.get('pseudo'), placeholder : 'JeanJean', help : { text : 'Identifiant / pseudo unique<br>60 caractères maximum :', limit : '0/60' }, required : true }) }}
+                    {{ form.input('text', 'Votre pseudo*', 'pseudo', {errors: errors.pseudo, value: post.get('pseudo'), placeholder: 'JeanJean', help: { text: 'Identifiant / pseudo unique<br>60 caractères maximum :', limit: '0/60'}, required: true}) }}
                 
-                    {{ form.input('email','Votre email','email',{ errors : errors.email, value : post.get('email'), placeholder : 'exemple@monmail.com', required : true }) }}
+                    {{ form.input('email', 'Votre email', 'email', {errors: errors.email, value: post.get('email'), placeholder: 'exemple@monmail.com', required: true}) }}
 
                 </div>
 
                 <div class="row">
 
-                    {{ form.input('password','Votre mot de passe*','password',{ errors : errors.password, help : { text : '1 chiffre, 1 majuscule, 1 caratère spécial et 8 caractères minimum', limit : '0/60' }, pattern : '(?=.*[^A-Za-z\\d])(?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{8,}', required : true }) }}
+                    {{ form.input('password', 'Votre mot de passe*', 'password1', {errors: errors.password, help: {text: '1 chiffre, 1 majuscule, 1 caratère spécial et 8 caractères minimum', limit: '0/60'}, pattern: '(?=.*[^A-Za-z\\d])(?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{8,}', required: true}) }}
 
-                    {{ form.input('password','Confirmer le mot de passe*','password2',{ errors : errors.password2, pattern : '(?=.*[^A-Za-z\\d])(?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{8,}', required : true }) }}
+                    {{ form.input('password', 'Confirmer le mot de passe*', 'password2', {errors: errors.password2, pattern: '(?=.*[^A-Za-z\\d])(?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{8,}', required: true}) }}
 
                 </div>
 
                 
-                {{ form.input('phone','Votre numéro de téléphone','phone',{ col : 'col-md-5', errors : errors.phone, value : post.get('phone'), placeholder : '0612345678', pattern : '[0-9]', help : { text : '', limit : '0/10' } }) }}
+                {{ form.input('tel', 'Votre numéro de téléphone', 'phone', {col: 'col-md-5', errors: errors.phone, value: post.get('phone'), placeholder: '0612345678', pattern: '[0-9]{10}', help: { text: '', limit: '0/10'}}) }}
 
-                {{ form.submit('Valider', { position : 'mx-auto'}) }} 
+                {{ form.submit('Valider', {position: 'mx-auto'}) }} 
 
             </form>
         </div>
@@ -56,4 +56,5 @@
     passwordInput.addEventListener("keyup", () => countChars(passwordInput,"passwordContentHelp",60));
     phoneInput.addEventListener("keyup", () => countChars(phoneInput,"phoneContentHelp",10));
 </script>
+
 {% endblock %}

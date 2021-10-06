@@ -1,15 +1,16 @@
 <?php
 
-namespace App\src\DAO;
+namespace App\Src\DAO;
 
-use App\config\Parameter;
-use App\src\model\Article;
+use App\Config\Parameter;
+use App\Src\Model\Article;
 
 class ArticleDAO extends DAO
 {
     private function buildObject(array $row) : Article
     {
         $article = new Article();
+        
         $article->setId($row['id']);
         $article->setCreatedAt($row['created_at']);
         $article->setLastModified($row['last_modified']);
@@ -23,6 +24,7 @@ class ArticleDAO extends DAO
         $article->setStatusId($row['status_id']);
         $article->setStatusName($row['status_name']);
         $article->setAllowComment($row['allow_comment']);
+        
         return $article;
     }
 
@@ -35,7 +37,7 @@ class ArticleDAO extends DAO
         $result = $this->createQuery((string)$this->query, ['articleId' => $articleId]);
         $article = $result->fetch();
         $result->closeCursor();
-        if($article){
+        if ($article) {
             $article = $this->buildObject($article);
         }
         return $article;
@@ -43,31 +45,42 @@ class ArticleDAO extends DAO
     
     public function countArticles(array $parameters = []) : int
     {
-        $this->query = (new QueryBuilder()) ->statement('select')
-                                            ->count(1)
-                                            ->table('article', 'a')
-                                            ->innerJoin(['u' => 'user'], 'a.author_id = u.id')
-                                            ->leftJoin(['c' => 'category'], 'a.category_id = c.id')
-                                            ->innerJoin(['s' => 'article_status'], 'a.status_id = s.id');
-
+        $this->query = (new QueryBuilder()) 
+            ->statement('select')
+            ->count(1)
+            ->table('article', 'a')
+            ->innerJoin(['u' => 'user'], 'a.author_id = u.id')
+            ->leftJoin(['c' => 'category'], 'a.category_id = c.id')
+            ->innerJoin(['s' => 'article_status'], 'a.status_id = s.id');
 
         $parameters = $this->addParameters($parameters);
 
         $result = $this->createQuery((string)$this->query,$parameters);
+
         return $result->fetch(\PDO::FETCH_NUM)[0];
     }    
 
-    public function countByCategory() : array
+    public function countByCategory(array $parameters = []) : array
     {
-        $this->query = (new QueryBuilder()) ->statement('select')
-                                            ->count('1' ,'count')
-                                            ->select('c.name','c.id')
-                                            ->table('article as a')
-                                            ->leftJoin(['c' => 'category'],'a.category_id = c.id')
-                                            ->groupBy('c.id')
-                                            ->orderBy(['column'=>'count','order'=>'DESC']);
-        $result = $this->createQuery((string)$this->query)->fetchAll(\PDO::FETCH_ASSOC);
-        if(!$result){
+        if (isset($parameters['categoryId'])) {
+            unset($parameters['categoryId']);
+        }
+ 
+        $this->query = (new QueryBuilder())
+            ->statement('select')
+            ->count('1' ,'count')
+            ->select('c.name','c.id')
+            ->table('article as a')
+            ->innerJoin(['s' => 'article_status'], 'a.status_id = s.id')
+            ->leftJoin(['c' => 'category'],'a.category_id = c.id')
+            ->groupBy('c.id')
+            ->orderBy(['column'=>'count','order'=>'DESC']);
+
+        $parameters = $this->addParameters($parameters);
+
+        $result = $this->createQuery((string)$this->query,$parameters)->fetchAll(\PDO::FETCH_ASSOC);
+
+        if (!$result) {
             return [];
         }
         return $result;                                  
@@ -83,12 +96,16 @@ class ArticleDAO extends DAO
         $parameters = $this->addParameters($parameters);
 
         $result = $this->createQuery((string)$this->query,$parameters);
+
         $articles = [];
-        foreach ($result as $row){
+
+        foreach ($result as $row) {
             $articleId = $row['id'];
             $articles[$articleId] = $this->buildObject($row);
         }
+
         $result->closeCursor();
+
         return $articles;
     }
 
@@ -97,17 +114,21 @@ class ArticleDAO extends DAO
      */
     public function addArticle(Parameter $post) : void
     {
-        $this->query = (new QueryBuilder()) ->statement('insert')
-                                            ->table('article')
-                                            ->insertValues(['created_at' => ':createdAt',
-                                                            'last_modified' => ':lastModified',
-                                                            'title' => ':title',
-                                                            'lede' => ':lede',
-                                                            'content' => ':content',
-                                                            'author_id' => ':authorId',
-                                                            'category_id' => ':categoryId',
-                                                            'status_id' => ':statusId',
-                                                            'allow_comment' => ':allowComment']);
+        $this->query = (new QueryBuilder()) 
+            ->statement('insert')
+            ->table('article')
+            ->insertValues([
+                'created_at' => ':createdAt',
+                'last_modified' => ':lastModified',
+                'title' => ':title',
+                'lede' => ':lede',
+                'content' => ':content',
+                'author_id' => ':authorId',
+                'category_id' => ':categoryId',
+                'status_id' => ':statusId',
+                'allow_comment' => ':allowComment'
+            ]);
+
         $pdo = $this->prepareQuery((string)$this->query);
         $pdo->bindValue(':createdAt', $post->get('createdAt'));
         $pdo->bindValue(':lastModified', null);
@@ -118,6 +139,7 @@ class ArticleDAO extends DAO
         $pdo->bindValue(':categoryId', (int)$post->get('categoryId'));
         $pdo->bindValue(':statusId', (int)$post->get('statusId'));
         $pdo->bindValue(':allowComment', (int)$post->get('allowComment'));
+
         $pdo->execute();                      
     }
 
@@ -126,26 +148,32 @@ class ArticleDAO extends DAO
      */
     public function editArticle(Parameter $post,int $articleId) : void
     {
-        $this->query = (new QueryBuilder()) ->statement('update')
-                                            ->table('article')
-                                            ->set('last_modified = :lastModified',
-                                                    'title = :title',
-                                                    'lede=:lede',
-                                                    'content = :content',
-                                                    'author_id = :authorId',
-                                                    'category_id = :categoryId',
-                                                    'status_id = :statusId',
-                                                    'allow_comment = :allowComment');
-        if($post->get('createdAt')){
+        $this->query = (new QueryBuilder()) 
+            ->statement('update')
+            ->table('article')
+            ->set(
+                'last_modified = :lastModified',
+                'title = :title',
+                'lede=:lede',
+                'content = :content',
+                'author_id = :authorId',
+                'category_id = :categoryId',
+                'status_id = :statusId',
+                'allow_comment = :allowComment'
+            );
+
+        if ($post->get('createdAt')) {
             $this->query->set('created_at = :createdAt');
         }
+        
         $this->query->where('id = :articleId');
 
         $pdo = $this->prepareQuery((string)$this->query);
 
-        if($post->get('createdAt')){
+        if ($post->get('createdAt')) {
             $pdo->bindValue(':createdAt', $post->get('createdAt'));
-        }        
+        }
+
         $pdo->bindValue(':lastModified', $post->get('lastModified'));
         $pdo->bindValue(':title', $post->get('title'));
         $pdo->bindValue(':lede', $post->get('lede'));
@@ -155,18 +183,22 @@ class ArticleDAO extends DAO
         $pdo->bindValue(':statusId', (int)$post->get('statusId'));
         $pdo->bindValue(':allowComment', (int)$post->get('allowComment'));
         $pdo->bindValue(':articleId', $articleId);
+
         $pdo->execute();
     }
 
     public function updateArticleStatus(array $parameters) : void
     {
-        $this->query = (new QueryBuilder()) ->statement('update')
-                                            ->table('article')
-                                            ->set('status_id = :statusId')
-                                            ->where('id = :articleId');                                        
-        if(isset($parameters['createdAt'])){
+        $this->query = (new QueryBuilder()) 
+            ->statement('update')
+            ->table('article')
+            ->set('status_id = :statusId')
+            ->where('id = :articleId');      
+
+        if (isset($parameters['createdAt'])) {
             $this->query->set('created_at = :createdAt');
         }
+
         $this->createQuery((string)$this->query,$parameters);
     }
 
@@ -176,61 +208,62 @@ class ArticleDAO extends DAO
     public function deleteArticle(int $articleId) : void
     {
         $parameters['articleId'] = $articleId;
-        $this->query = (new QueryBuilder()) ->statement('delete')
-                                            ->table('comment')
-                                            ->where('article_id = :articleId');
+        $this->query = (new QueryBuilder()) 
+            ->statement('delete')
+            ->table('comment')
+            ->where('article_id = :articleId');
+
         $this->createQuery((string)$this->query,$parameters);
-        $this->query = (new QueryBuilder()) ->statement('delete')
-                                            ->table('article')
-                                            ->where('id = :articleId');
+
+        $this->query = (new QueryBuilder()) 
+            ->statement('delete')
+            ->table('article')
+            ->where('id = :articleId');
+
         $this->createQuery((string)$this->query,$parameters);
     }
 
     private function addParameters(array $parameters = []) : array
     {
-        if(isset($parameters['q'])){
+        if (isset($parameters['q'])) {
             $this->query->subWhere('a.content LIKE "%' . htmlentities($parameters['q']) . '%" OR a.lede LIKE "%' . htmlentities($parameters['q']) . '%" OR a.title LIKE "%' . htmlentities($parameters['q']) . '%" OR u.pseudo LIKE "%' . htmlentities($parameters['q']) . '%"');
             unset($parameters['q']);
         }
 
-        if(isset($parameters['authorId'])){
+        if (isset($parameters['authorId'])) {
             $this->query->where('a.author_id = :authorId');
         }
 
-        if(isset($parameters['categoryId'])){
+        if (isset($parameters['categoryId'])) {
             $this->query->where('a.category_id = :categoryId');
         }
 
-        if(isset($parameters['published']) || isset($parameters['private']) || isset($parameters['standby'])){
+        if (isset($parameters['published']) || isset($parameters['private']) || isset($parameters['standby'])) {
             $conditions = [];
-            if(isset($parameters['published'])){
+            if (isset($parameters['published'])) {
                 $conditions[] = 's.name = :published';
                 $parameters['published'] = 'published';
             }
-            if(isset($parameters['private'])){
+            if (isset($parameters['private'])) {
                 $conditions[] = 's.name = :private';
                 $parameters['private'] = 'private';
             }
-            if(isset($parameters['standby'])){
+            if (isset($parameters['standby'])) {
                 $conditions[] = 's.name = :standby';
                 $parameters['standby'] = 'standby';
             }
             $this->query->subWhere(join(' OR ', $conditions));
         }
 
-
-
-        // Common
-
-        if(isset($parameters['beforeDatetime'])){
+        if (isset($parameters['beforeDatetime'])) {
             $this->query->where('a.created_at < :beforeDatetime');
         }
         
-        if(isset($parameters['afterDatetime'])){
+        if (isset($parameters['afterDatetime'])) {
             $this->query->where('a.created_at > :afterDatetime');
         }
 
-        if(isset($parameters['orderBy'])){
+        if (isset($parameters['orderBy'])) {
             $this->query->orderBy($parameters['orderBy']);
             unset($parameters['orderBy']);
         } else {
@@ -238,10 +271,10 @@ class ArticleDAO extends DAO
             unset($parameters['orderBy']);
         }
 
-        if(isset($parameters['limit'])){
+        if (isset($parameters['limit'])) {
             $this->query->limit($parameters['limit']);
             unset($parameters['limit']);
-            if(isset($parameters['offset'])){
+            if (isset($parameters['offset'])) {
                 $this->query->offset($parameters['offset']);
                 unset($parameters['offset']);
             }
@@ -252,14 +285,22 @@ class ArticleDAO extends DAO
 
     private function selectArticles() : QueryBuilder
     {
-        return (new QueryBuilder()) ->statement('select')
-                                    ->select('a.id', 'a.created_at', 'a.last_modified', 'a.title', 'a.lede', 'a.content', 'a.author_id', 'a.category_id', 'a.status_id', 'a.allow_comment',
-                                    'u.pseudo as author_pseudo',
-                                    'c.name as category_name',
-                                    's.name as status_name')
-                                    ->table('article', 'a')
-                                    ->innerJoin(['u' => 'user'], 'a.author_id = u.id')
-                                    ->leftJoin(['c' => 'category'], 'a.category_id = c.id')
-                                    ->innerJoin(['s' => 'article_status'], 'a.status_id = s.id');
+        return (new QueryBuilder()) 
+            ->statement('select')
+            ->select(
+                'a.id',
+                'a.created_at',
+                'a.last_modified',
+                'a.title', 'a.lede',
+                'a.content', 'a.author_id',
+                'a.category_id', 'a.status_id',
+                'a.allow_comment',
+                'u.pseudo as author_pseudo',
+                'c.name as category_name','s.name as status_name'
+            )
+            ->table('article', 'a')
+            ->innerJoin(['u' => 'user'], 'a.author_id = u.id')
+            ->leftJoin(['c' => 'category'], 'a.category_id = c.id')
+            ->innerJoin(['s' => 'article_status'], 'a.status_id = s.id');
     }
 }

@@ -1,10 +1,10 @@
 <?php
 
-namespace App\src\controller\backcontroller;
+namespace App\Src\Controller\BackController;
 
-use App\config\Parameter;
-use App\src\controller\Controller;
-use App\src\utils\URL;
+use App\Config\Parameter;
+use App\Src\Controller\Controller;
+use App\Src\Utils\URL;
 
 class BackAdminController extends BackController
 {
@@ -50,11 +50,11 @@ class BackAdminController extends BackController
         $this->data['get'] = $get;
 
         $this->parameters['limit'] = $this->defaultLimit ;
-        if(in_array((int)$get->get('limit'),$this->limitArray)){
+        if (in_array((int)$get->get('limit'),$this->limitArray)) {
             $this->parameters['limit'] = $get->get('limit');
         }
 
-        if(isset($this->parameters['validated']) && $this->parameters['validated'] === 'all'){
+        if (isset($this->parameters['validated']) && $this->parameters['validated'] === 'all') {
             unset($this->parameters['validated']);
         }
 
@@ -62,7 +62,7 @@ class BackAdminController extends BackController
 
         $this->data['pages'] = ceil($this->data['totalCommentsCount']/$this->parameters['limit']);
 
-        if($this->data['page'] <= $this->data['pages'] && $this->data['page'] > 1){
+        if ($this->data['page'] <= $this->data['pages'] && $this->data['page'] > 1) {
             $this->parameters['offset'] = $this->parameters['limit']*($this->data['page'] - 1);     
         } else {
             $this->data['page'] = 1;
@@ -98,11 +98,11 @@ class BackAdminController extends BackController
         $this->data['get'] = $get;
 
         $this->parameters['limit'] = $this->defaultLimit ;
-        if(in_array((int)$get->get('limit'),$this->limitArray)){
+        if (in_array((int)$get->get('limit'),$this->limitArray)) {
             $this->parameters['limit'] = $get->get('limit');
         }
         
-        if(isset($this->parameters['all'])){
+        if (isset($this->parameters['all'])) {
             unset($this->parameters['published']);
             unset($this->parameters['private']);
             unset($this->parameters['standby']);
@@ -113,7 +113,7 @@ class BackAdminController extends BackController
 
         $this->data['pages'] = ceil($this->data['totalArticlesCount']/$this->parameters['limit']);
 
-        if($this->data['page'] <= $this->data['pages'] && $this->data['page'] > 1){
+        if ($this->data['page'] <= $this->data['pages'] && $this->data['page'] > 1) {
             $this->parameters['offset'] = $this->parameters['limit']*($this->data['page'] - 1);     
         } else {
             $this->data['page'] = 1;
@@ -149,18 +149,18 @@ class BackAdminController extends BackController
         $this->data['get'] = $get;
 
         $this->parameters['limit'] = $this->defaultLimit ;
-        if(in_array((int)$get->get('limit'),$this->limitArray)){
+        if (in_array((int)$get->get('limit'),$this->limitArray)) {
             $this->parameters['limit'] = $get->get('limit');
         }
 
-        if(isset($this->parameters['allUserStatus'])){
+        if (isset($this->parameters['allUserStatus'])) {
             unset($this->parameters['online']);
             unset($this->parameters['offline']);
             unset($this->parameters['banned']);
             unset($this->parameters['allUserStatus']);
         }
 
-        if(isset($this->parameters['allUserRoles'])){
+        if (isset($this->parameters['allUserRoles'])) {
             unset($this->parameters['admin']);
             unset($this->parameters['moderator']);
             unset($this->parameters['editor']);
@@ -172,7 +172,7 @@ class BackAdminController extends BackController
 
         $this->data['pages'] = ceil($this->data['totalUsersCount']/$this->parameters['limit']);
 
-        if($this->data['page'] <= $this->data['pages'] && $this->data['page'] > 1){
+        if ($this->data['page'] <= $this->data['pages'] && $this->data['page'] > 1) {
             $this->parameters['offset'] = $this->parameters['limit']*($this->data['page'] - 1);     
         } else {
             $this->data['page'] = 1;

@@ -1,9 +1,8 @@
 <?php
 
-namespace App\src\model;
+namespace App\Src\Model;
 
-use App\src\utils\Text;
-use App\src\utils\Date;
+use App\Src\Utils\{Text, Date};
 
 class Model
 {
@@ -14,7 +13,7 @@ class Model
 
     public function getFormatedDate($date)
     {
-        if($date !== null){
+        if ($date !== null) {
             return Date::formatedDate($date);            
         }
         return null;

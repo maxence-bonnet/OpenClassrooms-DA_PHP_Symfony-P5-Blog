@@ -1,6 +1,7 @@
 <?php
 
-namespace App\src\DAO;
+namespace App\Src\DAO;
+
 use Exception;
 
 class QueryBuilder
@@ -33,14 +34,15 @@ class QueryBuilder
                 $this->statement = 'DELETE';    
                 break;
             default :
-                throw new Exception ('Syntax error in statement declaration');
+                throw new Exception('Syntax error in statement declaration');
         }
+
         return $this;
     }
 
     public function table(string $table, ?string $alias = null) : self
     {
-        if($alias){
+        if ($alias) {
             $this->table[$alias] = $table;
         } else {
             $this->table[] = $table;
@@ -51,8 +53,8 @@ class QueryBuilder
     private function eachTable() : string
     {
         $tables = [];
-        foreach($this->table as $key => $value){
-            if(is_string($key)){
+        foreach ($this->table as $key => $value) {
+            if (is_string($key)) {
                 $tables[] = "$value as $key";
             } else {
                 $tables[] = $value;
@@ -63,7 +65,7 @@ class QueryBuilder
 
     public function insertValues(array $insertValues) : self
     {
-        foreach($insertValues as $key => $value){
+        foreach ($insertValues as $key => $value) {
             $inColumns[] = $key;
             $values[] = $value;
         }
@@ -80,7 +82,7 @@ class QueryBuilder
 
     public function select(string ...$fields) : self
     {
-        foreach($fields as $field){
+        foreach ($fields as $field) {
             $this->select[] = $field;
         }
         return $this;
@@ -88,8 +90,8 @@ class QueryBuilder
 
     public function innerJoin(array $table, string $condition) : self
     {
-        foreach($table as $key => $value){
-            if(is_string($key)){
+        foreach ($table as $key => $value) {
+            if (is_string($key)) {
                 $join = "$value as $key";
             } else {
                 $join = "$value";
@@ -101,8 +103,8 @@ class QueryBuilder
 
     public function leftJoin(array $table, string $condition) : self
     {
-        foreach($table as $key => $value){
-            if(is_string($key)){
+        foreach ($table as $key => $value) {
+            if (is_string($key)) {
                 $join = "$value as $key";
             } else {
                 $join = "$value";
@@ -114,7 +116,7 @@ class QueryBuilder
 
     public function count(string $field, string $alias = null) : self
     {
-        if($alias){
+        if ($alias) {
             $this->select[] = "COUNT($field) as $alias";
         } else {
             $this->select[] = "COUNT($field)";
@@ -154,59 +156,68 @@ class QueryBuilder
 
     public function orderBy(array $orderBy) : self
     {
-        if(isset($orderBy['column']) && isset($orderBy['order'])){
-            if($orderBy['order'] === 'ASC' || $orderBy['order'] === 'DESC'){
+        if (isset($orderBy['column']) && isset($orderBy['order']) && !$this->orderBy) {
+            if ($orderBy['order'] === 'ASC' || $orderBy['order'] === 'DESC') {
                 $this->orderBy = "ORDER BY " . $orderBy['column'] . " " . $orderBy['order'];
-            }    
-            return $this;            
+            }                     
         }
-
+        return $this; 
     }
 
     public function __toString() : string
     {
         $parts[] = $this->statement;
-        if($this->select){
+        if ($this->select) {
             $parts[] = join(', ',$this->select);
         }
-        if($this->statement === 'SELECT' || $this->statement === 'DELETE'){
+
+        if ($this->statement === 'SELECT' || $this->statement === 'DELETE') {
             $parts[] = 'FROM';
         }
+
         $parts[] = $this->eachTable();
-        if($this->statement === 'INSERT INTO'){
+
+        if ($this->statement === 'INSERT INTO') {
             $parts[] = $this->insert;
         }
-        if($this->statement === 'UPDATE' && $this->set){
+
+        if ($this->statement === 'UPDATE' && $this->set) {
             $parts[] = 'SET';
             $parts[] = join(', ', $this->set);
         }
-        if($this->join){
-            foreach($this->join as $join){
+
+        if ($this->join) {
+            foreach ($this->join as $join) {
                 $parts[] = $join;
             }
         }
-        if($this->where){
+
+        if ($this->where) {
             $parts[] = "WHERE";
-            foreach($this->where as $key => $condition){
+            foreach ($this->where as $key => $condition) {
                 $parts[] = $condition;
-                if($key !== array_key_last($this->where)){
+                if ($key !== array_key_last($this->where)) {
                     $parts[] = "AND";
                 }
             }          
         }
-        if($this->groupBy){
+
+        if ($this->groupBy) {
             $parts[] = "GROUP BY";
             $parts[] = join(', ', $this->groupBy);
         }
-        if($this->orderBy){
+
+        if ($this->orderBy) {
             $parts[] = $this->orderBy;
         }
-        if($this->limit){
+        
+        if ($this->limit) {
             $parts[] = $this->limit;
-            if($this->offset){
+            if ($this->offset) {
                 $parts[] = $this->offset;
             }
         }
+        
         return join(' ', $parts);
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\src\model;
+namespace App\Src\Model;
 
 class Category
 {
@@ -40,12 +40,7 @@ class Category
      */
     public function getParentId(){return $this->parentId;}
 
-    // /**
-    //  * @return string/null
-    //  */
-    // public function getParentName(){return $this->parentName;}
-
- 
+    
     /**
      * @param int $id
      */
@@ -60,9 +55,4 @@ class Category
      * @param string $parentId
      */
     public function setParentId($parentId){$this->parentId = $parentId;}
-
-    // /**
-    //  * @param string $parentName
-    //  */
-    // public function setParentName($parentName){$this->parentName = $parentName;}
 }

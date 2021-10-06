@@ -1,18 +1,18 @@
 <?php
 
-namespace App\config;
+namespace App\Config;
 
 class HTTP
 {
     public function redirect(string $url) : void 
     {
         header("Location: $url");
-        exit;
+        exit(0);
     }
 
     public function dynamicRedirect(string $url, Session $session) : void 
     {
-        if($session->get('previousURI')){
+        if ($session->get('previousURI')) {
             $url = $session->use('previousURI');
         }
         $this->redirect($url);

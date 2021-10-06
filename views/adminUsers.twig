@@ -11,9 +11,9 @@
 
         {{ title }}
 
-        {{ link.buttonLink('<i class=\'bx bx-redo\'></i> Les commentaires','?route=adminComments', { position : 'ms-auto my-auto'}) }}
+        {{ link.buttonLink('<i class=\'bx bx-redo\'></i> Les commentaires','?route=adminComments', {position: 'ms-auto my-auto'}) }}
 
-        {{ link.buttonLink('<i class=\'bx bx-redo\'></i> Les articles','?route=adminArticles', { position : 'mx-2 my-auto'}) }}
+        {{ link.buttonLink('<i class=\'bx bx-redo\'></i> Les articles','?route=adminArticles', {position: 'mx-2 my-auto'}) }}
 
     </h1>
 </section>
@@ -23,31 +23,31 @@
     <div class="row p-3 p-sm-0">
         <div class="col-md-12">
             <form method="get" class="mb-3">
-                {{ form.hiddenInput('route', { value : 'adminUsers'}) }}
+                {{ form.hiddenInput('route', {value: 'adminUsers'}) }}
 
                 <div class="row">                    
                     <div class="col-lg-9">
                         {{ form.inputGroup({
-                            textQ : {
-                                type : 'text',
-                                label : 'Pseudo',
-                                name : 'q',
-                                value : get.get('q'),
-                                placeholder : '...'
+                            textQ: {
+                                type: 'text',
+                                label: 'Pseudo',
+                                name: 'q',
+                                value: get.get('q'),
+                                placeholder: '...'
                                 },
-                            numberScoreHigherThan : {
-                                type : 'number',
-                                label : 'Score supérieur à',
-                                name : 'scoreHigherThan',
-                                value : get.get('scoreHigherThan'),
-                                options : { labelPosition : 'ms-lg-2' }                    
+                            numberScoreHigherThan: {
+                                type: 'number',
+                                label: 'Score supérieur à',
+                                name: 'scoreHigherThan',
+                                value: get.get('scoreHigherThan'),
+                                options: {labelPosition: 'ms-lg-2'}                    
                                 },
-                            numberScoreLowerThan : {
-                                type : 'number',
-                                label : 'Score inférieur à',
-                                name : 'scoreLowerThan',
-                                value : get.get('scoreLowerThan'),
-                                options : { labelPosition : 'ms-lg-2' }                 
+                            numberScoreLowerThan: {
+                                type: 'number',
+                                label: 'Score inférieur à',
+                                name: 'scoreLowerThan',
+                                value: get.get('scoreLowerThan'),
+                                options: {labelPosition: 'ms-lg-2'}                 
                                 }
                             })
                         }}
@@ -57,18 +57,18 @@
                 <div class="row">                    
                     <div class="col-lg-9">
                         {{ form.inputGroup({
-                            datetimeAfterDatetime : {
-                                type : 'datetime-local',
-                                label : 'Inscrit après',
-                                name : 'afterDatetime',
-                                value : get.get('afterDatetime'),
+                            datetimeAfterDatetime: {
+                                type: 'datetime-local',
+                                label: 'Inscrit après',
+                                name: 'afterDatetime',
+                                value: get.get('afterDatetime'),
                                 },
-                            datetimeBeforeDatetime : {
-                                type : 'datetime-local',
-                                label : 'inscrit avant',
-                                name : 'beforeDatetime',
-                                value : get.get('beforeDatetime'),
-                                options : { labelPosition : 'ms-lg-2' }
+                            datetimeBeforeDatetime: {
+                                type: 'datetime-local',
+                                label: 'inscrit avant',
+                                name: 'beforeDatetime',
+                                value: get.get('beforeDatetime'),
+                                options: {labelPosition: 'ms-lg-2'}
                                 }
                             })
                         }}
@@ -79,37 +79,37 @@
                     <div class="col-lg-9">
                         <h4>Avec le statut : </h4>
                         {{ form.inputGroup({
-                            checkboxStatusOnline : {
-                                type : 'checkbox',
-                                label : 'En ligne',
-                                name : 'online',
-                                id : 'online',
-                                value : 'on',
-                                checked : get.get('online')
+                            checkboxStatusOnline: {
+                                type: 'checkbox',
+                                label: 'En ligne',
+                                name: 'online',
+                                id: 'online',
+                                value: 'on',
+                                checked: get.get('online')
                                 },
-                            checkboxStatusOffline : {
-                                type : 'checkbox',
-                                label : 'Hors ligne',
-                                name : 'offline',
-                                id : 'offline',
-                                value : 'on',
-                                checked : get.get('offline')                                
+                            checkboxStatusOffline: {
+                                type: 'checkbox',
+                                label: 'Hors ligne',
+                                name: 'offline',
+                                id: 'offline',
+                                value: 'on',
+                                checked: get.get('offline')                                
                                 },
-                            checkboxStatusBanned : {
-                                type : 'checkbox',
-                                label : 'Bannis',
-                                name : 'banned',
-                                id : 'banned',
-                                value : 'on',
-                                checked : get.get('banned')                                
+                            checkboxStatusBanned: {
+                                type: 'checkbox',
+                                label: 'Bannis',
+                                name: 'banned',
+                                id: 'banned',
+                                value: 'on',
+                                checked: get.get('banned')                                
                                 },
-                            checkboxStatusAll : {
-                                type : 'checkbox',
-                                label : 'Tous',
-                                name : 'allUserStatus',
-                                id : 'allUserStatus',
-                                value : 'on',
-                                checked : get.get('allUserStatus')                                
+                            checkboxStatusAll: {
+                                type: 'checkbox',
+                                label: 'Tous',
+                                name: 'allUserStatus',
+                                id: 'allUserStatus',
+                                value: 'on',
+                                checked: get.get('allUserStatus')                                
                                 }
                             })
                         }}
@@ -120,45 +120,45 @@
                     <div class="col-lg-9">
                         <h4>Rôle : </h4>
                         {{ form.inputGroup({
-                            checkboxRoleAdmin : {
-                                type : 'checkbox',
-                                label : 'Administrateur',
-                                name : 'admin',
-                                id : 'admin',
-                                value : 'on',
-                                checked : get.get('admin')
+                            checkboxRoleAdmin: {
+                                type: 'checkbox',
+                                label: 'Administrateur',
+                                name: 'admin',
+                                id: 'admin',
+                                value: 'on',
+                                checked: get.get('admin')
                                 },
-                            checkboxRoleModerator : {
-                                type : 'checkbox',
-                                label : 'Modérateur',
-                                name : 'moderator',
-                                id : 'moderator',
-                                value : 'on',
-                                checked : get.get('moderator')                                
+                            checkboxRoleModerator: {
+                                type: 'checkbox',
+                                label: 'Modérateur',
+                                name: 'moderator',
+                                id: 'moderator',
+                                value: 'on',
+                                checked: get.get('moderator')                                
                                 },
-                            checkboxRoleEditor : {
-                                type : 'checkbox',
-                                label : 'Éditeur',
-                                name : 'editor',
-                                id : 'editor',
-                                value : 'on',
-                                checked : get.get('editor')                                
+                            checkboxRoleEditor: {
+                                type: 'checkbox',
+                                label: 'Éditeur',
+                                name: 'editor',
+                                id: 'editor',
+                                value: 'on',
+                                checked: get.get('editor')                                
                                 },
-                            checkboxRoleUser : {
-                                type : 'checkbox',
-                                label : 'Utilisateur',
-                                name : 'user',
-                                id : 'user',
-                                value : 'on',
-                                checked : get.get('user')                                
+                            checkboxRoleUser: {
+                                type: 'checkbox',
+                                label: 'Utilisateur',
+                                name: 'user',
+                                id: 'user',
+                                value: 'on',
+                                checked: get.get('user')                                
                                 },                                
-                            checkboxRoleAll : {
-                                type : 'checkbox',
-                                label : 'Tous',
-                                name : 'allUserRoles',
-                                id : 'allUserRoles',
-                                value : 'on',
-                                checked : get.get('allUserRoles')                                
+                            checkboxRoleAll: {
+                                type: 'checkbox',
+                                label: 'Tous',
+                                name: 'allUserRoles',
+                                id: 'allUserRoles',
+                                value: 'on',
+                                checked: get.get('allUserRoles')                                
                                 }
                             })
                         }}
@@ -168,14 +168,14 @@
                 <div class="row">                    
                     <div class="col-lg-6">
                         {{ form.inputGroup({
-                            SelectLimit : {
-                                type : 'select',
-                                label : 'Résultats par page',
-                                name : 'limit',
-                                dataList : limits,
-                                options : {
-                                    selected : get.get('limit'),
-                                    default : "20"
+                            SelectLimit: {
+                                type: 'select',
+                                label: 'Résultats par page',
+                                name: 'limit',
+                                dataList: limits,
+                                options: {
+                                    selected: get.get('limit'),
+                                    default: "20"
                                     }
                                 } 
                             })
@@ -250,7 +250,7 @@
                             <td>
                                 {% if user.getRoleId() is same as("1") %}
 
-                                    {{ link.link('<i class=\'bx bx-crown\' ></i>','#', { class : 'mx-auto'}) }}
+                                    {{ link.link('<i class=\'bx bx-crown\' ></i>','#', {class: 'mx-auto'}) }}
 
                                 {% else %}
 
@@ -271,9 +271,11 @@
                         </tr>
                     {% endfor %}
                     {% if users is empty %}
-                        <td colspan="7" class="text-center">
-                            Aucun utilisateur correspondant à la recherche
-                        </td>
+                        <tr>
+                            <td colspan="7" class="text-center">
+                                Aucun utilisateur correspondant à la recherche
+                            </td>
+                        </tr>
                     {% endif %}
                 </tbody>
             </table>
@@ -282,10 +284,11 @@
                     {{ link.buttonLink('❮ Page précédente', previousPageURL) }}
                 {% endif %}
                 {% if nextPageURL %}
-                    {{ link.buttonLink('Page suivante ❯', nextPageURL,{ position : 'ms-auto'}) }}
+                    {{ link.buttonLink('Page suivante ❯', nextPageURL,{position: 'ms-auto'}) }}
                 {% endif %}
             </div>
-        </div>    
+        </div>
+    </div> 
 </section>
 
 {% endblock %}

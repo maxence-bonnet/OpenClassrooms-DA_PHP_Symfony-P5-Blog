@@ -1,6 +1,6 @@
 <?php
 
-namespace App\src\DAO;
+namespace App\Src\DAO;
 
 use PDO;
 use PDOStatement;
@@ -14,9 +14,10 @@ abstract class DAO
     
     private function checkConnection()
     {
-        if($this->connection === null) {
+        if ($this->connection === null) {
             return $this->getConnection();
         }
+
         return $this->connection;
     }
 
@@ -26,20 +27,21 @@ abstract class DAO
             $this->connection = new PDO(DB_HOST,DB_USER,DB_PASS);
             $this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             return $this->connection;
-        }
-        catch(Exception $connectionError) {
-            throw new Exception ('Erreur lors de la connexion à la base de données : ' . $connectionError->getMessage());
+        } catch(Exception $connectionError) {
+            throw new Exception('Erreur lors de la connexion à la base de données : ' . $connectionError->getMessage());
         }
     }
     
     protected function createQuery($sql, $parameters = null)
     {
-        if($parameters){
+        if ($parameters) {
             $result = $this->checkConnection()->prepare($sql);
             $result->execute($parameters);
             return $result;
         }
+
         $result = $this->checkConnection()->query($sql);
+        
         return $result;
     }
 

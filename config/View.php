@@ -1,9 +1,10 @@
 <?php
 
-namespace App\config;
+namespace App\Config;
 
-use App\config\Request;
-use App\config\HTTP;
+use App\Config\Request;
+use App\Config\Session;
+use App\Config\HTTP;
 
 use Twig\Extra\Markdown\MarkdownExtension;
 use Twig\Extra\Markdown\DefaultMarkdown;
@@ -15,7 +16,7 @@ class View
     private $loader;
     private $twig;
 
-    public function __construct($session)
+    public function __construct(Session $session)
     {
         $this->loader = new \Twig\Loader\FilesystemLoader('../views');
         $this->twig = new \Twig\Environment($this->loader,[

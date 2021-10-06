@@ -1,8 +1,8 @@
 <?php
 
-namespace App\src\constraint;
+namespace App\Src\constraint;
 
-use App\config\Parameter;
+use App\Config\Parameter;
 
 class Validation
 {
@@ -17,11 +17,11 @@ class Validation
 
     public function validate($data, $name)
     {
-        if($name === 'Article') {
+        if ($name === 'Article') {
             $articleValidation = new ArticleValidation();
             $errors = $articleValidation->check($data);
             return $errors;
-        } elseif($name === 'Comment') {
+        } elseif ($name === 'Comment') {
             $commentValidation = new CommentValidation();
             $errors = $commentValidation->check($data);
             return $errors;
@@ -43,7 +43,7 @@ class Validation
             $this->updateRequiredFields($key);
         }
         // check if all required fields has been found & cleared from array
-        if(!empty($this->requiredFields)){
+        if (!empty($this->requiredFields)) {
             $this->addError('missingField',1);
         }
         return $this->errors;
@@ -51,13 +51,14 @@ class Validation
 
     protected function updateRequiredFields($key) : void
     {
-        if(in_array($key,$this->requiredFields)){
+        if (in_array($key,$this->requiredFields)) {
             unset($this->requiredFields[array_search($key,$this->requiredFields)]);
         }
     }
 
-    protected function addError($name, $error) {
-        if($error) {
+    protected function addError($name, $error) 
+    {
+        if ($error) {
             $this->errors += [
                 $name => '<div class="invalid-feedback">' . $error . '</div>'
             ];

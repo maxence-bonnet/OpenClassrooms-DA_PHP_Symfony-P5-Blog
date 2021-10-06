@@ -1,6 +1,6 @@
 <?php
 
-namespace App\src\utils;
+namespace App\Src\Utils;
 
 use League\HTMLToMarkdown\HtmlConverter;
 use League\CommonMark\CommonMarkConverter;
@@ -10,23 +10,26 @@ class Text
     public static function excerpt(?string $content, int $limit = 20) : ?string
     {
         $content = strip_tags($content);
-        if(mb_strlen($content) <= $limit){
+        if (mb_strlen($content) <= $limit) {
             return $content;
         }
+
         $lastSpace =  mb_strpos($content, ' ', $limit);
-        if(!$lastSpace){
+        
+        if (!$lastSpace) {
             $lastSpace =  mb_strpos($content, PHP_EOL , $limit);
-            if(!$lastSpace){
+            if (!$lastSpace) {
                 $lastSpace =  mb_strpos($content, "\t" , $limit);
-                if(!$lastSpace){
+                if (!$lastSpace) {
                     $lastSpace = $limit;
                 }
             }
         }
         
-        if(mb_strlen(mb_substr($content, 0, $lastSpace)) > $limit + 10){
+        if (mb_strlen(mb_substr($content, 0, $lastSpace)) > $limit + 10) {
             return mb_substr($content, 0, $limit + 10) . '...';
         }
+
         return mb_substr($content, 0, $lastSpace) . '...';
     }
 
@@ -41,6 +44,7 @@ class Text
             'strip_tags'=> true,
             'hard_break'=> true
         ]);
+
         return $htmlToMarkdown->convert($html);
     }
 
@@ -50,6 +54,7 @@ class Text
             'html_input' => 'strip',
             'allow_unsafe_links' => false,
         ]);
+
         return $markdownToHtml->convertToHtml($markdown);
     }
 

@@ -1,25 +1,25 @@
 <?php
 
-namespace App\src\controller\frontcontroller;
+namespace App\Src\Controller\FrontController;
 
-use App\src\controller\Controller;
-use App\config\Parameter;
+use App\Src\Controller\Controller;
+use App\Config\Parameter;
 
 class FrontController extends Controller
 {
     public function home(Parameter $post)
     {
-        if($post->get('submit')){
+        if ($post->get('submit')) {
             $errors = $this->validation->validate($post, 'ContactForm');
-            if(!$errors){
+            if (!$errors) {
                 $result = $this->mailer->sendContactForm($post);
-                if($result){
+                if ($result) {
                     $this->session->addMessage('success','Votre message a bien été envoyé');
                     $this->http->redirect('?');
                 }
                 $this->session->addMessage('danger','Échec lors de l\'envoi du message');  
             }
-            if(isset($errors['missingField'])){
+            if (isset($errors['missingField'])) {
                 $this->session->addMessage('danger','Un ou plusieurs champs manquant.');
             }
             $data['post'] = $post;

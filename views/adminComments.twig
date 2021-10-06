@@ -9,11 +9,11 @@
 <section class="container">
     <h1 class="d-flex">
 
-        {{ title }}
+        {{title }}
 
-        {{ link.buttonLink('<i class=\'bx bx-redo\'></i> Les articles','?route=adminArticles', { position : 'ms-auto my-auto'}) }}
+        {{ link.buttonLink('<i class=\'bx bx-redo\'></i> Les articles','?route=adminArticles', {position: 'ms-auto my-auto'}) }}
 
-        {{ link.buttonLink('<i class=\'bx bx-redo\'></i> Les utilisateurs','?route=adminUsers', { position : 'mx-2 my-auto'}) }}
+        {{ link.buttonLink('<i class=\'bx bx-redo\'></i> Les utilisateurs','?route=adminUsers', {position: 'mx-2 my-auto'}) }}
 
     </h1>
 </section>
@@ -24,30 +24,30 @@
         <div class="col-md-12">
             <form method="get" class="mb-3">
 
-                {{ form.hiddenInput('route', { value : 'adminComments'}) }}
+                {{ form.hiddenInput('route', {value: 'adminComments'}) }}
 
                 <div class="row">                    
                     <div class="col-lg-9">
                         {{ form.inputGroup({
-                            textQ : {
-                                type : 'text',
-                                label : 'Commentaire contenant',
-                                name : 'q',
-                                value : get.get('q'),
-                                placeholder : '...'
+                            textQ: {
+                                type: 'text',
+                                label: 'Commentaire contenant',
+                                name: 'q',
+                                value: get.get('q'),
+                                placeholder: '...'
                                 },
-                            SelectLimit : {
-                                type : 'select',
-                                label : 'De l\'auteur',
-                                name : 'userId',
-                                dataList : users,
-                                options : {
-                                    genericOption : {
-                                        value : '',
-                                        name : ''
+                            selectAuthor: {
+                                type: 'select',
+                                label: 'De l\'auteur',
+                                name: 'userId',
+                                dataList: users,
+                                options: {
+                                    genericOption: {
+                                        value: '',
+                                        name: '- Tous -'
                                         },
-                                    labelPosition : 'ms-2',
-                                    selected : get.get('userId'),
+                                    labelPosition: 'ms-2',
+                                    selected: get.get('userId'),
                                     }
                                 } 
                             })
@@ -58,17 +58,17 @@
                 <div class="row">                    
                     <div class="col-lg-9">
                         {{ form.inputGroup({
-                            selectArticleId : {
-                                type : 'select',
-                                label : 'De l\'article',
-                                name : 'articleId',
-                                dataList : articles,
-                                options : {
-                                    genericOption : {
-                                        value : '',
-                                        name : 'Tous les articles'
+                            selectArticleId: {
+                                type: 'select',
+                                label: 'De l\'article',
+                                name: 'articleId',
+                                dataList: articles,
+                                options: {
+                                    genericOption: {
+                                        value: '',
+                                        name: 'Tous les articles'
                                         },
-                                    selected : get.get('articleId')
+                                    selected: get.get('articleId')
                                     }
                                 } 
                             })
@@ -79,18 +79,18 @@
                 <div class="row">                    
                     <div class="col-lg-9">
                         {{ form.inputGroup({
-                            datetimeAfterDatetime : {
-                                type : 'datetime-local',
-                                label : 'Après',
-                                name : 'afterDatetime',
-                                value : get.get('afterDatetime'),
+                            datetimeAfterDatetime: {
+                                type: 'datetime-local',
+                                label: 'Après',
+                                name: 'afterDatetime',
+                                value: get.get('afterDatetime'),
                                 },
-                            datetimeBeforeDatetime : {
-                                type : 'datetime-local',
-                                label : 'Avant',
-                                name : 'beforeDatetime',
-                                value : get.get('beforeDatetime'),
-                                options : { labelPosition : 'ms-lg-2' }                        
+                            datetimeBeforeDatetime: {
+                                type: 'datetime-local',
+                                label: 'Avant',
+                                name: 'beforeDatetime',
+                                value: get.get('beforeDatetime'),
+                                options: {labelPosition: 'ms-lg-2'}                        
                                 }
                             })
                         }}
@@ -100,29 +100,29 @@
                 <div class="row">                    
                     <div class="col-lg-9">
                         {{ form.inputGroup({
-                            RadioValidatedValidated : {
-                                type : 'radio',
-                                label : 'Validés',
-                                name : 'validated',
-                                id : 'validated',
-                                value : 'validated',
-                                checked : get.get('validated')
+                            RadioValidatedValidated: {
+                                type: 'radio',
+                                label: 'Validés',
+                                name: 'validated',
+                                id: 'validated',
+                                value: 'validated',
+                                checked: get.get('validated')
                                 },
-                            RadioValidatedPending : {
-                                type : 'radio',
-                                label : 'Non Validés',
-                                name : 'validated',
-                                id : 'pending',
-                                value : 'pending',
-                                checked : get.get('validated')                                
+                            RadioValidatedPending: {
+                                type: 'radio',
+                                label: 'Non Validés',
+                                name: 'validated',
+                                id: 'pending',
+                                value: 'pending',
+                                checked: get.get('validated')                                
                                 },
-                            RadioValidatedAll : {
-                                type : 'radio',
-                                label : 'Tous',
-                                name : 'validated',
-                                id : 'all',
-                                value : 'all',
-                                checked : get.get('validated')                                
+                            RadioValidatedAll: {
+                                type: 'radio',
+                                label: 'Tous',
+                                name: 'validated',
+                                id: 'all',
+                                value: 'all',
+                                checked: get.get('validated')                                
                                 }
                             })
                         }}
@@ -132,14 +132,14 @@
                 <div class="row">                    
                     <div class="col-lg-6">
                         {{ form.inputGroup({
-                            SelectLimit : {
-                                type : 'select',
-                                label : 'Résultats par page',
-                                name : 'limit',
-                                dataList : limits,
-                                options : {
-                                    selected : get.get('limit'),
-                                    default : "20"
+                            SelectLimit: {
+                                type: 'select',
+                                label: 'Résultats par page',
+                                name: 'limit',
+                                dataList: limits,
+                                options: {
+                                    selected: get.get('limit'),
+                                    default: "20"
                                     }
                                 } 
                             })
@@ -197,9 +197,11 @@
                         </tr>
                     {% endfor %}
                     {% if comments is empty %}
-                        <td colspan="6" class="text-center">
-                            Aucun commentaire correspondant à la recherche
-                        </td>
+                        <tr>
+                            <td colspan="6" class="text-center">
+                                Aucun commentaire correspondant à la recherche
+                            </td>
+                        </tr>
                     {% endif %}
                 </tbody>
             </table>
@@ -208,10 +210,11 @@
                     {{ link.buttonLink('❮ Page précédente', previousPageURL) }}
                 {% endif %}
                 {% if nextPageURL %}
-                    {{ link.buttonLink('Page suivante ❯', nextPageURL,{ position : 'ms-auto'}) }}
+                    {{ link.buttonLink('Page suivante ❯', nextPageURL,{position: 'ms-auto'}) }}
                 {% endif %}
             </div>
-        </div>    
+        </div>
+    </div>   
 </section>
 
 {% endblock %}

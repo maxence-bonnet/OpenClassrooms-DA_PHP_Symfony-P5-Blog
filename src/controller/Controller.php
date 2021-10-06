@@ -1,17 +1,11 @@
 <?php
 
-namespace App\src\controller;
+namespace App\Src\Controller;
 
-use App\src\constraint\Validation;
-use App\config\Request;
-use App\config\View;
-use App\config\HTTP;
-use App\src\DAO\ArticleDAO;
-use App\src\DAO\CategoryDAO;
-use App\src\DAO\CommentDAO;
-use App\src\DAO\ReactionDAO;
-use App\src\DAO\UserDAO;
-use App\src\model\Mailer;
+use App\Src\Constraint\Validation;
+use App\Config\{Request, View, HTTP};
+use App\Src\DAO\{ArticleDAO, CategoryDAO, CommentDAO, ReactionDAO, UserDAO};
+use App\Src\Service\Mailer;
 
 
 abstract class Controller
@@ -49,7 +43,7 @@ abstract class Controller
 
     protected function checkLoggedIn()
     {
-        if(!$this->session->get('pseudo')) {
+        if (!$this->session->get('pseudo')) {
             
             $this->session->addMessage('danger', 'Vous devez être connecté pour accèder à cette page');
 
@@ -65,7 +59,7 @@ abstract class Controller
      */
     protected function setPreviousURI() : void
     {
-        if($this->server->get('REQUEST_URI')){
+        if ($this->server->get('REQUEST_URI')) {
             $this->session->set('previousURI', $this->server->get('REQUEST_URI'));
         }
     }
@@ -78,22 +72,22 @@ abstract class Controller
      */
     protected function getCleanParameters(array $parameters = [],string $from) : array
     {
-        $toStringArray = ['q','afterDatetime','beforeDatetime'];
-        $toStringArticle = ['published','private','standby','all'];
+        $toStringArray = ['q', 'afterDatetime', 'beforeDatetime'];
+        $toStringArticle = ['published', 'private', 'standby', 'all'];
         $toStringComment = ['validated','all'];
-        $toStringUser = ['online','offline','banned','allUserStatus','admin','moderator','editor','user','allUserRoles'];
+        $toStringUser = ['online', 'offline', 'banned', 'allUserStatus', 'admin', 'moderator', 'editor', 'user', 'allUserRoles'];
         $toString = array_merge($toStringArray,${'toString' . ucfirst($from)});
 
         $toIntegerArray = ['page','limit'];
-        $toIntegerArticle = ['userId','authorId','categoryId'];
-        $toIntegerComment = ['userId','articleId'];
+        $toIntegerArticle = ['userId', 'authorId', 'categoryId'];
+        $toIntegerComment = ['userId', 'articleId'];
         $toIntegerUser = ['scoreHigherThan','scoreLowerThan'];
-        $toInteger = array_merge($toIntegerArray,${'toInteger' . ucfirst($from)});
+        $toInteger = array_merge($toIntegerArray, ${'toInteger' . ucfirst($from)});
 
-        foreach($parameters as $key => $value){
-            if(in_array($key,$toString) && $value){
+        foreach ($parameters as $key => $value) {
+            if (in_array($key,$toString) && $value) {
                 $cleanParameters[$key] = htmlentities($value);
-            } elseif(in_array($key,$toInteger) && $value){
+            } elseif (in_array($key,$toInteger) && $value) {
                 $cleanParameters[$key] = (int)$value;
             }            
         }

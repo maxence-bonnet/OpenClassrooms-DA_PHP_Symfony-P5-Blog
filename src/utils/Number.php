@@ -1,6 +1,6 @@
 <?php
 
-namespace App\src\utils;
+namespace App\Src\Utils;
 
 class Number
 {

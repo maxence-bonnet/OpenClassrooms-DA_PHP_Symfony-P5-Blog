@@ -1,8 +1,8 @@
 <?php
 
-namespace App\src\controller\frontcontroller;
+namespace App\Src\Controller\FrontController;
 
-use App\config\Parameter;
+use App\Config\Parameter;
 
 class FrontCommentController extends FrontController
 {
@@ -11,14 +11,14 @@ class FrontCommentController extends FrontController
         $this->checkLoggedIn();
 
         $article = $this->articleDAO->getArticle($articleId);
-        if($article && $article->getAllowComment()){
-            if($post->get('submit')) {
+        if ($article && $article->getAllowComment()) {
+            if ($post->get('submit')) {
                 $errors = $this->validation->validate($post, 'Comment');
-                if(!$errors) {
+                if (!$errors) {
                     $parameters['userId'] = (int)$this->session->get('id');
                     $parameters['articleId'] = $articleId;
                     
-                    if($post->get('answerTo')){
+                    if ($post->get('answerTo')) {
                         $parameters['answerTo'] = (int)$post->get('answerTo');
                         $parameters['content'] = htmlspecialchars($post->get('answer'));
                     } else {
@@ -26,7 +26,7 @@ class FrontCommentController extends FrontController
                         $parameters['content'] = htmlspecialchars($post->get('comment'));
                     }
 
-                    if($this->session->get('role') === "admin" || $this->session->get('role') === "moderator"){
+                    if ($this->session->get('role') === "admin" || $this->session->get('role') === "moderator") {
                         $parameters['validated'] = 1;
                         $this->session->addMessage('success', 'Le commentaire a bien été publié');
                     } else {
@@ -38,7 +38,7 @@ class FrontCommentController extends FrontController
                     $this->commentDAO->addComment($parameters);
                     $this->http->redirect('?route=article&articleId=' . $articleId);
                 }
-                if(isset($errors['missingField'])){
+                if (isset($errors['missingField'])) {
                     $this->session->addMessage('danger','Un ou plusieurs champs manquant.');
                 }
                 $post->set('new', true);
@@ -47,7 +47,7 @@ class FrontCommentController extends FrontController
                     'validated' => "validated"
                 ]);
 
-                if($post->get('answerTo')){
+                if ($post->get('answerTo')) {
                     $data['answerTo'] = (int)$post->get('answerTo');
                 }
                 $data['article'] = $article;
@@ -67,24 +67,24 @@ class FrontCommentController extends FrontController
         $this->checkLoggedIn();
 
         $comment = $this->commentDAO->getComment($commentId);
-        if(!$comment){
+        if (!$comment) {
             $this->session->addMessage('danger', 'Commentaire inexistant');
             $this->http->redirect('?route=articles');
         }
 
         $articleId = $comment->getArticleId();
 
-        if($this->session->get('role') !== "admin" && $this->session->get('role') !== "moderator"){
-            if($this->session->get('id') !== $comment->getUserId()){
+        if ($this->session->get('role') !== "admin" && $this->session->get('role') !== "moderator") {
+            if ($this->session->get('id') !== $comment->getUserId()) {
                 $this->session->addMessage('danger', 'Vous ne pouvez pas modifier les commentaires d\'autres personnes');
                 $this->http->redirect('?route=article&articleId=' . $articleId);
             }
         }
 
-        if($post->get('submit')){
+        if ($post->get('submit')) {
             $errors = $this->validation->validate($post, 'Comment');
-            if (!$errors){
-                if($this->session->get('role') === "admin" || $this->session->get('role') === "moderator"){
+            if (!$errors) {
+                if ($this->session->get('role') === "admin" || $this->session->get('role') === "moderator") {
                     $validated = 1;
                     $this->session->addMessage('success', 'Le commentaire a bien été modifié');
                 } else {
@@ -96,7 +96,7 @@ class FrontCommentController extends FrontController
                 $this->commentDAO->editComment($content, $commentId, $lastModified, $validated);
                 $this->http->redirect('?route=article&articleId=' . $articleId);
             }
-            if(isset($errors['missingField'])){
+            if (isset($errors['missingField'])) {
                 $this->session->addMessage('danger','Un ou plusieurs champs manquant.');
             }
             $data['errors'] = $errors;
@@ -109,7 +109,7 @@ class FrontCommentController extends FrontController
         ]);
 
         $post->set('id', $comment->getId());
-        if(!$post->get('comment')){
+        if (!$post->get('comment')) {
             $post->set('comment', $comment->getContent());
         }
         

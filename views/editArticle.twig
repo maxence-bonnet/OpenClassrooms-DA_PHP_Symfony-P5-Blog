@@ -18,58 +18,58 @@
 
                         <div class="row">
 
-                            {{ form.input('text','Titre de l\'article','title', { errors : errors.title, value : post.get('title'), help : { text : '60 caractères max :', limit : '0/60' } }) }}
+                            {{ form.input('text', 'Titre de l\'article', 'title', {errors: errors.title, value: post.get('title'), help: {text: '60 caractères max:', limit: '0/60'}}) }}
         
-                            {{ form.select('Auteur','authorId', users, { errors : errors.authorId, selected : post.get('authorId') ?: session.get('id') }) }}
+                            {{ form.select('Auteur', 'authorId', users, {errors: errors.authorId, selected: post.get('authorId') ?: session.get('id')}) }}
                             
-                            {{ form.select('Catégorie','categoryId', categories, { errors : errors.categoryId, selected : post.get('categoryId') }) }}
+                            {{ form.select('Catégorie', 'categoryId', categories, {errors: errors.categoryId, selected: post.get('categoryId')}) }}
 
                         </div>
 
-                        {{ form.textarea('Chapô', 'lede', 'articleLede', { errors : errors.lede, value : post.get('lede') ? post.get('lede') | markdown_to_html, help : '0/500'}) }}
+                        {{ form.textarea('Chapô', 'lede', 'articleLede', {errors: errors.lede, value: post.get('lede') ? post.get('lede') |markdown_to_html, help: '0/500'}) }}
 
-                        {{ form.textarea('Contenu de l\'article', 'content', 'articleContent', { errors : errors.content, value : post.get('content') ? post.get('content') | markdown_to_html, size : 500, help : '0/2000'}) }}
+                        {{ form.textarea('Contenu de l\'article', 'content', 'articleContent', {errors: errors.content, value: post.get('content') ? post.get('content') |markdown_to_html, size: 500, help: '0/5000'}) }}
 
                         <div class="row">
 
                             {{ form.checkbox({ 
-                                allowComment : {
-                                    name : 'allowComment',
-                                    label : 'Autoriser les commentaires sur cet article',
-                                    value : "1",
-                                    checked : post.get('allowComment')
+                                allowComment: {
+                                    name: 'allowComment',
+                                    label: 'Autoriser les commentaires sur cet article',
+                                    value: "1",
+                                    checked: post.get('allowComment')
                                     }
                                 }) 
                             }}
 
-                            {{ form.radio('statusId',{
-                                published : {
-                                    id : 'published',
-                                    label : 'Publier',
-                                    name : 'statusId1',
-                                    value : '1',
-                                    checked : post.get('statusId'),
-                                    default : true
+                            {{ form.radio('statusId', {
+                                published: {
+                                    id: 'published',
+                                    label: 'Publier',
+                                    name: 'statusId1',
+                                    value: '1',
+                                    checked: post.get('statusId'),
+                                    default: true
                                     },
-                                private : {
-                                    id : 'private',
-                                    label : 'Publier en privé',
-                                    name : 'statusId2',
-                                    value : '2',
-                                    checked : post.get('statusId')
+                                private: {
+                                    id: 'private',
+                                    label: 'Publier en privé',
+                                    name: 'statusId2',
+                                    value: '2',
+                                    checked: post.get('statusId')
                                     },
-                                hidden : {
-                                    id : 'hidden',
-                                    label : 'Attendre avant publication',
-                                    name : 'statusId3',
-                                    value : '3',
-                                    checked : post.get('statusId')
+                                hidden: {
+                                    id: 'hidden',
+                                    label: 'Attendre avant publication',
+                                    name: 'statusId3',
+                                    value: '3',
+                                    checked: post.get('statusId')
                                     }
-                                }, { errors : errors.statusId })
+                                }, {errors: errors.statusId})
                             }}
 
                         </div>
-                        {{ form.submit( post.get('id') ? 'Mettre à jour' : 'Créer l\'article' ,{ position : 'me-auto'}) }}
+                        {{ form.submit( post.get('id') ? 'Mettre à jour' : 'Créer l\'article' ,{position: 'me-auto'}) }}
 
                     </div>
                 </div>
@@ -78,7 +78,7 @@
     </div>
 </section>
 <script src="js/countChars.js"></script>
-<script type="text/javascript">
+<script>
     tinymce.init({
         selector: '#articleLede',
         plugins: 'wordcount',        
@@ -88,10 +88,10 @@
             text.on('keyup', function (e) {
                 let ledeCharactersCount = tinymce.editors.articleLede.plugins.wordcount.body.getCharacterCount();
                 ledeContentHelp.innerHTML = ledeCharactersCount + "/500 caractères";
-                if(ledeCharactersCount > 500){
+                if (ledeCharactersCount > 500) {
                     ledeContentHelp.classList.add("invalid-feedback");
                     ledeTextarea.classList.add("is-invalid");
-                } else if(ledeCharactersCount <= 500 && ledeContentHelp.classList.contains("invalid-feedback")){
+                } else if (ledeCharactersCount <= 500 && ledeContentHelp.classList.contains("invalid-feedback")) {
                     ledeContentHelp.classList.remove("invalid-feedback");
                 }
             });
@@ -106,11 +106,11 @@
             let contentTextarea = document.getElementById("articleContent");
             text.on('keyup', function (e) { 
                 let contentCharactersCount = tinymce.editors.articleContent.plugins.wordcount.body.getCharacterCount();
-                contentContentHelp.innerHTML = contentCharactersCount + "/2000 caractères";
-                if(contentCharactersCount > 2000){
+                contentContentHelp.innerHTML = contentCharactersCount + "/5000 caractères";
+                if (contentCharactersCount > 5000) {
                     contentContentHelp.classList.add("invalid-feedback");
                     contentTextarea.classList.add("is-invalid");
-                } else if(contentCharactersCount <= 2000 && contentContentHelp.classList.contains("invalid-feedback")){
+                } else if (contentCharactersCount <= 5000 && contentContentHelp.classList.contains("invalid-feedback")) {
                     contentContentHelp.classList.remove("invalid-feedback");
                 }
             });
@@ -126,4 +126,5 @@
     titleInput = document.getElementById("title");
     titleInput.addEventListener("keyup", () => countChars(titleInput,"titleContentHelp",60));
 </script>
+
 {% endblock %}

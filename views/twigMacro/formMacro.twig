@@ -1,10 +1,22 @@
-{# {% import 'twigMacro/formMacro.twig' as form %} #}
+{#
+    Import :
+    {% import 'twigMacro/formMacro.twig' as form %}
+#}
 
 {# #}
 {% macro input(type, label, name, options = [] ) %}
     <div class="form-group mb-3 {{ options.col | default('col-md')}}">
         <label class="form-label {{ options.labelposition }}" for="{{ name }}">{{ label | raw }} :</label>
-        <input type="{{ type }}" class="form-control {{ options.errors ? 'is-invalid' : '' }}" id="{{ name }}" name="{{ name }}" {% if options.help %} aria-describedby="{{ name ~ 'ContentHelp' }}" {% endif %} placeholder="{{ options.placeholder }}" value="{{ options.value }}" {{ options.pattern ? 'pattern=' ~ options.pattern }} {{ options.required ? 'required' }}>
+        <input  
+            type="{{ type }}" 
+            class="form-control {{ options.errors ? 'is-invalid' : '' }}" 
+            id="{{ name }}" name="{{ name }}" 
+            {% if options.help %} aria-describedby="{{ name ~ 'ContentHelp' }}" {% endif %} 
+            {% if options.placeholder %} placeholder="{{ options.placeholder }}" {% endif %}
+            {% if options.value %} value="{{ options.value }}" {% endif %}
+            {% if options.pattern %} pattern="{{ options.pattern }}" {% endif %}
+            {{ options.required ? 'required' }}
+            >
         {% if options.help %}
             <div id="{{ name ~ 'ContentHelp' }}" class="form-text">{{ options.help.text | raw }} <span class="dynamic">{{ options.help.limit | raw }}</span></div>
         {% endif %}
@@ -20,7 +32,7 @@
 {# #}
 {% macro textarea(label, name, id, options = [] ) %}
     <div class="form-group mb-3 col">
-        <label class="form-label" for="{{ name }}">{{ label }} :</label>
+        <label class="form-label" for="{{ id }}">{{ label }} :</label>
         <textarea class="form-control {{ options.errors ? 'is-invalid' : '' }}" id="{{ id }}" name="{{ name }}" {% if options.help %} aria-describedby="{{ name ~ 'ContentHelp' }}" {% endif %} style="height: {{ options.size ?? '120' }}px" placeholder="...">{{ options.value }}</textarea>
         {% if options.help %}
             <div id="{{ name ~ 'ContentHelp' }}" class="form-text">{{ options.help.text | raw }} <span class="dynamic">{{ options.help.limit | raw }}</span></div>
@@ -71,7 +83,7 @@
 {# #}
 {% macro submit(value = 'Valider', options = [] ) %}
     <div class="mb-3 d-flex">
-        <input type="submit" class="btn btn-primary {{ options.position }}" id="submit" name="submit" value="{{ value }}">
+        <input type="submit" class="btn btn-primary {{ options.position }}" id="{{ options.id ?: 'submit' }}" name="submit" value="{{ value }}">
     </div>
 {% endmacro %}
 
@@ -85,7 +97,7 @@
                     <label class="form-check-label" for="{{ sample.id }}">{{ sample.label }}</label>
                 </div>
             {% else %}
-                <label class="input-group-text {{ sample.options.labelPosition }}" for="{{ sample.name }}">{{ sample.label }} : </label>
+                <label class="input-group-text {{ sample.options.labelPosition }}" for="{{ sample.name }}">{{ sample.label }} :</label>
                 {% if sample.type is same as('select') %}
                     <select class="form-select" name ="{{ sample.name }}" id="{{ sample.name }}">
                         {% if sample.options.genericOption %}
@@ -96,7 +108,7 @@
                         {% endfor %}
                     </select>
                 {% else %}
-                    <input type="{{ sample.type }}" class="form-control" name="{{ sample.name }}" id="{{ sample.name }}" placeholder="{{ sample.placeholder }}" value="{{ sample.value }}">                   
+                    <input type="{{ sample.type }}" class="form-control" name="{{ sample.name }}" id="{{ sample.name }}" {{ sample.placeholder ? 'placeholder=' ~ sample.placeholder ~ '' }} value="{{ sample.value }}">                   
                 {% endif %}
             {% endif %}
         {% endfor %}

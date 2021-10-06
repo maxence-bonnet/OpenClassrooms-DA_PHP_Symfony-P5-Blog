@@ -1,36 +1,39 @@
 <?php
 
-namespace App\src\controller\frontcontroller;
+namespace App\Src\Controller\FrontController;
 
-use App\config\Parameter;
-use App\src\constraint\Constraint;
+use App\Config\Parameter;
+use App\Src\Constraint\Constraint;
 use Exception;
 
 class FrontUserController extends FrontController
 {
     public function register(Parameter $post)
     {
-        if($this->session->get('pseudo')){
+        if ($this->session->get('pseudo')) {
             $this->session->set('danger', 'Vous ne pouvez pas vous inscrire en étant déjà connecté');
             $this->http->redirect('?');
         }
 
-        if($post->get('submit')){
-            foreach($post->all() as $key => $value){
+        if ($post->get('submit')) {
+            $password = $post->get('password1');
+            foreach ($post->all() as $key => $value) {
                 $post->set($key, htmlspecialchars($value));
             }
             $errors = $this->validation->validate($post, 'User');
-            if(!$errors){
+            if (!$errors) {
                 $post->set('createdAt', date('Y-m-d H:i:s'));
-                $post->set('password', password_hash($post->get('password'),PASSWORD_BCRYPT));
-                try{
+                $post->set('password', password_hash($password,PASSWORD_BCRYPT));
+                try {
                     $this->userDAO->register($post);
+                } catch (Exception $error) {
+                    throw new Exception('Erreur lors de l\'inscription de l\'utilisateur : ' . $error->getMessage());
                 }
-                catch(Exception $error){
-                    throw new Exception ('Erreur lors de l\'inscription de l\'utilisateur : ' . $error->getMessage());
-                }                   
                 $this->session->addMessage('success', 'Inscription réussie');
                 $this->http->redirect('?route=login');
+            }
+            if (isset($errors['missingField'])) {
+                $this->session->addMessage('danger','Un ou plusieurs champs manquant.');
             }
             $data['post'] = $post;
             $data['errors'] = $errors;
@@ -41,27 +44,26 @@ class FrontUserController extends FrontController
 
     public function login(Parameter $post)
     {
-        if(strlen($post->get('pseudo')) > 61 || strlen($post->get('password')) > 121){
+        if (strlen($post->get('pseudo')) > 61 || strlen($post->get('password')) > 121) {
             $this->http->redirect('?');
         }
         
-        if($this->session->get('pseudo')){
+        if ($this->session->get('pseudo')) {
             $this->session->addMessage('danger', 'Vous ne pouvez pas effectuer cette action en étant déjà connecté');
             $this->http->redirect('?');
         }
 
-        if($post->get('submit')){
+        if ($post->get('submit')) {
             $post->set('pseudo', htmlspecialchars($post->get('pseudo')));
-            if(!empty($post->get('pseudo')) && $this->userDAO->pseudoExists($post->get('pseudo'))){
-                try{
+            if (!empty($post->get('pseudo')) && $this->userDAO->pseudoExists($post->get('pseudo'))) {
+                try {
                     $result = $this->userDAO->login($post);
+                } catch(Exception $error) {
+                    throw new Exception('Erreur lors de la connexion de l\'utilisateur : ' . $error->getMessage());
                 }
-                catch(Exception $error){
-                    throw new Exception ('Erreur lors de la connexion de l\'utilisateur : ' . $error->getMessage());
-                }
-                if($result){
-                    if(password_verify($post->get('password'), $result['password'])){
-                        if($result['status_name'] === "banned"){
+                if ($result) {
+                    if (password_verify($post->get('password'), $result['password'])) {
+                        if ($result['status_name'] === "banned") {
                             $this->session->addMessage('danger', 'Vous avez été banni du blog');
                         } else {
                             $this->userDAO->updateUserStatus((int)$result['id'], 2); // set connected status
@@ -100,17 +102,17 @@ class FrontUserController extends FrontController
         $this->checkLoggedIn();
 
         $user = $this->userDAO->getUser((int)$get->get('userId'));
-        if(!$user){
+        if (!$user) {
             $this->session->addMessage('danger', 'Utilisateur inexistant');
             $this->http->redirect('?');
         }
 
         $data['title'] = 'Profil de ' . $user->getPseudo() ;
-        if($user->getPseudo() === $this->session->get('pseudo')){
+        if ($user->getPseudo() === $this->session->get('pseudo')) {
             $themesList = $this->getThemesList();
-            if($get->get('theme')){
-                if(in_array($get->get('theme'),$themesList) || $get->get('theme') === "default"){
-                    if($get->get('theme') === "default" && $this->session->get('theme')){
+            if ($get->get('theme')) {
+                if (in_array($get->get('theme'),$themesList) || $get->get('theme') === "default") {
+                    if ($get->get('theme') === "default" && $this->session->get('theme')) {
                         $this->session->remove('theme');
                     } else {
                         $this->session->set('theme', $get->get('theme'));
@@ -131,8 +133,8 @@ class FrontUserController extends FrontController
         $exclude = ['.','..'];
         $themes = scandir('../public/bootstrap_themes/'); // Codacy doesn't like scandir()
         foreach ($themes as $theme) {
-            if (!in_array($theme,$exclude) && preg_match("#^bootstrap-[a-z]+\.min\.css$#",$theme)){                   
-                    $themesList[] = preg_replace("#^bootstrap-([a-z]+)\.min\.css$#","$1",$theme);
+            if (!in_array($theme,$exclude) && preg_match("#^bootstrap-[a-z\-]+\.css$#",$theme)) {                   
+                    $themesList[] = preg_replace("#^bootstrap-([a-z\-]+)\.css$#","$1",$theme);
             }
         }
         return isset($themesList) ? $themesList : [];

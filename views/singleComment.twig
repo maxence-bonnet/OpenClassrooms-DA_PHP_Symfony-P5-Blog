@@ -9,17 +9,17 @@
     <div class="row mb-2">
         <div class="col-6 shadow">
             <h6>{{ comment.getUserPseudo() }} le {{ comment.getFormatedDate(comment.getCreatedAt()) }} {{ comment.getCreatedAt() < comment.getLastModified() ? '(modifié le ' ~ comment.getFormatedDate(comment.getLastModified()) ~ ')' }}</h6>
-            <p>{{ comment.getContent() | nl2br }}</p>
+            <p>{{ comment.getContent() |nl2br }}</p>
         </div>
     </div>
     {% if not comment.getValidated() %}
-        {{ link.buttonLink('Valider','?route=updateCommentValidation&commentId=' ~ comment.getId() ~ '&validation=1') }}
+        {{ link.buttonLink('Valider', '?route=updateCommentValidation&commentId=' ~ comment.getId() ~ '&validation=1') }}
     {% else %}
-        {{ link.buttonLink('Suspendre','?route=updateCommentValidation&commentId=' ~ comment.getId() ~ '&validation=0') }}
-        {{ link.buttonLink('Voir dans son contexte','?route=article&articleId=' ~ comment.getArticleId() ~ '#comment' ~ comment.getId()) }}
+        {{ link.buttonLink('Suspendre', '?route=updateCommentValidation&commentId=' ~ comment.getId() ~ '&validation=0') }}
+        {{ link.buttonLink('Voir dans son contexte', '?route=article&articleId=' ~ comment.getArticleId() ~ '#comment' ~ comment.getId()) }}
     {% endif %}
-        {{ link.buttonLink('Modifier','?route=adminEditComment&commentId=' ~ comment.getId()) }}
-        {{ link.buttonLink('Supprimer','?route=deleteComment&commentId=' ~ comment.getId()) }}     
+        {{ link.buttonLink('Modifier', '?route=adminEditComment&commentId=' ~ comment.getId()) }}
+        {{ link.buttonLink('Supprimer', '?route=deleteComment&commentId=' ~ comment.getId()) }}     
 </section>
 
 {% endblock %}

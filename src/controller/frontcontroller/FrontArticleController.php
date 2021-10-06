@@ -1,9 +1,9 @@
 <?php
 
-namespace App\src\controller\frontcontroller;
+namespace App\Src\Controller\FrontController;
 
-use App\config\Parameter;
-use App\src\utils\URL;
+use App\Config\Parameter;
+use App\Src\Utils\URL;
 
 class FrontArticleController extends FrontController
 {
@@ -25,7 +25,7 @@ class FrontArticleController extends FrontController
         // For all users -> published articles
         $this->parameters['published'] = 1;
         // For connected users -> add private articles
-        if($this->session->get('role')){
+        if ($this->session->get('role')) {
             $this->parameters['private'] = 1;
         }
 
@@ -33,7 +33,7 @@ class FrontArticleController extends FrontController
 
         $this->data['pages'] = ceil($this->data['totalArticlesCount']/$this->parameters['limit']);
 
-        if($this->data['page'] <= $this->data['pages'] && $this->data['page'] > 1){
+        if ($this->data['page'] <= $this->data['pages'] && $this->data['page'] > 1) {
             $this->parameters['offset'] = $this->parameters['limit']*($this->data['page'] - 1);     
         } else {
             $this->data['page'] = 1;
@@ -42,7 +42,7 @@ class FrontArticleController extends FrontController
 
         $this->data['articles'] = $this->articleDAO->getArticles($this->parameters);
 
-        $this->data['withCountCategories'] = $this->articleDAO->countByCategory();
+        $this->data['withCountCategories'] = $this->articleDAO->countByCategory($this->parameters);
 
         $this->data['pageArticlesCount'] = count($this->data['articles']);
 
@@ -56,25 +56,25 @@ class FrontArticleController extends FrontController
     {
         $article = $this->articleDAO->getArticle((int)$get->get('articleId'));
 
-        if($article){
+        if ($article) {
             $this->setPreviousURI();
 
-            if($this->session->get('pseudo')){
-                if($article->getStatusName() === "standby" && ($this->session->get('role') !== "admin" && $this->session->get('role') !== "editor")){
+            if ($this->session->get('pseudo')) {
+                if ($article->getStatusName() === "standby" && ($this->session->get('role') !== "admin" && $this->session->get('role') !== "editor")) {
                     $this->session->addMessage('danger', 'L\'article recherché est n\'est pas encore publié ou n\'est plus disponnible');
                     $this->http->redirect('?route=articles');                  
                 }
             } else {
-                if($article->getStatusName() === "private"){
+                if ($article->getStatusName() === "private") {
                     $this->session->addMessage('danger', 'L\'article recherché est privé, vous devez vous connecter pour pouvoir le consulter');
                     $this->http->redirect('?route=articles');
-                } elseif($article->getStatusName() === "standby"){
+                } elseif ($article->getStatusName() === "standby") {
                     $this->session->addMessage('danger', 'L\'article recherché est n\'est pas encore publié ou n\'est plus disponnible');
                     $this->http->redirect('?route=articles');                  
                 }             
             }
             $comments = [];
-            if($article->getAllowComment()) {
+            if ($article->getAllowComment()) {
                 $comments = $this->commentDAO->getComments([
                     'articleId' => (int)$get->get('articleId'),
                     'validated' => "validated"

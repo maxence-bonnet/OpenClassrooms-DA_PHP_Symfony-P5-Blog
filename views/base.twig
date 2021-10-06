@@ -2,11 +2,12 @@
 
 <html lang="fr" class="h-100">
     <head>
-        <meta charset="UTF-8" />
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width">
         <base href="http://localhost/P5_blog/public/">
         <link href='css/boxicons/boxicons.min.css' rel='stylesheet'>
         {% if session.get('theme') and session.get('theme') is not same as('default') %}
-            <link href="bootstrap_themes/bootstrap-{{ session.get('theme') }}.min.css" rel="stylesheet">
+            <link href="bootstrap_themes/bootstrap-{{ session.get('theme') }}.css" rel="stylesheet">
         {% else %}
             <link href="css/bootstrap/bootstrap.min.css" rel="stylesheet">
         {% endif %}
@@ -18,44 +19,45 @@
         <header class="shadow-lg">
             <nav class="navbar navbar-expand-md navbar-dark bg-dark">
                 <div class="container-fluid">
-                <a class="navbar-brand" href="?"><i class='bx bx-cube-alt fs-1' ></i></a>
+                    <a class="navbar-brand" href="?"><i class='bx bx-cube-alt fs-1' ></i></a>
                     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
+                        <span class="navbar-toggler-icon"></span>
                     </button>
                     <div class="collapse navbar-collapse" id="navbarNav">
                         <ul class="navbar-nav mb-2 mb-lg-0 w-100 px-2">
 
                             {% import 'twigMacro/linkMacro.twig' as link %}
 
-                            {{ link.navLink('Accueil', '?', {page : title, icon : "bx bx-home"}) }}
+                            {{ link.navLink('Accueil', '?', {page: title, icon: "bx bx-home"}) }}
 
-                            {{ link.navLink('Les Articles', '?route=articles', {page : title, icon : "bx bx-book-open"}) }}
+                            {{ link.navLink('Les Articles', '?route=articles', {page: title, icon: "bx bx-book-open"}) }}
                             
                             {% if session.get('pseudo') %}
 
-                                {{ link.navLink('Profil', '?route=profile&userId=' ~ session.get('id'), {page : title, icon : "bx bx-user"})}}
+                                {{ link.navLink('Profil', '?route=profile&userId=' ~ session.get('id'), {page: title, icon: "bx bx-user"})}}
 
                                 {% if session.get('role') is same as("admin") %}
 
-                                    {{ link.navLink('Nouvel article', '?route=addArticle', {page : title, icon : "bx bx-pencil"}) }}
+                                    {{ link.navLink('Nouvel article', '?route=addArticle', {page: title, icon: "bx bx-pencil"}) }}
 
-                                    {{ link.navLink('Administration', '?route=administration', {page : title, icon : "bx bx-crown"}) }}
+                                    {{ link.navLink('Administration', '?route=administration', {page: title, icon: "bx bx-crown"}) }}
 
                                 {% endif %}
 
-                                {{ link.navLink(session.get('pseudo'), '?route=profile&userId=' ~ session.get('id'), {icon : "bx bx-user", position : 'ms-md-auto'}) }}
+                                {{ link.navLink(session.get('pseudo'), '?route=profile&userId=' ~ session.get('id'), {icon: "bx bx-user", position: 'ms-md-auto'}) }}
 
-                                {{ link.navLink('Déconnexion', '?route=logout', {icon : "bx bx-log-out-circle"}) }}
+                                {{ link.navLink('Déconnexion', '?route=logout', {icon: "bx bx-log-out-circle"}) }}
 
                             {% else %}
                             
-                                {{ link.navLink('Inscription', '?route=register', {page : title, icon : "bx bx-user", position : 'ms-md-auto'}) }}
+                                {{ link.navLink('Inscription', '?route=register', {page: title, icon: "bx bx-user", position: 'ms-md-auto'}) }}
 
-                                {{ link.navLink('Connexion', '?route=login', {page : title, icon : "bx bx-log-in-circle"}) }}
+                                {{ link.navLink('Connexion', '?route=login', {page: title, icon: "bx bx-log-in-circle"}) }}
 
                             {% endif %}
 
                         </ul>
+                    </div>
                 </div>
             </nav>
         </header>
@@ -66,7 +68,7 @@
 
             {% for message in session.use('messages') %}
 
-                {{ message.getAlertMessage() | raw }}          
+                {{ message.getAlertMessage() |raw }}          
                 
             {% endfor %}
 
@@ -87,7 +89,7 @@
 
                     <a href="?route=administration" class="ms-auto p-2 d-flex text-decoration-none"><i class='bx bxs-crown fs-3' ></i> Administration </a>
 
-                    <span class="d-inline-block p-2"> Généré en {{ (1000*("now" | date('U.u') - constant('PAGE_GENERATING_TIME'))) | round }} ms <i class='bx-fw bx bxl-php'></i></span>
+                    <span class="d-none d-md-inline-block p-2"> Généré en {{ (1000*("now" |date('U.u') - constant('PAGE_GENERATING_TIME'))) |round }} ms <i class='bx-fw bx bxl-php'></i></span>
 
                 {% endif %}
 
