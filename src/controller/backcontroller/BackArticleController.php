@@ -10,16 +10,16 @@ class BackArticleController extends BackController
 {
     public function addArticle(Parameter $post)
     {
-        $this->checkAdmin();
+        if ($post->get('submit') && $post->get('token')) {
 
-        if ($post->get('submit')) {
+            $tokenState = $this->checkToken((string)$post->get('token'), ['saveMode' => 1]);
 
             $post->set('title', htmlspecialchars($post->get('title')));
             $post->set('lede', Text::HtmlToMarkdown($post->get('lede')));
             $post->set('content',Text::HtmlToMarkdown($post->get('content')));
 
             $errors = $this->validation->validate($post, 'Article');
-            if (!$errors) {
+            if (!$errors && $tokenState !== 'expired') {
                 $post->set('createdAt', null);
                 if ((int)$post->get('statusId') !== 3) {
                     $post->set('createdAt', date('Y-m-d H:i:s'));
@@ -47,8 +47,6 @@ class BackArticleController extends BackController
 
     public function editArticle(Parameter $post, int $articleId)
     {
-        $this->checkAdmin();
-
         $this->data['users'] = $this->buildUsersList();
         
         $this->data['categories'] = $this->buildCategoriesList();
@@ -61,14 +59,16 @@ class BackArticleController extends BackController
 
         $post->set('id', $articleId);
 
-        if ($post->get('submit')) {
+        if ($post->get('submit') && $post->get('token')) {
+
+            $tokenState = $this->checkToken((string)$post->get('token'), ['saveMode' => 1]);
 
             $post->set('title', htmlspecialchars($post->get('title')));
             $post->set('lede', Text::HtmlToMarkdown($post->get('lede')));
             $post->set('content',Text::HtmlToMarkdown($post->get('content')));
 
             $errors = $this->validation->validate($post, 'Article');
-            if (!$errors) {
+            if (!$errors && $tokenState !== 'expired') {
                 if ($article->getCreatedat() === null && $post->get('statusId') !== 3) {
                     $post->set('createdAt', date('Y-m-d H:i:s')); 
                 }
@@ -108,30 +108,40 @@ class BackArticleController extends BackController
         return $this->view->renderTwig('editArticle', $this->data);
     }
 
-    public function updateArticleStatus(int $articleId,int $statusId) : void
+    public function updateArticleStatus(Parameter $get) : void
     {
-        $this->checkAdmin();
+        if ($get->get('articleId') && $get->get('statusId') && $get->get('token')) {
 
-        $this->parameters['articleId'] = $articleId;
-        $this->parameters['statusId'] = $statusId;
+            $this->checkToken((string)$get->get('token'));
 
-        if ($statusId === 1 || $statusId === 2) {
-            $article = $this->articleDAO->getArticle($articleId);
-            if ((int)$article->getStatusId() === 3 && $article->getCreatedAt() === null) {
-                $this->parameters['createdAt'] = date('Y-m-d H:i:s');
+            $this->parameters['articleId'] = (int)$get->get('articleId');
+            $this->parameters['statusId'] = (int)$get->get('statusId');
+
+            if ($get->get('statusId') === 1 || $get->get('statusId') === 2) {
+
+                $article = $this->articleDAO->getArticle((int)$get->get('articleId'));
+
+                if ((int)$article->getStatusId() === 3 && $article->getCreatedAt() === null) {
+                    $this->parameters['createdAt'] = date('Y-m-d H:i:s');
+                }
             }
+            $this->articleDAO->updateArticleStatus($this->parameters);
+            $this->session->addMessage('success', 'Le statut de l\'article a bien été mis à jour');
         }
-        $this->articleDAO->updateArticleStatus($this->parameters);
-        $this->session->addMessage('success', 'Le statut de l\'article a bien été mis à jour');
+
         $this->http->dynamicRedirect('?route=adminArticles',$this->session);
     } 
-    
-    public function deleteArticle(int $articleId) : void
-    {
-        $this->checkAdmin();
 
-        $this->articleDAO->deleteArticle($articleId);
-        $this->session->addMessage('success', 'L\' article a bien été supprimé');
+    public function deleteArticle(Parameter $get) : void
+    {
+        if ($get->get('articleId') && $get->get('token')) {
+
+            $this->checkToken((string)$get->get('token'));
+
+            $this->articleDAO->deleteArticle((int)$get->get('articleId'));
+
+            $this->session->addMessage('success', 'L\' article a bien été supprimé');
+        }
         $this->http->dynamicRedirect('?route=adminArticles',$this->session);
     }
 }

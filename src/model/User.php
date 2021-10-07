@@ -149,7 +149,12 @@ class User extends Model
     /**
      * @param string pseudo
      */
-    public function setPseudo($pseudo){$this->pseudo = $pseudo;}
+    public function setPseudo($pseudo) {
+        $this->pseudo = 'inconnu';
+        if ($pseudo) {
+            $this->pseudo = $pseudo;
+        }    
+    }
 
     /**
      * @param string email

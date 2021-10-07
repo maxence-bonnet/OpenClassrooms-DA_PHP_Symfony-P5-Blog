@@ -48,27 +48,27 @@
                 <div class="col-md-8">
                     <div class="p-2 shadow mb-2 {{ post and post.get('id') is same as(comment.getId()) ? 'selected' }}" id="comment{{ comment.getId() }}">
 
-                        <h6>{{ link.link(comment.getUserPseudo(), '?route=profile&userId=' ~ comment.getUserId(), {class: 'text-decoration-none'}) }} {{comment.getFormatedDate(comment.getCreatedAt()) }} {{ comment.getLastModified() ? '(modifié)' }}</h6>
+                        <h6>{{ link.link(comment.getUserPseudo(), '?route=profile&userId=' ~ comment.getUserId(), {class: 'text-decoration-none'}) }} le {{comment.getFormatedDate(comment.getCreatedAt()) }} {{ comment.getLastModified() ? '(modifié)' }}</h6>
 
                         <p>{{ comment.getContent() |nl2br }}</p>
                         <div class="d-md-flex m-1 p-md-2">
                             {% if session.get('id') and session.get('id') is same as(comment.getUserId()) or session.get('role') is same as("admin") or session.get('role') is same as("moderator") %}
                                 
-                                {{ link.buttonLink('Modifier', '?route=editComment&commentId=' ~ comment.getId() ~ '#commentForm',{position: 'mx-1'}) }}
+                                {{ link.buttonLink('Modifier', '?route=editComment&commentId=' ~ comment.getId() ~ '#commentForm', {position: 'mx-1'}) }}
 
                                     {% if session.get('role') is same as("admin") or session.get('role') is same as("moderator") %}
 
-                                        {{ link.buttonLink('Masquer', '?route=updateCommentValidation&commentId=' ~ comment.getId() ~ '&validation=0',{position: 'mx-1'}) }}
+                                        {{ link.buttonLink('Masquer', '?route=updateCommentValidation&commentId=' ~ comment.getId() ~ '&validation=0&token=' ~ session.get('csrfToken'), {position: 'mx-1'}) }}
 
                                     {% endif %}
 
-                                {{ link.buttonLink('Supprimer', '?route=deleteComment&commentId=' ~ comment.getId(),{position: 'mx-1'}) }}
+                                {{ link.buttonLink('Supprimer', '?route=frontDeleteComment&commentId=' ~ comment.getId() ~ '&token=' ~ session.get('csrfToken'), {position: 'mx-1'}) }}
                             
                             {% endif %}
 
                             {% if session.get('pseudo') %}
                             
-                                {{ link.buttonLink('Répondre', '?route=article&articleId=' ~ article.getId() ~ '&answerTo=' ~ comment.getId() ~ '#answerForm',{position: 'ms-auto'}) }}                        
+                                {{ link.buttonLink('Répondre', '?route=article&articleId=' ~ article.getId() ~ '&answerTo=' ~ comment.getId() ~ '#answerForm', {position: 'ms-auto'}) }}                        
 
                             {% endif %}
                         </div>
@@ -81,28 +81,28 @@
                                 
                                     <div class="p-4 shadow mb-2 {{ post and post.get('id') is same as(answer.getId()) ? 'selected' }}" id="comment{{ answer.getId() }}">
                                         
-                                        <h6>{{ link.link(answer.getUserPseudo(), '?route=profile&userId=' ~ answer.getUserId(), {class: 'text-decoration-none'}) }} {{ answer.getFormatedDate(answer.getCreatedAt()) }} {{ answer.getLastModified() ? '(modifié)' }}</h6>
+                                        <h6>{{ link.link(answer.getUserPseudo(), '?route=profile&userId=' ~ answer.getUserId(), {class: 'text-decoration-none'}) }} le {{ answer.getFormatedDate(answer.getCreatedAt()) }} {{ answer.getLastModified() ? '(modifié)' }}</h6>
                                         
                                         <p>{{ answer.getContent() |nl2br }}</p>
                                         
                                         <div class="d-md-flex m-1 p-md-2">
                                             {% if session.get('id') and session.get('id') is same as(answer.getUserId()) or session.get('role') is same as("admin") or session.get('role') is same as("moderator") %}
                                                 
-                                                {{ link.buttonLink('Modifier', '?route=editComment&commentId=' ~ answer.getId() ~ '#commentForm',{ position: 'mx-1'}) }}
+                                                {{ link.buttonLink('Modifier', '?route=editComment&commentId=' ~ answer.getId() ~ '#commentForm', {position: 'mx-1'}) }}
 
                                                     {% if session.get('role') is same as("admin") or session.get('role') is same as("moderator") %}
 
-                                                        {{ link.buttonLink('Masquer', '?route=updateCommentValidation&commentId=' ~ answer.getId() ~ '&validation=0',{position: 'mx-1'}) }}
+                                                        {{ link.buttonLink('Masquer', '?route=updateCommentValidation&commentId=' ~ answer.getId() ~ '&validation=0&token=' ~ session.get('csrfToken'), {position: 'mx-1'}) }}
 
                                                     {% endif %}
 
-                                                {{ link.buttonLink('Supprimer', '?route=deleteComment&commentId=' ~ answer.getId(),{position: 'mx-1'}) }}
+                                                {{ link.buttonLink('Supprimer', '?route=frontDeleteComment&commentId=' ~ answer.getId() ~ '&token=' ~ session.get('csrfToken'), {position: 'mx-1'}) }}
                                             
                                             {% endif %}
 
                                             {% if session.get('pseudo') %}
                                             
-                                                {{ link.buttonLink('Répondre', '?route=article&articleId=' ~ article.getId() ~ '&answerTo=' ~ comment.getId() ~ '#answerForm',{position: 'ms-auto'}) }}                        
+                                                {{ link.buttonLink('Répondre', '?route=article&articleId=' ~ article.getId() ~ '&answerTo=' ~ comment.getId() ~ '#answerForm', {position: 'ms-auto'}) }}                        
 
                                             {% endif %}  
                                         </div>
@@ -120,7 +120,9 @@
                                         <div class="row d-flex justify-content-center">
                                             <div class="row d-flex justify-content-center">
 
-                                            {{ form.hiddenInput('answerTo',{value: answerTo}) }}
+                                            {{ form.hiddenInput('answerTo', {value: answerTo}) }}
+
+                                            {{ form.hiddenInput('token', {value: session.get('csrfToken')}) }}
 
                                             {{ form.textarea('Votre réponse', 'answer', 'answerContent', {errors: errors.answer, value: post.get('answer'), placeholder: '...', help: {text: 'Ce commentaire sera soumis à relecture avant publication <br> 500 caractères maximum : ', limit: '0/500'}}) }}
 
@@ -147,6 +149,8 @@
                         <div class="py-2 px-5 shadow">
                             <h4 class="text-center text-md-start">{{ post and not post.get('new') ? 'Modifier le commentaire' : 'Ajouter un commentaire' }}</h4>
                             <form method="post" action="?route={{ post and not post.get('new') ? 'editComment&commentId=' ~ post.get('id') ~ '#commentForm' : 'addComment&articleId=' ~ article.getId() ~ '#commentForm'}}" id="commentForm">
+
+                                {{ form.hiddenInput('token', {value: session.get('csrfToken')}) }}
 
                                 {{ form.textarea(session.get('pseudo'), 'comment', 'commentContent', {errors: errors.comment, value: post.get('comment'), placeholder: 'C\'est énorme j\'adore !', help: {text: 'Ce commentaire sera soumis à relecture avant publication <br> 500 caractères maximum : ', limit : '0/500'}}) }}
                                 

@@ -193,15 +193,21 @@
                                     {% endif %} </td>
                             <td>
                                 {% if article.getStatusId() is same as("1") %}
-                                    {{ link.link('Privé', '?route=updateArticleStatus&articleId=' ~ article.getId() ~ '&statusId=2') }}<span> | </span>{{ link.link('Suspendren', '?route=updateArticleStatus&articleId=' ~ article.getId() ~ '&statusId=3') }}
+                                    {{ link.link('Privé', '?route=updateArticleStatus&articleId=' ~ article.getId() ~ '&statusId=2&token=' ~ session.get('csrfToken')) }}
+                                    <span> | </span>
+                                    {{ link.link('Suspendre', '?route=updateArticleStatus&articleId=' ~ article.getId() ~ '&statusId=3&token=' ~ session.get('csrfToken')) }}
                                 {% elseif article.getStatusId() is same as("2") %}
-                                    {{ link.link('Public', '?route=updateArticleStatus&articleId=' ~ article.getId() ~ '&statusId=1') }}<span> | </span>{{ link.link('Suspendre', '?route=updateArticleStatus&articleId=' ~ article.getId() ~ '&statusId=3') }}
+                                    {{ link.link('Public', '?route=updateArticleStatus&articleId=' ~ article.getId() ~ '&statusId=1&token=' ~ session.get('csrfToken')) }}
+                                    <span> | </span>
+                                    {{ link.link('Suspendre', '?route=updateArticleStatus&articleId=' ~ article.getId() ~ '&statusId=3&token=' ~ session.get('csrfToken')) }}
                                 {% elseif article.getStatusId() is same as("3") %}
-                                    {{ link.link('Public', '?route=updateArticleStatus&articleId=' ~ article.getId() ~ '&statusId=1') }}<span> | </span>{{ link.link('Privé', '?route=updateArticleStatus&articleId=' ~ article.getId() ~ '&statusId=2') }}
+                                    {{ link.link('Public', '?route=updateArticleStatus&articleId=' ~ article.getId() ~ '&statusId=1&token=' ~ session.get('csrfToken')) }}
+                                    <span> | </span>
+                                    {{ link.link('Privé', '?route=updateArticleStatus&articleId=' ~ article.getId() ~ '&statusId=2&token=' ~ session.get('csrfToken')) }}
                                 {% endif %}                           
                             </td>
 
-                            <td> {{ link.link('<i class=\'bx bx-trash-alt\'></i> Supprimer', '?route=deleteArticle&articleId=' ~ article.getId()) }} </td>
+                            <td> {{ link.link('<i class=\'bx bx-trash-alt\'></i> Supprimer', '?route=deleteArticle&articleId=' ~ article.getId() ~ '&token=' ~ session.get('csrfToken')) }} </td>
                         </tr>
                     {% endfor %}
                     {% if articles is empty %}

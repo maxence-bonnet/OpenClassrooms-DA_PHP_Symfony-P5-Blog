@@ -77,7 +77,11 @@ class FrontArticleController extends FrontController
             if ($article->getAllowComment()) {
                 $comments = $this->commentDAO->getComments([
                     'articleId' => (int)$get->get('articleId'),
-                    'validated' => "validated"
+                    'validated' => 'validated',
+                    'orderBy' => [
+                        'column' => 'c.created_at',
+                        'order' => 'ASC'
+                    ]
                 ]);
             }
             $this->data['title'] = $article->getTitle();

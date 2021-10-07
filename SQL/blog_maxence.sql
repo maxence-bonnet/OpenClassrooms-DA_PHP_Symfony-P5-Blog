@@ -180,7 +180,7 @@ ALTER TABLE `article`
 --
 ALTER TABLE `comment`
   ADD CONSTRAINT `comment_ibfk_1` FOREIGN KEY (`answer_to`) REFERENCES `comment` (`id`),
-  ADD CONSTRAINT `comment_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`),
+  ADD CONSTRAINT `comment_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE ON UPDATE SET NULL ,
   ADD CONSTRAINT `comment_ibfk_3` FOREIGN KEY (`article_id`) REFERENCES `article` (`id`);
 
 --

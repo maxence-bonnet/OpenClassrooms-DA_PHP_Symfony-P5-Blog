@@ -71,6 +71,16 @@ class UserDAO extends DAO
         ]);
     }
 
+    public function deleteUser(int $userId) : void
+    {
+        $this->query = (new QueryBuilder())
+            ->statement('delete')
+            ->table('user')
+            ->where('id = :userId');
+
+        $this->createQuery((string)$this->query, [':userId' => $userId]);
+    }
+
     public function pseudoExists(string $pseudo) : ?int
     {
         $this->query = (new QueryBuilder()) 

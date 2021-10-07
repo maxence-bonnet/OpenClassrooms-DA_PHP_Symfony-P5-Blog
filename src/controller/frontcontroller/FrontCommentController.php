@@ -12,9 +12,12 @@ class FrontCommentController extends FrontController
 
         $article = $this->articleDAO->getArticle($articleId);
         if ($article && $article->getAllowComment()) {
-            if ($post->get('submit')) {
+            if ($post->get('submit') && $post->get('token')) {
+
+                $tokenState = $this->checkToken((string)$post->get('token'), ['saveMode' => 1]);
+
                 $errors = $this->validation->validate($post, 'Comment');
-                if (!$errors) {
+                if (!$errors && $tokenState !== 'expired') {
                     $parameters['userId'] = (int)$this->session->get('id');
                     $parameters['articleId'] = $articleId;
                     
@@ -81,9 +84,12 @@ class FrontCommentController extends FrontController
             }
         }
 
-        if ($post->get('submit')) {
+        if ($post->get('submit') && $post->get('token')) {
+
+            $tokenState = $this->checkToken((string)$post->get('token'), ['saveMode' => 1]);
+
             $errors = $this->validation->validate($post, 'Comment');
-            if (!$errors) {
+            if (!$errors && $tokenState !== 'expired') {
                 if ($this->session->get('role') === "admin" || $this->session->get('role') === "moderator") {
                     $validated = 1;
                     $this->session->addMessage('success', 'Le commentaire a bien été modifié');
@@ -105,7 +111,11 @@ class FrontCommentController extends FrontController
         $article = $this->articleDAO->getArticle($articleId);
         $comments = $this->commentDAO->getComments([
             'articleId' => $articleId,
-            'validated' => "validated"
+            'validated' => 'validated',
+            'orderBy' => [
+                'column' => 'c.created_at',
+                'order' => 'ASC'
+            ]
         ]);
 
         $post->set('id', $comment->getId());
@@ -119,5 +129,30 @@ class FrontCommentController extends FrontController
         $data['title'] = $article->getTitle();
 
         return $this->view->renderTwig('article', $data);
+    }
+
+    public function deleteComment(Parameter $get)
+    {
+        $this->checkLoggedIn();
+
+        if ($get->get('commentId') && $get->get('token')) {
+
+            $comment = $this->commentDAO->getComment((int)$get->get('commentId'));
+
+            if ($comment) {
+
+                if ($this->session->get('roleId') === 1 || $this->session->get('roleId') === 4 || $this->session->get('id') === $comment->getUserId()) {
+
+                    $this->checkToken((string)$get->get('token'));
+
+                    $this->commentDAO->deleteComment((int)$get->get('commentId'));
+                    $this->session->addMessage('success', 'Le commentaire a bien été supprimé');                    
+                }
+
+            } else {
+                $this->session->addMessage('danger', 'Le commentaire à supprimer n\'existe pas / plus');
+            }
+        }
+        $this->http->dynamicRedirect('?route=adminComments',$this->session);     
     }
 }

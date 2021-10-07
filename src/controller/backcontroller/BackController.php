@@ -9,6 +9,13 @@ abstract class BackController extends Controller
     protected $parameters;
     protected $data;
 
+    public function __construct()
+    {
+        parent::__construct();
+        $this->checkAdmin();
+        $this->CSRF();
+    }
+    
     protected function checkAdmin() : void
     {
         $this->checkLoggedIn();

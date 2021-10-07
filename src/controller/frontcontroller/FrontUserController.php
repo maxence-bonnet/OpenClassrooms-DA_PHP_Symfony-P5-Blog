@@ -18,7 +18,7 @@ class FrontUserController extends FrontController
         if ($post->get('submit')) {
             $password = $post->get('password1');
             foreach ($post->all() as $key => $value) {
-                $post->set($key, htmlspecialchars($value));
+                $post->set($key, htmlentities($value));
             }
             $errors = $this->validation->validate($post, 'User');
             if (!$errors) {
@@ -54,7 +54,6 @@ class FrontUserController extends FrontController
         }
 
         if ($post->get('submit')) {
-            $post->set('pseudo', htmlspecialchars($post->get('pseudo')));
             if (!empty($post->get('pseudo')) && $this->userDAO->pseudoExists($post->get('pseudo'))) {
                 try {
                     $result = $this->userDAO->login($post);
@@ -109,6 +108,11 @@ class FrontUserController extends FrontController
         }
 
         $data['title'] = 'Profil de ' . $user->getPseudo() ;
+
+        $data['commentsCount'] = $this->commentDAO->countComments(['userId' => (int)$user->getId()]);
+
+        $data['articlesCount'] = $this->articleDAO->countArticles(['authorId' => (int)$user->getId()]);
+
         if ($user->getPseudo() === $this->session->get('pseudo')) {
             $themesList = $this->getThemesList();
             if ($get->get('theme')) {

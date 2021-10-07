@@ -9,6 +9,7 @@
     <div class="col-md-6">
         <form method="post" action="?route=adminEditComment&commentId={{ post.get('id') }}">
             <div class="row">
+                {{ form.hiddenInput('token', {value: session.get('csrfToken')}) }}
                 {{ form.textarea('Modifier','comment', 'commentContent', {errors: errors.comment, value: post.get('comment'), help: '0/500'}) }}
                 {{ form.submit('Valider', {position: 'me-auto'}) }}
             </div>

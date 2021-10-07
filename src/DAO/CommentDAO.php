@@ -187,7 +187,7 @@ class CommentDAO extends DAO
             $this->query->orderBy($parameters['orderBy']);
             unset($parameters['orderBy']);
         } else {
-            $this->query->orderBy(['column'=>'c.created_at','order'=>'DESC']);
+            $this->query->orderBy(['column' => 'c.created_at', 'order' => 'DESC']);
             unset($parameters['orderBy']);
         }
 
@@ -220,6 +220,6 @@ class CommentDAO extends DAO
             )
             ->table('comment','c')
             ->innerJoin(['a'=>'article'], 'c.article_id = a.id')
-            ->innerJoin(['u'=>'user'], 'c.user_id = u.id');
+            ->leftJoin(['u'=>'user'], 'c.user_id = u.id');
     }
 }

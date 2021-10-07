@@ -13,13 +13,13 @@
         </div>
     </div>
     {% if not comment.getValidated() %}
-        {{ link.buttonLink('Valider', '?route=updateCommentValidation&commentId=' ~ comment.getId() ~ '&validation=1') }}
+        {{ link.buttonLink('Valider', '?route=updateCommentValidation&commentId=' ~ comment.getId() ~ '&validation=1&token=' ~ session.get('csrfToken')) }}
     {% else %}
-        {{ link.buttonLink('Suspendre', '?route=updateCommentValidation&commentId=' ~ comment.getId() ~ '&validation=0') }}
+        {{ link.buttonLink('Suspendre', '?route=updateCommentValidation&commentId=' ~ comment.getId() ~ '&validation=0&token=' ~ session.get('csrfToken')) }}
         {{ link.buttonLink('Voir dans son contexte', '?route=article&articleId=' ~ comment.getArticleId() ~ '#comment' ~ comment.getId()) }}
     {% endif %}
-        {{ link.buttonLink('Modifier', '?route=adminEditComment&commentId=' ~ comment.getId()) }}
-        {{ link.buttonLink('Supprimer', '?route=deleteComment&commentId=' ~ comment.getId()) }}     
+        {{ link.buttonLink('Modifier', '?route=adminEditComment&commentId=' ~ comment.getId() ~ '&token=' ~ session.get('csrfToken')) }}
+        {{ link.buttonLink('Supprimer', '?route=deleteComment&commentId=' ~ comment.getId() ~ '&token=' ~ session.get('csrfToken')) }}     
 </section>
 
 {% endblock %}
