@@ -6,6 +6,7 @@ use App\Src\Constraint\Validation;
 use App\Config\{Request, View, HTTP};
 use App\Src\DAO\{ArticleDAO, CategoryDAO, CommentDAO, ReactionDAO, UserDAO};
 use App\Src\Service\Mailer;
+use App\Src\Utils\CSRF;
 
 
 abstract class Controller
@@ -22,6 +23,7 @@ abstract class Controller
     protected $server;
     protected $session;
     protected $validation;
+    protected $csrf;
 
     public function __construct()
     {
@@ -38,6 +40,7 @@ abstract class Controller
         $this->post = $this->request->getPost();
         $this->server = $this->request->getServer();
         $this->session = $this->request->getSession();
+        $this->csrf = new CSRF();
         $this->view = new View($this->session);
     }
 
@@ -51,6 +54,7 @@ abstract class Controller
 
             $this->http->redirect('?route=login');
         }
+        $this->CSRF();
     }
 
     /**
@@ -92,5 +96,25 @@ abstract class Controller
             }            
         }
         return isset($cleanParameters) ? $cleanParameters : [] ;
+    }
+
+    protected function CSRF() : void
+    {
+        if (!$this->session->get('csrfToken') || $this->session->get('crsfTokenTime') + $this->csrf::REFRESH_TIME < time()) {
+            $this->session->set('csrfToken', $this->csrf->generateToken());
+            $this->session->set('crsfTokenTime', time());
+        }
+    }
+
+    protected function checkToken(string $token, array $option = [])
+    {
+        if ($this->session->get('csrfToken') !== $token) {
+            $this->session->addMessage('danger', 'Le lien de sécurité est manquant ou expiré, veuillez réessayer');
+            // Save mode to avoid redirection and enable form posts backup 
+            if (isset($option['saveMode']) && $option['saveMode'] === 1) {
+                return 'expired';
+            }
+            $this->http->dynamicRedirect('?', $this->session);
+        }
     }
 }

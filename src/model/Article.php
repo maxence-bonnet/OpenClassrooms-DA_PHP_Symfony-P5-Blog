@@ -188,7 +188,13 @@ class Article extends Model
     /**
      * @param string $authorPseudo
      */
-    public function setAuthorPseudo($authorPseudo) {$this->authorPseudo = $authorPseudo;}
+    public function setAuthorPseudo($authorPseudo) 
+    {    
+        $this->authorPseudo = 'Utilisateur';
+        if ($authorPseudo) {
+            $this->authorPseudo = $authorPseudo;
+        } 
+    }
 
     /**
      * @param string $categoryId

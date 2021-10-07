@@ -183,16 +183,16 @@
     
                             <td>
                                 {% if comment.getValidated() %}
-                                    {{ link.link('<i class=\'bx bx-comment-x\'></i> Suspendre', '?route=updateCommentValidation&commentId=' ~ comment.getId() ~ '&validation=0') }}
+                                    {{ link.link('<i class=\'bx bx-comment-x\'></i> Suspendre', '?route=updateCommentValidation&commentId=' ~ comment.getId() ~ '&validation=0&token=' ~ session.get('csrfToken')) }}
                                 {% else %}
-                                    {{ link.link('<i class=\'bx bx-comment-check\' ></i> Valider', '?route=updateCommentValidation&commentId=' ~ comment.getId() ~ '&validation=1') }}
+                                    {{ link.link('<i class=\'bx bx-comment-check\' ></i> Valider', '?route=updateCommentValidation&commentId=' ~ comment.getId() ~ '&validation=1&token=' ~ session.get('csrfToken')) }}
                                 {% endif %}
                                 
                                 <span> | </span>
                                 
                                 {{ link.link('<i class=\'bx bx-glasses\'></i> Voir', '?route=viewSingleComment&commentId=' ~ comment.getId()) }} </td>
 
-                            <td> {{ link.link('<i class=\'bx bx-trash-alt\'></i> Supprimer', '?route=deleteComment&commentId=' ~ comment.getId()) }} </td>
+                            <td> {{ link.link('<i class=\'bx bx-trash-alt\'></i> Supprimer', '?route=deleteComment&commentId=' ~ comment.getId() ~ '&token=' ~ session.get('csrfToken')) }} </td>
 
                         </tr>
                     {% endfor %}

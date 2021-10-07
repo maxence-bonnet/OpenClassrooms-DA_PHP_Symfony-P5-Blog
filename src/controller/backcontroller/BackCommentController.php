@@ -9,8 +9,6 @@ class BackCommentController extends BackController
 {
     public function viewSingleComment(int $commentId)
     {
-        $this->checkAdmin();
-
         $comment = $this->commentDAO->getComment($commentId);
         if (!$comment) {
             $this->session->addMessage('danger', 'Le commentaire recherché n\'existe pas / plus');  
@@ -22,17 +20,18 @@ class BackCommentController extends BackController
         return $this->view->renderTwig('singleComment', $this->data);
     }
 
-    public function adminEditComment(Parameter $post, $commentId)
-    {
-        $this->checkAdmin();
-        
+    public function adminEditComment(Parameter $post,int $commentId)
+    {        
         $comment = $this->commentDAO->getComment($commentId);
         if (!$comment) {
             $this->session->addMessage('danger', 'Le commentaire recherché n\'existe pas / plus');  
             $this->http->dynamicRedirect('?route=adminComments',$this->session);              
         }
 
-        if ($post->get('submit')) {
+        if ($post->get('submit') && $post->get('token')) {
+
+            $this->checkToken((string)$post->get('token'));
+
             $errors = $this->validation->validate($post, 'Comment');
             if (!$errors) {
                 $validated = 1;
@@ -56,27 +55,37 @@ class BackCommentController extends BackController
         return $this->view->renderTwig('adminEditComment', $this->data);
     }
 
-    public function updateCommentValidation(int $commentId, int $validated)
+    public function updateCommentValidation(Parameter $get)
     {
-        $this->checkAdmin();
-        
-        if ($validated === 1 || $validated === 0) {
-            $this->commentDAO->updateCommentValidation($commentId, $validated);
-            $message = $validated ? 'validé' : 'suspendu';
-            $this->session->addMessage('success', 'Le commentaire a bien été ' . $message);            
+        if ($get->get('commentId') && $get->get('token')) {
+
+            $this->checkToken((string)$get->get('token'));
+
+            $validated = (int)$get->get('validation');
+
+            if ($validated === 1 || $validated === 0) {
+                $this->commentDAO->updateCommentValidation((int)$get->get('commentId'), $validated);
+                $message = $validated ? 'validé' : 'suspendu';
+                $this->session->addMessage('success', 'Le commentaire a bien été ' . $message);            
+            }
         }
         $this->http->dynamicRedirect('?route=adminComments',$this->session);
     }
 
-    public function deleteComment(int $commentId)
+    public function deleteComment(Parameter $get)
     {
-        $this->checkAdmin();
+        if ($get->get('commentId') && $get->get('token')) {
 
-        if ($this->commentDAO->getComment($commentId)) {
-            $this->commentDAO->deleteComment($commentId);
-            $this->session->addMessage('success', 'Le commentaire a bien été supprimé');
-        } else {
-            $this->session->addMessage('danger', 'Le commentaire à supprimer n\'existe pas / plus');
+            $this->checkToken((string)$get->get('token'));
+
+            $commentId = (int)$get->get('commentId');
+
+            if ($this->commentDAO->getComment($commentId)) {
+                $this->commentDAO->deleteComment($commentId);
+                $this->session->addMessage('success', 'Le commentaire a bien été supprimé');
+            } else {
+                $this->session->addMessage('danger', 'Le commentaire à supprimer n\'existe pas / plus');
+            }
         }
         $this->http->dynamicRedirect('?route=adminComments',$this->session);
     }

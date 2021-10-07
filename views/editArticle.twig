@@ -13,6 +13,7 @@
         <div class="col-10 shadow">
             <h1>{{ title }}</h1>
             <form method="post" action="?route={{ post.get('id') ? 'editArticle&articleId=' ~ post.get('id') : 'addArticle'}}">
+                {{ form.hiddenInput('token', {value: session.get('csrfToken')}) }}
                 <div class="row">
                     <div class="col">
 

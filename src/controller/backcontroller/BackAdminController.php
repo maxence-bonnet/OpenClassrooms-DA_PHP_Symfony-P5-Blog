@@ -13,7 +13,6 @@ class BackAdminController extends BackController
 
     public function administration()
     {
-        $this->checkAdmin();
         $this->setPreviousURI();
 
         $this->data['comments'] = $this->commentDAO->getComments([
@@ -39,7 +38,6 @@ class BackAdminController extends BackController
 
     public function adminComments(Parameter $get)
     {
-        $this->checkAdmin();
         $this->setPreviousURI();
 
         $this->parameters = $this->getCleanParameters($get->all(),'comment');
@@ -87,7 +85,6 @@ class BackAdminController extends BackController
 
     public function adminArticles(Parameter $get)
     {
-        $this->checkAdmin();
         $this->setPreviousURI();
 
         $this->parameters = $this->getCleanParameters($get->all(),'article');
@@ -138,9 +135,8 @@ class BackAdminController extends BackController
 
     public function adminUsers(Parameter $get)
     {
-        $this->checkAdmin();
         $this->setPreviousURI();
-
+        
         $this->parameters = $this->getCleanParameters($get->all(),'user');
     
         $this->data['page'] = isset($this->parameters['page']) && $this->parameters['page'] > 1 ? $this->parameters['page'] : 1;

@@ -33,9 +33,11 @@
 
                         <td> {{ link.link(comment.getArticleTitle(), '?route=article&articleId=' ~ comment.getArticleId()) }} </td>
 
-                        <td> {{ link.link('<i class=\'bx bx-comment-check\' ></i> Valider', '?route=updateCommentValidation&commentId=' ~ comment.getId() ~ '&validation=1') }}<span> | </span>{{ link.link('<i class=\'bx bx-glasses\' ></i> Voir', '?route=viewSingleComment&commentId=' ~ comment.getId()) }} </td>
+                        <td> {{ link.link('<i class=\'bx bx-comment-check\' ></i> Valider', '?route=updateCommentValidation&commentId=' ~ comment.getId() ~ '&validation=1&token=' ~ session.get('csrfToken')) }}
+                            <span> | </span>
+                            {{ link.link('<i class=\'bx bx-glasses\' ></i> Voir', '?route=viewSingleComment&commentId=' ~ comment.getId()) }} </td>
 
-                        <td> {{ link.link('<i class=\'bx bx-trash-alt\'></i> Supprimer', '?route=deleteComment&commentId=' ~ comment.getId()) }} </td>
+                        <td> {{ link.link('<i class=\'bx bx-trash-alt\'></i> Supprimer', '?route=deleteComment&commentId=' ~ comment.getId() ~ '&token=' ~ session.get('csrfToken')) }} </td>
 
                     </tr>
                 {% endfor %}
@@ -95,7 +97,7 @@
                                     {% endif %} 
                                 </td>
 
-                                <td> {{ link.link('<i class=\'bx bx-trash-alt\'></i> Supprimer', '?route=deleteArticle&articleId=' ~ article.getId()) }} </td>
+                                <td> {{ link.link('<i class=\'bx bx-trash-alt\'></i> Supprimer', '?route=deleteArticle&articleId=' ~ article.getId() ~ '&token=' ~ session.get('csrfToken')) }} </td>
 
                             </tr>
                 {% endfor %}
@@ -161,11 +163,17 @@
 
                                 <td>
                                     {% if user.getRoleId() is same as("2") %}
-                                        {{ link.link('<i class=\'bx bx-pencil\' ></i> Éditeur', '?route=updateUserRole&userId=' ~ user.getId() ~ '&roleId=3') }}<span> | </span>{{ link.link('<i class=\'bx bx-glasses\' ></i> Modérateur', '?route=updateUserRole&userId=' ~ user.getId() ~ '&roleId=4') }}
+                                        {{ link.link('<i class=\'bx bx-pencil\' ></i> Éditeur', '?route=updateUserRole&userId=' ~ user.getId() ~ '&roleId=3&token=' ~ session.get('csrfToken')) }}
+                                        <span> | </span>
+                                        {{ link.link('<i class=\'bx bx-glasses\' ></i> Modérateur', '?route=updateUserRole&userId=' ~ user.getId() ~ '&roleId=4&token=' ~ session.get('csrfToken')) }}
                                     {% elseif user.getRoleId() is same as("3") %}
-                                        {{ link.link('<i class=\'bx bx-user\' ></i> Utilisateur', '?route=updateUserRole&userId=' ~ user.getId() ~ '&roleId=2') }}<span> | </span>{{ link.link('<i class=\'bx bx-glasses\' ></i> Modérateur', '?route=updateUserRole&userId=' ~ user.getId() ~ '&roleId=4') }}
+                                        {{ link.link('<i class=\'bx bx-user\' ></i> Utilisateur', '?route=updateUserRole&userId=' ~ user.getId() ~ '&roleId=2&token=' ~ session.get('csrfToken')) }}
+                                        <span> | </span>
+                                        {{ link.link('<i class=\'bx bx-glasses\' ></i> Modérateur', '?route=updateUserRole&userId=' ~ user.getId() ~ '&roleId=4&token=' ~ session.get('csrfToken')) }}
                                     {% elseif user.getRoleId() is same as("4") %}
-                                        {{ link.link('<i class=\'bx bx-user\' ></i> Utilisateur', '?route=updateUserRole&userId=' ~ user.getId() ~ '&roleId=2') }}<span> | </span>{{ link.link('<i class=\'bx bx-pencil\' ></i> Éditeur', '?route=updateUserRole&userId=' ~ user.getId() ~ '&roleId=3') }}
+                                        {{ link.link('<i class=\'bx bx-user\' ></i> Utilisateur', '?route=updateUserRole&userId=' ~ user.getId() ~ '&roleId=2&token=' ~ session.get('csrfToken')) }}
+                                        <span> | </span>
+                                        {{ link.link('<i class=\'bx bx-pencil\' ></i> Éditeur', '?route=updateUserRole&userId=' ~ user.getId() ~ '&roleId=3&token=' ~ session.get('csrfToken')) }}
                                     {% else %}
                                         {{ link.link('<i class=\'bx bx-crown\' ></i>','#') }}
                                     {% endif %}                         
@@ -180,15 +188,15 @@
 
                                         {% if user.getStatusId() is not same as("3") %}
 
-                                            {{ link.link('<i class=\'bx bx-block\' ></i> Bannir', '?route=updateUserStatus&userId=' ~ user.getId() ~ '&statusId=3') }}
+                                            {{ link.link('<i class=\'bx bx-block\' ></i> Bannir', '?route=updateUserStatus&userId=' ~ user.getId() ~ '&statusId=3&token=' ~ session.get('csrfToken')) }}
 
                                         {% else %}
 
-                                            {{ link.link('Relaxer', '?route=updateUserStatus&userId=' ~ user.getId() ~ '&statusId=1') }}
+                                            {{ link.link('Relaxer', '?route=updateUserStatus&userId=' ~ user.getId() ~ '&statusId=1&token=' ~ session.get('csrfToken')) }}
 
                                         {% endif %}
 
-                                        <span> | </span>{{ link.link('<i class=\'bx bx-trash-alt\'></i> Supprimer', '?route=deleteUser&userId=' ~ user.getId()) }}
+                                        <span> | </span>{{ link.link('<i class=\'bx bx-trash-alt\'></i> Supprimer', '?route=deleteUser&userId=' ~ user.getId() ~ '&token=' ~ session.get('csrfToken')) }}
 
                                     {% endif %} 
                                 </td>

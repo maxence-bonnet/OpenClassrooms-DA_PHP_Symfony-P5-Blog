@@ -138,7 +138,13 @@ class Comment extends Model
     /**
      * @param string $user
      */
-    public function setUserPseudo($userPseudo){$this->userPseudo = $userPseudo;}
+    public function setUserPseudo($userPseudo)
+    {
+        $this->userPseudo = 'Utilisateur';
+        if ($userPseudo) {
+            $this->userPseudo = $userPseudo;
+        } 
+    }
 
     /**
      * @param int $articleId

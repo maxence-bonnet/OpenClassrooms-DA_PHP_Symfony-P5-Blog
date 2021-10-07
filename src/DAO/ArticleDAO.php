@@ -71,6 +71,7 @@ class ArticleDAO extends DAO
             ->count('1' ,'count')
             ->select('c.name','c.id')
             ->table('article as a')
+            ->innerJoin(['u' => 'user'], 'a.author_id = u.id')
             ->innerJoin(['s' => 'article_status'], 'a.status_id = s.id')
             ->leftJoin(['c' => 'category'],'a.category_id = c.id')
             ->groupBy('c.id')
@@ -299,7 +300,7 @@ class ArticleDAO extends DAO
                 'c.name as category_name','s.name as status_name'
             )
             ->table('article', 'a')
-            ->innerJoin(['u' => 'user'], 'a.author_id = u.id')
+            ->leftJoin(['u' => 'user'], 'a.author_id = u.id')
             ->leftJoin(['c' => 'category'], 'a.category_id = c.id')
             ->innerJoin(['s' => 'article_status'], 'a.status_id = s.id');
     }

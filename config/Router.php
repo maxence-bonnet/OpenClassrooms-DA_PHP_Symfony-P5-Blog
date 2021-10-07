@@ -47,6 +47,9 @@ class Router
                     case 'editComment' :
                         (new FrontCommentController())->editComment($this->request->getPost(),(int)$this->request->getGet()->get('commentId'));
                         break;
+                    case 'frontDeleteComment' :
+                        (new FrontCommentController())->deleteComment($this->request->getGet());
+                        break;
                     case 'register' :
                         (new FrontUserController())->register($this->request->getPost());
                         break;
@@ -66,16 +69,16 @@ class Router
                         (new BackArticleController())->editArticle($this->request->getPost(),(int)$this->request->getGet()->get('articleId'));
                         break;
                     case 'updateArticleStatus' :
-                        (new BackArticleController())->updateArticleStatus((int)$this->request->getGet()->get('articleId'),(int)$this->request->getGet()->get('statusId'));
+                        (new BackArticleController())->updateArticleStatus($this->request->getGet());
                         break;
                     case 'deleteArticle' :
-                        (new BackArticleController())->deleteArticle((int)$this->request->getGet()->get('articleId'));
+                        (new BackArticleController())->deleteArticle($this->request->getGet());
                         break;
                     case 'deleteComment' :
-                        (new BackCommentController())->deleteComment((int)$this->request->getGet()->get('commentId'));
+                        (new BackCommentController())->deleteComment($this->request->getGet());
                         break;
                     case 'updateCommentValidation' :
-                        (new BackCommentController())->updateCommentValidation((int)$this->request->getGet()->get('commentId'),(int)$this->request->getGet()->get('validation'));
+                        (new BackCommentController())->updateCommentValidation($this->request->getGet());
                         break;
                     case 'viewSingleComment' :
                         (new BackCommentController())->viewSingleComment((int)$this->request->getGet()->get('commentId'));
@@ -96,11 +99,14 @@ class Router
                         (new BackAdminController())->adminUsers($this->request->getGet());
                         break;
                     case 'updateUserRole' :
-                        (new BackUserController())->updateUserRole((int)$this->request->getGet()->get('userId'),(int)$this->request->getGet()->get('roleId'));
+                        (new BackUserController())->updateUserRole($this->request->getGet());
                         break;
                     case 'updateUserStatus' :
-                        (new BackUserController())->updateUserStatus((int)$this->request->getGet()->get('userId'),(int)$this->request->getGet()->get('statusId'));
+                        (new BackUserController())->updateUserStatus($this->request->getGet());
                         break;
+                    case 'deleteUser' :
+                        (new BackUserController())->deleteUser($this->request->getGet());
+                        break;    
                     default :
                         (new ErrorController())->errorNotFound();
                 }     

@@ -60,6 +60,14 @@
                         <td class="text-center">{{ user.getScore() }}</td>
                     </tr>
                     <tr>
+                        <td>Commentaires postés :</td>
+                        <td class="text-center">{{ commentsCount }}</td>
+                    </tr>
+                    <tr>
+                        <td>Articles écrits :</td>
+                        <td class="text-center">{{ articlesCount }}</td>
+                    </tr>
+                    <tr>
                         <td>Description :</td>
                         <!-- User description not added yet -->
                         <td class="text-center">{{ user.getDescription() ? '' : 'Aucune description pour l\'instant' }}</td>

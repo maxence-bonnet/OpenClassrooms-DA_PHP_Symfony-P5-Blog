@@ -3,24 +3,6 @@
 # AuthUserFile "...\...\...\...\.htpasswd"
 # Require valid-user
 
-Options +FollowSymlinks 
-RewriteEngine off
-# 
-
-# RewriteCond %{REQUEST_FILENAME} !-f
-# RewriteCond %{REQUEST_FILENAME} !-d
-
-# RewriteRule ^article-([0-9]+)$     public/index.php?route=article&articleId=$1
-# TRAVAUX
-RewriteRule ^article-([0-9]+)/?([a-z0-9]+=.+)?$     public/index.php?route=article&articleId=$1&$2 [NC]
-RewriteRule ^([a-z0-9]+)$                           public/index.php?route=$1 [NC]
-RewriteRule ^([a-z0-9]+)\+?([a-z0-9]+=.+)?$         public/index.php?route=$1&$2 [NC]
-# RewriteRule ^([a-z0-9]+)/(.+)?$                                  public/index.php?route=$1$2 [NC]
-
-
-
-# RewriteRule ^([a-z0-9]+\?)(.+)?$         public/index.php?route=$1 [NC]
-
 ErrorDocument 404 /P5_blog/public/index.php?route=notFound
 ErrorDocument 403 /P5_blog/public/index.php?route=forbidden
 ErrorDocument 500 /P5_blog/public/index.php?route=errorServer
@@ -42,13 +24,6 @@ Deny from all
 
 # Allow access to index.php
 <FilesMatch "^index.php$">
-Order allow,deny
-Allow from all
-</FilesMatch>
-
-
-# Allow access to insersion.php
-<FilesMatch "^insersion.php$">
 Order allow,deny
 Allow from all
 </FilesMatch>
