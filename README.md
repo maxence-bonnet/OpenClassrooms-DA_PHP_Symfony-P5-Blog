@@ -60,7 +60,7 @@ Mettre à jour le fichier `config/developpement.php` avec vos propres paramètre
 
 ```php
 const HOST = 'localhost'; // adresse de l'hôte
-const DB_NAME = 'blog_maxence'; 
+const DB_NAME = ''; // Laisser vide pour le moment
 const CHARSET = 'utf8';
 const DB_USER = 'root'; // identifiant utilisateur
 const DB_PASS = ''; // mot de passe utilisateur
@@ -76,9 +76,15 @@ php .\SQL\importDataBase.php
 ### a-bis]
 Ou importer le fichier blog.sql directement sur PhpMyAdmin si disponnible
 
+Mettre à jour le fichier `config/developpement.php` :
+
+```php
+const DB_NAME = 'blog_maxence'; 
+```
 
 ## 4] Utilisation
-Si tout s'est bien déroulé, le site devrait désormais être fonctionnel.
+Si tout s'est bien déroulé, le site devrait désormais être fonctionnel, rendez-vous à la racine du site.
+
 Vous pouvez vous connecter avec le compte administrateur pour tester l'ensemble :
 
 pseudo :  admin

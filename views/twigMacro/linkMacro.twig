@@ -12,7 +12,7 @@
 
 {#  #}
 {% macro buttonLink(content,href,options = []) %}
-    <a href="{{ href }}" class="btn btn-primary {{ options.position }}">{{ content | raw }}</a>
+    <a href="{{ href }}" class="btn btn-primary {{ options.position }}"{% if options.target %}target="{{ options.target }}" {% endif %}">{{ content | raw }}</a>
 {% endmacro %}
 
 {#  #}
