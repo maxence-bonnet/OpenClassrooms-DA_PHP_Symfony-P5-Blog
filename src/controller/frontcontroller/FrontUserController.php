@@ -120,9 +120,8 @@ class FrontUserController extends FrontController
                 if (in_array($get->get('theme'),$themesList) || $get->get('theme') === "default") {
                     if ($get->get('theme') === "default" && $this->session->get('theme')) {
                         $this->session->remove('theme');
-                    } else {
-                        $this->session->set('theme', $get->get('theme'));
-                    } 
+                    }
+                    $this->session->set('theme', $get->get('theme'));
                     $this->session->addMessage('success','Le thème a été mis à jour : ' . $get->get('theme'));          
                 }
             }

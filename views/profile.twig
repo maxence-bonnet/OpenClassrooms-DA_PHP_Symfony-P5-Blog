@@ -112,7 +112,7 @@
                 {% for theme in themesList %}
                     <li class="list-group-item">{{ link.link(theme |capitalize, '?route=profile&userId=' ~ session.get('id') ~ '&theme=' ~ theme, {class: 'text-decoration-none'}) }}{{ session.get('theme') is same as(theme) ? '<i class=\'bx bx-check\'></i>'}}</li>
                 {% endfor %}
-                <li class="list-group-item">{{ link.link('Par défaut' |capitalize, '?route=profile&userId=' ~ session.get('id') ~ '&theme=default', {class: 'text-decoration-none'}) }}{{ session.get('theme') ? '' : '<i class=\'bx bx-check\'></i>'}}</li>
+                <li class="list-group-item">{{ link.link('Par défaut' |capitalize, '?route=profile&userId=' ~ session.get('id') ~ '&theme=default', {class: 'text-decoration-none'}) }}{{ session.get('theme') is same as('default') ? '<i class=\'bx bx-check\'></i>'}}</li>
             </ul>
         </div>
         {% endif %}
