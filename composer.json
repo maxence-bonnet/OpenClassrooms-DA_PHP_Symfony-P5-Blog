@@ -6,10 +6,11 @@
       }
     },
     "require": {
-        "twig/twig": "3.0",
+        "twig/twig": "3.3",
         "tinymce/tinymce": ">= 5",
         "twig/markdown-extra": "^3.3",
         "league/html-to-markdown": "^5.0",
-        "league/commonmark": "^2.0"
+        "league/commonmark": "^2.0",
+        "twig/string-extra": "^3.3"
     }
 }

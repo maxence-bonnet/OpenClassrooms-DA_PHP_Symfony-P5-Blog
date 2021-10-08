@@ -70,7 +70,8 @@ class FrontUserController extends FrontController
                             $this->session->set('role', $result['role_name']);
                             $this->session->set('pseudo', $post->get('pseudo'));
                             $this->session->set('refreshed', time());
-                            $this->session->addMessage('success', 'Vous êtes connecté en tant que ' . $post->get('pseudo'));     
+                            $this->session->addMessage('success', 'Vous êtes connecté en tant que ' . $post->get('pseudo'));
+                            $this->CSRF(); 
                             $this->http->dynamicRedirect('?',$this->session);
                         }                            
                     }  

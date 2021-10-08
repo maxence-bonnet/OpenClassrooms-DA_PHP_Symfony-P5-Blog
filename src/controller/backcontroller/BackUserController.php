@@ -4,6 +4,7 @@ namespace App\Src\Controller\BackController;
 
 use App\Config\Parameter;
 use App\Src\Controller\Controller;
+use \Exception;
 
 class BackUserController extends BackController
 {

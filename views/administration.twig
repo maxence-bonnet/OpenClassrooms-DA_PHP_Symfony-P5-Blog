@@ -25,13 +25,13 @@
                 {% for comment in comments %}
                     <tr>
                     
-                        <td> {{ link.link(comment.getUserPseudo(), '?route=profile&userId=' ~ comment.getUserId()) }} </td>
+                        <td> {{ link.link(comment.getUserPseudo()|u.truncate(25, '...'), '?route=profile&userId=' ~ comment.getUserId()) }} </td>
 
                         <td> {{ comment.getExcerptContent() }} </td>
 
                         <td> {{ comment.getFormatedDate(comment.getCreatedAt()) }} </td>
 
-                        <td> {{ link.link(comment.getArticleTitle(), '?route=article&articleId=' ~ comment.getArticleId()) }} </td>
+                        <td> {{ link.link(comment.getArticleTitle()|u.truncate(25, '...'), '?route=article&articleId=' ~ comment.getArticleId()) }} </td>
 
                         <td> {{ link.link('<i class=\'bx bx-comment-check\' ></i> Valider', '?route=updateCommentValidation&commentId=' ~ comment.getId() ~ '&validation=1&token=' ~ session.get('csrfToken')) }}
                             <span> | </span>
@@ -73,7 +73,7 @@
                 {% for article in articles %}
                             <tr>
 
-                                <td> {{ link.link(article.getTitle(), '?route=article&articleId=' ~ article.getId()) }} </td>
+                                <td> {{ link.link(article.getTitle()|u.truncate(25, '...'), '?route=article&articleId=' ~ article.getId()) }} </td>
 
                                 <td> {{ article.getFormatedDate(article.getCreatedAt()) }} </td>
 

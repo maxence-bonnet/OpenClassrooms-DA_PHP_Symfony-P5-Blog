@@ -173,7 +173,7 @@
                 <tbody>
                     {% for article in articles %}
                         <tr>
-                            <td> {{ link.link(article.getTitle(), '?route=article&articleId=' ~ article.getId()) }} </td>
+                            <td> {{ link.link(article.getTitle()|u.truncate(25, '...') , '?route=article&articleId=' ~ article.getId()) }} </td>
 
                             <td> {{ link.link(article.getAuthorPseudo(), '?route=profile&userId=' ~ article.getAuthorId()) }} </td>
 

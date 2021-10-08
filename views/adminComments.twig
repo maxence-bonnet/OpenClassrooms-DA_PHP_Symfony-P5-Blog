@@ -179,7 +179,7 @@
 
                             <td> {{ comment.getFormatedDate(comment.getCreatedAt()) }} </td>
 
-                            <td> {{ link.link(comment.getArticleTitle(), '?route=article&articleId=' ~ comment.getArticleId()) }} </td>
+                            <td> {{ link.link(comment.getArticleTitle()|u.truncate(25, '...'), '?route=article&articleId=' ~ comment.getArticleId()) }} </td>
     
                             <td>
                                 {% if comment.getValidated() %}
