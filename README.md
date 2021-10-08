@@ -23,6 +23,7 @@ Les commentaires postés par les utilisateurs doivent être validés par l'admin
  * PHP 7.2.5 +
  * MySQL 10 +
  * [Composer](https://getcomposer.org/)
+ * [Bootstrap v5 +](https://getbootstrap.com/)
 
 ## 1] Cloner le projet
 
@@ -81,8 +82,15 @@ Mettre à jour le fichier `config/developpement.php` :
 ```php
 const DB_NAME = 'blog_maxence'; 
 ```
+## 4] Bootstrap
 
-## 4] Utilisation
+Intégrer les fichiers Bootstrap 5 dans les dossiers css / js
+
+`public/css/bootstrap`
+
+`public/js/bootstrap`
+
+## 5] Utilisation
 Si tout s'est bien déroulé, le site devrait désormais être fonctionnel, rendez-vous à la racine du site.
 
 Vous pouvez vous connecter avec le compte administrateur pour tester l'ensemble :
@@ -100,6 +108,11 @@ En plus de ce qui est demandé, il est possible de :
   * Choisir un thème sur sa propre page de profil
  
 L'espace d'adminitration permet de faire des recherches précises (commentaires / articles / utilisateurs) avec un système de filtre flexible.
+
+
+## Codacy Review
+
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/79f37147ee3e460f876eb294ca8e4873)](https://www.codacy.com/gh/maxence-bonnet/OpenClassrooms-DA_PHP_Symfony-P5-Blog/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=maxence-bonnet/OpenClassrooms-DA_PHP_Symfony-P5-Blog&amp;utm_campaign=Badge_Grade)
 
 ## Pistes d'améliorations
 
