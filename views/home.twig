@@ -1,28 +1,56 @@
 {% extends 'base.twig' %}
 
+{% import 'twigMacro/linkMacro.twig' as link %}
+
 {% import 'twigMacro/formMacro.twig' as form %}
 
 {% block content %}
 
-<section class="container-fluid container-md mb-3">
-    <div class="row justify-content-md-center">
-        <div class="col shadow">
-            <h1> Maxence Bonnet</h1>
-                <!-- <img src="../public/uploads/photo.jpg" alt="Ceci est une photo"> -->
-            <h2> Slogan </h2>
-            <p> [...] </p>
-            <p>
-                <a href="../public/uploads/CV.pdf" target="_blank">Mon CV</a>
-            </p>
-            <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Ut temporibus nam, quod molestiae ea atque suscipit consequuntur tempora itaque. Quaerat nam facere alias praesentium eveniet ex non incidunt corporis explicabo?
-            Error vitae asperiores provident accusantium blanditiis non quidem, aut impedit. Molestias cumque dolorum error voluptas eos similique vitae molestiae quaerat ullam nemo ratione nulla aliquam ipsa, nesciunt modi iusto officia.</p>
+<section class="container-fluid mb-3">
+    <div class="row justify-content-center flex-row-reverse">
+        <div class="col-12 col-sm-6 col-md-3 d-flex justify-content-center">
+            <div class="card" style="width:15rem;">
+                <img src="uploads/photo.png" alt="photo_maxence_bonnet" class="card-img rounded mx-auto d-block px-3 py-2">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Maxence Bonnet</h5>
+                    <p class="card-text">Éternel étudiant dans l'univers de la programmation et de l'informatique.</p>
+                    {{ link.buttonLink('Voir mon CV', 'uploads/CV.pdf', {target: '_blank'}) }}
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-md-7 p-3 ms-3">
+            <h1> Bienvenue sur mon blog </h1>
+
+            <h2> À propos de moi : </h2>
+
+            <p>Né à Orléans en 1994, je me suis beaucoup déplacé pendant ma scolarité (Guadeloupe, Dijon, Saint-Brieux, Quimper, Nantes, Amiens). J'ai
+            passé un Bac S en 2012, puis obtenu un BTS en gestion & maitrise de l'eau, une license Professionnel en Agriculture, Agronomie et Développement Durable.
+            Après des périodes alternant bénévolat pour la faune sauvage et emplois, j'ai décidé de m'intéresser à l'informatique non plus comme un hobby, mais 
+            comme une réelle perspective d'avenir professionel.
+
+            <h2> Et maintenant ? </h2>
+
+            <p>Mon intérêt naissant pour la programmation m’a amené à me former au sein de l’organisme OpenClassrooms. Je me suis intéressé dans un 
+            premier temps aux cours concernant le fonction des réseaux TCP/IP, les bases de Linux, HTML 5 & CSS, puis il m'est apparu nécessaire 
+            de confirmer ce qui devenait ma passion en réels acquis certifiés.</p>
+
+            <p>Grâce au soutien de pôle-emploi, j'ai pu m'orienter vers une première formation : initiation fullstack, formation condensée 
+            de 3 mois qui a confirmé ma volonté d’approfondir mes connaissances et compétences en matière de développement PHP, et backend 
+            de manière générale.</p>
+
+            <p>Pour étoffer mes formations et démarrer avec un bon bagage technique avant de chercher un premier emploi, j'ai choisi de me former
+            au framework Symfony dans le cadre de la formation Développeur d’application - PHP / Symfony (toujours Openclassrooms😜).</p>
+
+            <p>Désolé pour l'esthétique qui n'est pas encore très poussée, j'ai plus d'affinité pour le backend vous l'aurez compris.</p>
+
+
         </div>
     </div>
 </section>
-
+<hr>
 <section class="container-fluid container-md mb-3">
     <div class="row justify-content-md-center">
-        <div class="col-md-6 shadow-lg">
+        <div class="col-md-9 shadow p-3">
             <h4 class="text-center text-md-start">Formulaire de contact</h4>
             <form method="post">
                 <div class="row">
