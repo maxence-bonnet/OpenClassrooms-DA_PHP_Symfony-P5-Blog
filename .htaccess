@@ -1,8 +1,3 @@
-# AuthName "[...]"
-# AuthType Basic
-# AuthUserFile "...\...\...\...\.htpasswd"
-# Require valid-user
-
 ErrorDocument 404 /P5_blog/public/index.php?route=notFound
 ErrorDocument 403 /P5_blog/public/index.php?route=forbidden
 ErrorDocument 500 /P5_blog/public/index.php?route=errorServer
@@ -11,7 +6,7 @@ ErrorDocument 500 /P5_blog/public/index.php?route=errorServer
 Options -Indexes 
 
 # Deny access to files with extensions
-<FilesMatch "\.(pdf|jpg|jpeg|png|php|json|lock|md|gitignore|sql)$">
+<FilesMatch "\.(pdf|php|json|lock|md|gitignore|sql)$">
 Order allow,deny
 Deny from all
 </FilesMatch>
@@ -34,10 +29,10 @@ Order allow,deny
 Allow from all
 </FilesMatch>
 
-# Password protect files
-#<FilesMatch "^()*$">
-#AuthType Basic
-#AuthName "Mypassword"
-#AuthUserFile <Full Server Path to .htpasswd file>/.htpasswd
-#Require valid-user
-#</FilesMatch>
+RewriteEngine On
+RewriteBase /P5_blog/
+
+RewriteCond %{THE_REQUEST} /public/([^\s?]*) [NC]
+RewriteRule ^ %1 [L,NE]
+
+RewriteRule ^((?!public/).*)$ public/$1 [L,NC]

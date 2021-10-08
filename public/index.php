@@ -2,9 +2,9 @@
 
 define('PAGE_GENERATING_TIME', microtime(true));
 
-require '../config/developpement.php';
-// require '../config/production.php';
-require '../vendor/autoload.php';
+require dirname(__DIR__) . '/config/developpement.php';
+// require dirname(__DIR__) . '/config/production.php';
+require dirname(__DIR__) . '/vendor/autoload.php';
 
 session_start([
     'name' => 'SESSID',

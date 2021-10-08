@@ -123,7 +123,7 @@ class UserValidation extends Validation
         if ($this->constraint->maxLength($name, $value, 120)) {
             return $this->constraint->maxLength('Mot de passe', $value, 120);
         }
-        if ($this->constraint->PassRequirements($name, $value)) {
+        if ($this->constraint->passRequirements($name, $value)) {
             return $this->constraint->PassRequirements('Mot de passe', $value);
         }
     }

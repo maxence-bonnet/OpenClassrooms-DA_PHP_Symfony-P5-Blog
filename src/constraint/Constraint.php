@@ -29,7 +29,7 @@ class Constraint
         }
     }
     
-    public function PassRequirements($name, $value)
+    public function passRequirements($name, $value)
     {
         if (!preg_match("#(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*\d)(?=.*[^A-Za-z\d])#",$value)) {
             return 'Le champ '.$name.' ne respecte pas le format demandé.';

@@ -158,7 +158,7 @@ class QueryBuilder
     {
         if (isset($orderBy['column']) && isset($orderBy['order']) && !$this->orderBy) {
             if ($orderBy['order'] === 'ASC' || $orderBy['order'] === 'DESC') {
-                $this->orderBy = "ORDER BY " . $orderBy['column'] . " " . $orderBy['order'];
+                $this->orderBy = "ORDER BY " . htmlentities($orderBy['column']) . " " . htmlentities($orderBy['order']);
             }                     
         }
         return $this; 

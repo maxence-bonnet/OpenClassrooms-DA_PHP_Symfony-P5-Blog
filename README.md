@@ -1,146 +1,107 @@
 # Projet 5 du parcours développeur d'application PHP / Symfony chez OpenClassrooms
 
 ## Contexte
-Ça y est, vous avez sauté le pas ! Le monde du développement web avec PHP est à portée de main et vous avez besoin de visibilité pour pouvoir convaincre vos futurs employeurs/clients en un seul regard. Vous êtes développeur PHP, il est donc temps de montrer vos talents au travers d’un blog à vos couleurs.
 
-### Description du besoin
-Le projet est donc de développer votre blog professionnel. Ce site web se décompose en deux grands groupes de pages :
+Ce projet consiste en la réalisation d'un blog personnel PHP avec une une approche Orientée Objet.
+Globalement le blog doit inclure :
+   * une page d'accueil pour se présenter
+   * un espace de connexion & inscription pour les visiteurs
+   * une page listant les articles du blog
+   * une page présentant un article 
+   * une page permettant la rédaction d'un article
+   * un espace d'administration permettant de :
+        * modérer les commentaires
+        * gérer les articles
+        * gérer les utilisateurs
 
-les pages utiles à tous les visiteurs ;
-les pages permettant d’administrer votre blog.
-Voici la liste des pages qui devront être accessibles depuis votre site web :
+Les commentaires postés par les utilisateurs doivent être validés par l'administrateur / modérateur avant d'être rendu public
 
-la page d'accueil ;
-la page listant l’ensemble des blog posts ;
-la page affichant un blog post ;
-la page permettant d’ajouter un blog post ;
-la page permettant de modifier un blog post ;
-les pages permettant de modifier/supprimer un blog post ;
-les pages de connexion/enregistrement des utilisateurs.
-Vous développerez une partie administration qui devra être accessible uniquement aux utilisateurs inscrits et validés.
+# Installation du blog
 
-Les pages d’administration seront donc accessibles sur conditions et vous veillerez à la sécurité de la partie administration.
+## Prérequis
 
-Commençons par les pages utiles à tous les internautes.
+ * PHP 7.2.5 +
+ * MySQL 10 +
+ * [Composer](https://getcomposer.org/)
 
-Sur la page d’accueil, il faudra présenter les informations suivantes :
+## 1] Cloner le projet
 
-votre nom et votre prénom ;
-une photo et/ou un logo ;
-une phrase d’accroche qui vous ressemble (exemple : “Martin Durand, le développeur qu’il vous faut !”) ;
-un menu permettant de naviguer parmi l’ensemble des pages de votre site web ;
-un formulaire de contact (à la soumission de ce formulaire, un e-mail avec toutes ces informations vous sera envoyé) avec les champs suivants :
-nom/prénom,
-e-mail de contact,
-message,
-un lien vers votre CV au format PDF ;
-et l’ensemble des liens vers les réseaux sociaux où l’on peut vous suivre (GitHub, LinkedIn, Twitter…).
-Sur la page listant tous les blogs posts (du plus récent au plus ancien), il faut afficher les informations suivantes pour chaque blog post :
+Une fois rendu dans le dossier de votre choix
 
-le titre ;
-la date de dernière modification ;
-le châpo ;
-et un lien vers le blog post.
-Sur la page présentant le détail d’un blog post, il faut afficher les informations suivantes :
+### a] Via le terminal Git :
+```shell
+git clone https://github.com/maxence-bonnet/OpenClassrooms-DA_PHP_Symfony-P5-Blog.git
+```
+### a-bis] Ou en téléchargeant manuellement depuis le dépôt Github :
 
-le titre ;
-le chapô ;
-le contenu ;
-l’auteur ;
-la date de dernière mise à jour ;
-le formulaire permettant d’ajouter un commentaire (soumis pour validation) ;
-les listes des commentaires validés et publiés.
-Sur la page permettant de modifier un blog post, l’utilisateur a la possibilité de modifier les champs titre, chapô, auteur et contenu.
+Code -> Download ZIP -> puis extraire dans votre dossier
 
-Dans le footer menu, il doit figurer un lien pour accéder à l’administration du blog.
+#### Puis
 
-### Contraintes
-Cette fois-ci, nous n’utiliserons pas WordPress. Tout sera développé par vos soins. Les seules lignes de code qui pourront provenir d’ailleurs seront celles du thème Bootstrap, que vous prendrez grand soin de choisir. La présentation, ça compte ! Il est également autorisé d’utiliser une ou plusieurs librairies externes à condition qu’elles soient intégrées grâce à Composer.
+- Renommer le dossier qui contient les fichiers par "P5_blog" 
 
-Attention, votre blog doit être navigable aisément sur un mobile (téléphone mobile, phablette, tablette…). C’est indispensable ! C’est indispensable :D
-Nous vous conseillons vivement d’utiliser un moteur de templating tel que Twig, mais ce n’est pas obligatoire.
+#### Ou
 
-Sur la partie administration, vous veillerez à ce que seules les personnes ayant le droit “administrateur” aient l’accès ; les autres utilisateurs pourront uniquement commenter les articles (avec validation avant publication).
+- Dans le fichier .htaccess :
 
-Important : Vous vous assurerez qu’il n’y a pas de failles de sécurité (XSS, CSRF, SQL Injection, session hijacking, upload possible de script PHP…).
+remplacer la ligne : `RewriteBase /P5_blog/`
 
-Votre projet doit être poussé et disponible sur GitHub. Je vous conseille de travailler avec des pull requests. Dans la mesure où la majorité des communications concernant les projets sur GitHub se font en anglais, il faut que vos commits soient en anglais.
+par le nom de votre dossier : `RewriteBase /Nom_de_votre_dossier/`
 
-Vous devrez créer l’ensemble des issues (tickets) correspondant aux tâches que vous aurez à effectuer pour mener à bien le projet.
 
-Veillez à bien valider vos tickets pour vous assurer que ceux-ci couvrent bien toutes les demandes du projet. Donnez une estimation indicative en temps ou en points d’effort (si la méthodologie agile vous est familière) et tentez de tenir cette estimation.
+## 2] Installation des dépendances via composer
+```shell
+php composer.phar update
+```
 
-L’écriture de ces tickets vous permettra de vous accorder sur un vocabulaire commun. Il est fortement apprécié qu’ils soient écrits en anglais !
+## 3] Initialisation de la base de données
 
-### Nota Bene
-Votre projet devra être suivi via SymfonyInsight, ou Codacy pour la qualité du code. Vous veillerez à obtenir une médaille d'argent au minimum (pour SymfonyInsight). En complément, le respect des PSR est recommandé afin de proposer un code compréhensible et facilement évolutif.
+Mettre à jour le fichier `config/developpement.php` avec vos propres paramètres de connexion  :
 
-Si vous n’arrivez pas à vous décider sur le thème Bootstrap, en voici un qui pourrait vous convenir http://bit.ly/2emOTxY (source : startbootstrap.com).
+```php
+const HOST = 'localhost'; // adresse de l'hôte
+const DB_NAME = 'blog_maxence'; 
+const CHARSET = 'utf8';
+const DB_USER = 'root'; // identifiant utilisateur
+const DB_PASS = ''; // mot de passe utilisateur
+```
 
-Dans le cas où une fonctionnalité vous semblerait mal expliquée ou manquante, parlez-en avec votre mentor afin de prendre une décision ensemble concernant les choix que vous souhaiteriez faire. Ce qui doit prévaloir doit être les délais.
+### a]
+Exécuter dans un terminal le script php à dispositon pour créer la base de données :
 
-### De l'aide pour aborder le projet étape par étape
-Afin de fluidifier votre avancement voici une proposition de manière de travailler :
+```
+php .\SQL\importDataBase.php
+```
 
-Étape 1 - Prenez connaissance entièrement de l’énoncé et des spécifications détaillées.
-Étape 2 - Créez les diagrammes UML.
-Étape 3 - Créez le repository GitHub pour le projet.
-Étape 4 - Créez l’ensemble des issues sur le repository GitHub (https://github.com/username/nom_du_repo/issues/new).
-Étape 5 - Faites les estimations de l’ensemble de vos issues.
-Étape 6 - Entamez le développement de l’application et proposez des pull requests pour chacune des fonctionnalités/issues. (L’estimation se fera au fur et à mesure de votre développement et sera discutée avec votre mentor.)
-Étape 7 - Faites relire votre code à votre mentor (code proposé dans la ou les pull requests), et une fois validée(s) mergez la ou les pull requests dans la branche principale. (Cette relecture servira à valider votre implémentation des bonnes pratiques et la cohérence de votre code. La validation se fera en continu durant les sessions.)
-Étape 8 - Validez la qualité du code via SymfonyInsight ou Codacy.
-Étape 9 - Effectuez une démonstration de l’ensemble de l’application.
-Étape 10 - Préparez l’ensemble de vos livrables et soumettez-les sur la plateforme.
+### a-bis]
+Ou importer le fichier blog.sql directement sur PhpMyAdmin si disponnible
 
-Prenez le temps de valider chaque étape avec votre mentor afin de vous assurer que vous avancez dans la bonne direction ^^
-Livrables
-Un lien vers l’ensemble du projet (fichiers PHP/HTML/JS/CSS…) sur un repository GitHub
-Les instructions pour installer le projet (dans un fichier README à la racine du projet)
-Les schémas UML (au format PNG ou JPG dans un dossier nommé “diagrammes” à la racine du projet)
- diagrammes de cas d’utilisation
-diagramme de classes
- diagrammes de séquence
-Les issues sur le repository GitHub que vous aurez créé
-Un lien vers la dernière analyse SymfonyInsight ou Codacy (ou vers le projet public sur la plateforme)
 
-### Soutenance
-Il vous sera demandé de présenter le projet en soutenance.
+## 4] Utilisation
+Si tout s'est bien déroulé, le site devrait désormais être fonctionnel.
+Vous pouvez vous connecter avec le compte administrateur pour tester l'ensemble :
 
-Il vous est demandé de vous mettre en situation réelle : en effet, il s'agit d'un rendez-vous professionnel. Vous vous adresserez à un potentiel employeur qui vous aurait contacté pour un poste et qui vous demanderait donc de détailler votre travail.‌
+pseudo :  admin
 
-Voici, sous forme d'étapes, comment devrait se dérouler la soutenance :‌‌
+mot de passe : @Azerty1
 
-Étape 1 : Présentation du contexte du projet, analyse du besoin & organisation du projet
+En plus de ce qui est demandé, il est possible de :
 
-Présentation du contexte du projet : il s'agit de rappeler le contexte du projet dans le cadre du parcours que vous suivez.
-Analyse du besoin : vous choisirez l'une des fonctionnalités développées et il vous faudra présenter les schémas UML correspondants (diagrammes d’utilisation, de classes et de séquence).
-Organisation du projet : vous expliciterez la méthodologie adoptée, l'organisation de votre travail (découpage en tâches, priorisation, les estimations…).
-~ 10 minutes
+  * Filtrer les articles par mot clé ou par catégorie (page listant les articles)
+  * Répondre à un commentaire (hiérarchie commentaire / réponse)
+  * Un utilisateur peut modifier son propre commentaire ou le supprimer
+  * Accéder à la page de profil d'un utilisateur (en développement)
+  * Choisir un thème sur sa propre page de profil
+ 
+L'espace d'adminitration permet de faire des recherches précises (commentaires / articles / utilisateurs) avec un système de filtre flexible.
 
-Étape 2 : Démonstration de l'application
+## Pistes d'améliorations
 
-Il s'agit de présenter l'ensemble des fonctionnalités de l'application.‌
-
-~5 minutes
-
-Étape 3 : Exécution
-
-Vous présenterez le projet du point de vue technique cette fois-ci. Il s'agit de :
-
-montrer comment vous avez versionné votre projet ;
-présenter l'architecture technique que vous avez mise en place ;
-lister les librairies que vous avez choisies et expliquer comment vous les avez intégrées ;
-prendre une pull request correspondant à une tâche sur GitHub  et détailler comment vous avez mené à bien cette tâche ;
-présenter une analyse SymfonyInsight ou Codacy et expliquer les correctifs apportés ;
-comment vous avez procédé pour garantir la mise en place des bonnes pratiques en vigueur.‌
-~ 5 minutes
-
-Étape 4 :Questions-réponses
-
-Une session de questions-réponses autour de ce que vous aurez exposé sera à mener.‌‌
-
- ~ 10 minutes
-Total
-
-30 minutes maximum
+  * Ajouter une fonctionnalité de réaction (like / dislike / ...)
+  * Système de score utilisateur (fonction de l'activité / like)
+  * Finir d'implémenter les rôles Éditeur / Modérateur
+  * Gestion des catégories 
+  * Ajouter un journal d'activité (administration & utilisateur)
+  * Modifier et réninitialiser un mot de passe (utilisateur)
+  * Photo de profil et description / biographie (utilisateur)
+  * Revoir l'esthétique globale
